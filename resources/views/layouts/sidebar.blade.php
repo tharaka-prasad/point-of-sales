@@ -8,7 +8,6 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
                 <img src="{{ Auth::user()->profile_photo_path ? url(Auth::user()->profile_photo_path) : asset('admin/img/user2-160x160.jpg') }}"
@@ -86,6 +85,14 @@
                         <a href="{{ route('transaction.new') }}" class="nav-link">
                             <i class="nav-icon fas fa-cart-plus"></i>
                             <p>New Transaction</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-header">CASHIER</li>
+                    <li class="nav-item">
+                        <a href="{{ route('cashier.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-cash-register"></i>
+                            <p>Cashier</p>
                         </a>
                     </li>
 
