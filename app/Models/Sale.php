@@ -14,6 +14,7 @@ class Sale extends Model
         'pay',
         'accepted',
         'user_id',
+        'status'
     ];
 
     // Relation
@@ -25,5 +26,9 @@ class Sale extends Model
     public function user()
     {
         return $this->hasOne(User::class, "id", "user_id");
+    }
+    public function details()
+    {
+        return $this->hasMany(SaleDetail::class, "sale_id", "id");
     }
 }
