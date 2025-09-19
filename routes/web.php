@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\{
+    CashierController,
     CategoryController,
     DashboardController,
     ExpenseController,
@@ -79,6 +80,9 @@ Route::middleware([
 
         // Setting
         Route::resource('/setting', SettingController::class)->except("create", "store", "edit", "destroy");
+
+        Route::get('/cashier', [CashierController::class, "index"])->name("cashier.index");
+        Route::post('/cashier', [CashierController::class, "store"])->name("cashier.store");
     });
 
     // Transaction
