@@ -62,7 +62,7 @@
                 <td>
                     <div class="barcode-container">
                         <p class="product-name">{{ $product->name }}</p>
-                        <p class="product-price">Rp {{ indonesia_money_format($product->sell_price) }}</p>
+                        <p class="product-price">LKR {{ indonesia_money_format($product->sell_price) }}</p>
                         <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($product->code, 'C39') }}"
                             alt="{{ $product->code }}" width="100" height="50">
                         <p class="product-code">{{ $product->code }}</p>
