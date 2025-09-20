@@ -29,7 +29,7 @@ class SaleController extends Controller
             ->of($sales)
             ->addIndexColumn()
             ->addColumn("created_at", function ($sale) {
-                return indonesia_date($sale->created_at, false);
+                return lkr_date($sale->created_at, false);
             })
             ->addColumn("member_code", function ($sale) {
                 return "<span class='badge badge-success' style='font-size: 14px;'>" . ($sale->member->member_code ?? "") . "</span>";
@@ -38,13 +38,13 @@ class SaleController extends Controller
                 return $sale->total_item;
             })
             ->addColumn("total_price", function ($sale) {
-                return indonesia_money_format($sale->total_price);
+                return lkr_money_format($sale->total_price);
             })
             ->addColumn("discount", function ($sale) {
                 return $sale->discount;
             })
             ->addColumn("total_pay", function ($sale) {
-                return indonesia_money_format($sale->pay);
+                return lkr_money_format($sale->pay);
             })
             ->addColumn("cashier", function ($sale) {
                 return $sale->user->name ?? "";
@@ -132,13 +132,13 @@ class SaleController extends Controller
                 return $detail->product->name;
             })
             ->addColumn("sale_price", function ($detail) {
-                return indonesia_money_format($detail->sale_price);
+                return lkr_money_format($detail->sale_price);
             })
             ->addColumn("amount", function ($detail) {
                 return $detail->amount;
             })
             ->addColumn("sub_total", function ($detail) {
-                return indonesia_money_format($detail->sub_total);
+                return lkr_money_format($detail->sub_total);
             })
             ->make(true);
     }

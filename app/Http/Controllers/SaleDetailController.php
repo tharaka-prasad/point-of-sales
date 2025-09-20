@@ -52,9 +52,9 @@ class SaleDetailController extends Controller
             $row_data = [
                 "product_code" => "<span class='badge badge-success' style='font-size: 14px;'>" . $detail->product->code . "</span>",
                 "product_name" => $detail->product->name,
-                "sale_price" => indonesia_money_format($detail->sale_price),
+                "sale_price" => lkr_money_format($detail->sale_price),
                 "amount" => "<input type='number' data-id='" . $detail->id . "' class='form-control input-sm edit_amount' id='edit_amount_" . $detail->id . "' value='" . $detail->amount . "' min='1'>",
-                "sub_total" => indonesia_money_format($detail->sub_total),
+                "sub_total" => lkr_money_format($detail->sub_total),
                 "action" => "
                     <div class='btn-group'>
                         <button class='btn btn-xs btn-danger' onclick='deleteSaleDetail(`" . route("transaction.destroy", $detail->id) . "`)'>
@@ -136,11 +136,11 @@ class SaleDetailController extends Controller
         $pay_back = ($accepted != 0) ? ($accepted - $pay) : 0;
 
         $data = [
-            "total_rp" => indonesia_money_format($total),
+            "total_rp" => lkr_money_format($total),
             "pay" => $pay,
-            "pay_rp" => indonesia_money_format($pay),
+            "pay_rp" => lkr_money_format($pay),
             "show_text" => ucwords(number_in_words($pay) . " Rupiah"),
-            "back_rp" => indonesia_money_format($pay_back),
+            "back_rp" => lkr_money_format($pay_back),
             "back_show_text" => ucwords(number_in_words($pay_back) . " Rupiah"),
         ];
 

@@ -68,20 +68,20 @@
 </head>
 
 <body>
-    <h3 class="text-center">Laporan Pendapatan</h3>
+    <h3 class="text-center">Ekrain Technologies & Solutions (Pvt) Ltd</h3>
     <h4 class="text-center">
-        Tanggal : {{ indonesia_date($first_date, false) }} s/d {{ indonesia_date($last_date, false) }}
+        Date : {{ lkr_date($first_date, false) }} s/d {{ lkr_date($last_date, false) }}
     </h4>
 
     <table class="table table-striped text-center">
         <thead>
             <tr>
                 <th width="5%">No.</th>
-                <th width="20%">Tanggal</th>
-                <th>Penjualan</th>
-                <th>Pembelian</th>
-                <th>Pengeluaran</th>
-                <th>Pendapatan</th>
+                <th width="20%">Date</th>
+                <th>Sale</th>
+                <th>Purchase</th>
+                <th>Production</th>
+                <th>Income</th>
             </tr>
         </thead>
         <tbody>
