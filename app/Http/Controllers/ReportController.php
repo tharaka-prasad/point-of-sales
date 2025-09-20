@@ -56,11 +56,11 @@ class ReportController extends Controller
 
             $row = [];
             $row["DT_RowIndex"] = $counter;
-            $row["date"] = indonesia_date($date, false);
-            $row["sale"] = indonesia_money_format($total_sale);
-            $row["purchase"] = indonesia_money_format($total_purchase);
-            $row["expense"] = indonesia_money_format($total_expense);
-            $row["income"] = indonesia_money_format($income);
+            $row["date"] = lkr_date($date, false);
+            $row["sale"] = lkr_money_format($total_sale);
+            $row["purchase"] = lkr_money_format($total_purchase);
+            $row["expense"] = lkr_money_format($total_expense);
+            $row["income"] = lkr_money_format($income);
 
             $data[] = $row;
 
@@ -72,8 +72,8 @@ class ReportController extends Controller
             "date" => "",
             "sale" => "",
             "purchase" => "",
-            "expense" => "Total Pendapatan",
-            "income" => indonesia_money_format($total_income),
+            "expense" => "Total Income",
+            "income" => lkr_money_format($total_income),
         ];
 
         $data_collection = collect($data);

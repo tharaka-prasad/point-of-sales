@@ -29,7 +29,7 @@ class PurchaseController extends Controller
             ->of($purchases)
             ->addIndexColumn()
             ->addColumn("created_at", function ($purchase) {
-                return indonesia_date($purchase->created_at, false);
+                return lkr_date($purchase->created_at, false);
             })
             ->addColumn("supplier", function ($purchase) {
                 return $purchase->supplier->name;
@@ -38,13 +38,13 @@ class PurchaseController extends Controller
                 return $purchase->total_item;
             })
             ->addColumn("total_price", function ($purchase) {
-                return indonesia_money_format($purchase->total_price);
+                return lkr_money_format($purchase->total_price);
             })
             ->addColumn("discount", function ($purchase) {
                 return $purchase->discount;
             })
             ->addColumn("pay", function ($purchase) {
-                return indonesia_money_format($purchase->pay);
+                return lkr_money_format($purchase->pay);
             })
             ->addColumn("action", function ($purchase) {
                 return "
@@ -119,13 +119,13 @@ class PurchaseController extends Controller
                 return $detail->product->name;
             })
             ->addColumn("purchase_price", function ($detail) {
-                return indonesia_money_format($detail->purchase_price);
+                return lkr_money_format($detail->purchase_price);
             })
             ->addColumn("amount", function ($detail) {
                 return $detail->amount;
             })
             ->addColumn("sub_total", function ($detail) {
-                return indonesia_money_format($detail->sub_total);
+                return lkr_money_format($detail->sub_total);
             })
             ->make(true);
     }
