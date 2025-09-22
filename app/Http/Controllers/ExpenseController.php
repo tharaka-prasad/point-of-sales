@@ -22,10 +22,10 @@ class ExpenseController extends Controller
             ->of($expenses)
             ->addIndexColumn()
             ->addColumn("created_at", function ($expense) {
-                return indonesia_date($expense->created_at, false);
+                return lkr_date($expense->created_at, false);
             })
             ->addColumn("amount", function ($expense) {
-                return indonesia_money_format($expense->amount);
+                return lkr_money_format($expense->amount);
             })
             ->addColumn("action", function ($expense) {
                 return "

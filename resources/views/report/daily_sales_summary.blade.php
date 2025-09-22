@@ -42,11 +42,12 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Date</th>
-                                        <th>Sale (Rs)</th>
-                                        <th>Purchase (Rs)</th>
-                                        <th>Expense (Rs)</th>
-                                        <th>Income (Rs)</th>
+                                        <th>Item Name</th>
+                                        <th>Category</th>
+                                        <th>Current Qty</th>
+                                        <th>Reorder Level</th>
+                                        <th>Supplier</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                             </table>

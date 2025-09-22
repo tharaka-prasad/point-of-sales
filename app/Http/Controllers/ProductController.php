@@ -34,10 +34,10 @@ class ProductController extends Controller
                 return "<span class='badge badge-success' style='font-size: 14px;'>" . $product->code . "</span>";
             })
             ->addColumn("price", function ($product) {
-                return indonesia_money_format($product->price);
+                return lkr_money_format($product->price);
             })
             ->addColumn("sell_price", function ($product) {
-                return indonesia_money_format($product->sell_price);
+                return lkr_money_format($product->sell_price);
             })
             ->addColumn('category', function ($product) {
                 return $product->category ? $product->category->name : '';

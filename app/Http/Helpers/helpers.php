@@ -1,79 +1,99 @@
 <?php
-
-// Money Format: IDR
-function indonesia_money_format($number)
+// Money Format: LKR
+function lkr_money_format($number)
 {
-    return number_format($number, 0, ".", ".");
+    $num = (float) $number; // cast string/other to float
+    return 'Rs. ' . number_format($num, 2, '.', ',');
 }
 
-// Number in Words
+//I was change it you can use this function for invoice to read number
+//if you want Sinhala/Tamil/LKR words, let me know and I’ll rewrite)
 function number_in_words($number)
 {
-    $read = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
+    $units = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+    $tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+    $teens = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
 
-    // < 0
-    if ($number < 0) {
-        return "-";
+    if ($number == 0) return "zero rupees";
+    if ($number < 0) return "minus " . number_in_words(abs($number));
+
+    // Separate rupees and cents
+    $rupees = floor($number);
+    $cents = round(($number - $rupees) * 100);
+
+    $result = "";
+
+    // Process rupees
+    if ($rupees >= 5000) {
+        $result .= number_in_words(floor($rupees / 5000)) . " thousand ";
+        $rupees %= 5000;
     }
 
-    // 1-11
-    if ($number < 12) {
-        return $read[$number];
+    if ($rupees >= 1000) {
+        $result .= number_in_words(floor($rupees / 1000)) . " thousand ";
+        $rupees %= 1000;
     }
 
-    // 12-19
-    if ($number < 20) {
-        return $read[$number - 10] . " belas";
+    if ($rupees >= 500) {
+        $result .= number_in_words(floor($rupees / 500)) . " five hundred ";
+        $rupees %= 500;
     }
 
-    // 20-99
-    if ($number < 100) {
-        $tens = floor($number / 10);
-        $ones = $number % 10;
-        return $read[$tens] . " puluh" . ($ones > 0 ? " " . $read[$ones] : "");
+    if ($rupees >= 100) {
+        $result .= number_in_words(floor($rupees / 100)) . " hundred ";
+        $rupees %= 100;
     }
 
-    // 100-199
-    if ($number < 200) {
-        return "seratus" . ($number > 100 ? " " . number_in_words($number - 100) : "");
+    if ($rupees >= 20) {
+        $result .= $tens[floor($rupees / 10)] . " ";
+        $rupees %= 10;
+    } elseif ($rupees >= 10) {
+        $result .= $teens[$rupees - 10] . " ";
+        $rupees = 0;
     }
 
-    // 200-999
-    if ($number < 1000) {
-        $hundreds = floor($number / 100);
-        $remainder = $number % 100;
-        return $read[$hundreds] . " ratus" . ($remainder > 0 ? " " . number_in_words($remainder) : "");
+    if ($rupees > 0) {
+        $result .= $units[$rupees] . " ";
     }
 
-    // 1000-1999
-    if ($number < 2000) {
-        return "seribu" . ($number > 1000 ? " " . number_in_words($number - 1000) : "");
+    $result = trim($result) . " rupees";
+
+    // Process cents if present
+    if ($cents > 0) {
+        $cent_words = "";
+
+        if ($cents >= 20) {
+            $cent_words .= $tens[floor($cents / 10)] . " ";
+            $cents %= 10;
+        } elseif ($cents >= 10) {
+            $cent_words .= $teens[$cents - 10] . " ";
+            $cents = 0;
+        }
+
+        if ($cents > 0) {
+            $cent_words .= $units[$cents] . " ";
+        }
+
+        $result .= " and " . trim($cent_words) . " cents";
     }
 
-    // 2000-999.999
-    if ($number < 1000000) {
-        return number_in_words(floor($number / 1000)) . " ribu" . ($number % 1000 > 0 ? " " . number_in_words($number % 1000) : "");
-    }
-
-    // 1.000.000-999.999.999
-    if ($number < 1000000000) {
-        return number_in_words(floor($number / 1000000)) . " juta" . ($number % 1000000 > 0 ? " " . number_in_words($number % 1000000) : "");
-    }
-
-    return "";
+    return $result;
 }
 
-// Indonesian Date Format
-function indonesia_date($dt, $day_show = true)
+
+// Sri Lankan Date Format
+function lkr_date($dt, $day_show = true)
 {
-    $day_name = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu"];
-    $month_name = [1 => "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    $day_name = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    $month_name = [1 => "January", "February", "March", "April", "May", "June",
+                   "July", "August", "September", "October", "November", "December"];
 
     $dt_obj = new DateTime($dt);
     $day = $day_show ? $day_name[$dt_obj->format('w')] . ', ' : '';
     $formattedDate = $dt_obj->format('d') . ' ' . $month_name[(int)$dt_obj->format('m')] . ' ' . $dt_obj->format('Y');
+    $time = $dt_obj->format('h:i A'); // 12-hour with AM/PM
 
-    return $day . $formattedDate;
+    return $day . $formattedDate . ', ' . $time;
 }
 
 //

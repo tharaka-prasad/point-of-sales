@@ -11,9 +11,10 @@
 
 @section('content')
     <div class="container-fluid">
+        <!-- Top-row -->
         <div class="row">
             <div class="col-lg-3 col-6">
-                <!-- small box -->
+                <!-- box_1 -->
                 <div class="small-box bg-info ">
                     <div class="inner">
                         <h3>{{ $total_category }}</h3>
@@ -28,7 +29,7 @@
                 </div>
             </div>
             <div class="col-lg-3 col-6">
-                <!-- small box -->
+                <!-- box_2 -->
                 <div class="small-box bg-success">
                     <div class="inner">
                         <h3>{{ $total_product }}</h3>
@@ -43,7 +44,7 @@
                 </div>
             </div>
             <div class="col-lg-3 col-6">
-                <!-- small box -->
+                <!-- box_3 -->
                 <div class="small-box bg-danger">
                     <div class="inner">
                         <h3>{{ $total_member }}</h3>
@@ -58,7 +59,7 @@
                 </div>
             </div>
             <div class="col-lg-3 col-6">
-                <!-- small box -->
+                <!-- box_4 -->
                 <div class="small-box bg-warning">
                     <div class="inner">
                         <h3>{{ $total_supplier }}</h3>
@@ -73,7 +74,7 @@
                 </div>
             </div>
         </div>
-
+            <!-- second row -->
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
