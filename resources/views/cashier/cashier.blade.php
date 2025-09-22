@@ -170,19 +170,23 @@ document.getElementById('customerSelect').addEventListener('change', function() 
 });
 
 // Contact auto-fill
-document.getElementById('customerContact').addEventListener('input', function() {
-    const contact = this.value.trim();
-    const customer = customers.find(c => c.phone === contact);
-    if (customer) {
-        document.getElementById('customerId').value = customer.id;
-        document.getElementById('customerAddress').value = customer.address;
-        document.getElementById('customerSelect').value = customer.id;
-    } else {
-        document.getElementById('customerId').value = '';
-        document.getElementById('customerAddress').value = '';
-        document.getElementById('customerSelect').value = '';
-    }
-});
+document.getElementById('customerContact').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // form submit wenna nawaththanna
+            const contact = this.value.trim();
+            const customer = customers.find(c => c.phone === contact);
+
+            if (customer) {
+                document.getElementById('customerId').value = customer.id;
+                document.getElementById('customerAddress').value = customer.address;
+                document.getElementById('customerSelect').value = customer.id;
+            } else {
+                document.getElementById('customerId').value = '';
+                document.getElementById('customerAddress').value = '';
+                document.getElementById('customerSelect').value = '';
+            }
+        }
+    });
 
 // Add Customer modal
 function addMember(url) {
