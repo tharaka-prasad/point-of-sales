@@ -174,7 +174,7 @@
         // Contact auto-fill
         document.getElementById('customerContact').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
-                e.preventDefault(); 
+                e.preventDefault();
                 const contact = this.value.trim();
                 const customer = customers.find(c => c.phone === contact);
 
@@ -285,7 +285,7 @@
             let totalAmount = 0;
 
             const rows = document.querySelectorAll('#productsTable tbody tr');
-            totalItems = rows.length; // product rows count karanawa
+            totalItems = rows.length;
 
             rows.forEach(row => {
                 const subtotal = parseFloat(row.querySelector('.subtotal').textContent) || 0;
