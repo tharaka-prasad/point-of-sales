@@ -2,7 +2,7 @@
 
 @section('title')
     <h3>{{ $menu }}</h3>
-    <h4 class="mb-0">{{ indonesia_date($first_date, false) }} - {{ indonesia_date($last_date, false) }}</h4>
+    <h4 class="mb-0">{{ lkr_date($first_date, false) }} - {{ lkr_date($last_date, false) }}</h4>
 @endsection
 
 @push('css_detail')
@@ -43,10 +43,10 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Date</th>
-                                        <th>Sale (Rp)</th>
-                                        <th>Purchase (Rp)</th>
-                                        <th>Expense (Rp)</th>
-                                        <th>Income (Rp)</th>
+                                        <th>Sale (Rs)</th>
+                                        <th>Purchase (Rs)</th>
+                                        <th>Expense (Rs)</th>
+                                        <th>Income (Rs)</th>
                                     </tr>
                                 </thead>
                             </table>
