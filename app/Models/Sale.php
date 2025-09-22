@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +13,13 @@ class Sale extends Model
         'pay',
         'accepted',
         'user_id',
-        'status'
+        'status',
+        'product_ids',
+        'return_products',
+    ];
+    protected $casts = [
+        'product_ids'     => 'array',
+        'return_products' => 'array',
     ];
 
     // Relation
