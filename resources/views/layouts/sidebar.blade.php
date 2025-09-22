@@ -182,10 +182,6 @@
                         </a>
                     </li>
 
-
-
-
-
                     <li class="nav-header">USER MANAGEMENT</li>
                     <li class="nav-item">
                         <a href="{{ route('user.index') }}" class="nav-link">
