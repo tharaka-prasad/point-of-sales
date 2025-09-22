@@ -87,6 +87,12 @@
                             <p>New Transaction</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('transaction.new') }}" class="nav-link">
+                            <i class="nav-icon fas fa-cart-plus"></i>
+                            <p>GRN</p>
+                        </a>
+                    </li>
 
                     <li class="nav-header">CASHIER</li>
                     <li class="nav-item">
