@@ -1,22 +1,19 @@
 <?php
 
-use App\Http\Controllers\{
-    CashierController,
-    CategoryController,
-    DashboardController,
-    ExpenseController,
-    MemberController,
-    ProductController,
-    PurchaseController,
-    PurchaseDetailController,
-    ReportController,
-    SaleController,
-    SaleDetailController,
-    SettingController,
-    SupplierController,
-    UserController,
-};
-
+use App\Http\Controllers\CashierController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\PurchaseDetailController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SaleDetailController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Login
@@ -84,6 +81,8 @@ Route::middleware([
         // Cashier
         Route::get('/cashier', [CashierController::class, "index"])->name("cashier.index");
         Route::post('/cashier', [CashierController::class, "store"])->name("cashier.store");
+        Route::get('/cashier/print/{sale}', [CashierController::class, 'print'])->name('cashier.print');
+
     });
 
     // Transaction
