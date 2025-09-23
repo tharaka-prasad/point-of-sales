@@ -89,7 +89,7 @@ class ReportController extends Controller
             ->of($data)
             ->make(true);
     }
-
+//this function for print pdf
     public function exportPdf($first_date, $last_date)
     {
         $data = $this->getData($first_date, $last_date);
