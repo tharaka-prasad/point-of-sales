@@ -75,7 +75,7 @@
                             <p>Sale</p>
                         </a>
                     </li>
-                    {{-- <li class="nav-item">
+                    <li class="nav-item">
                         <a href="{{ route('transaction.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-cart-arrow-down"></i>
                             <p>Active Transaction</p>
@@ -86,7 +86,7 @@
                             <i class="nav-icon fas fa-cart-plus"></i>
                             <p>New Transaction</p>
                         </a>
-                    </li> --}}
+                    </li>
 
                     <li class="nav-header">CASHIER</li>
                     <li class="nav-item">
