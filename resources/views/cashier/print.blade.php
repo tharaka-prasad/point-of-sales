@@ -13,9 +13,6 @@
                 <small>{{ $created_at }}</small>
             </div>
             <div>
-                <a href="{{ route('cashier.pdf', $sale->id) }}" class="btn btn-success me-2">
-                    <i class="fas fa-file-pdf"></i> Download PDF
-                </a>
                 <button class="btn btn-light" onclick="window.print()">
                     <i class="fas fa-print"></i> Print
                 </button>

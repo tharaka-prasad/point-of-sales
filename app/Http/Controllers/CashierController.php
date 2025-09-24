@@ -79,7 +79,7 @@ class CashierController extends Controller
             'return_products' => [],
         ]);
 
-        // ✅ Save details only if complete
+        // ✅ Save details + reduce stock only if complete
         if ($status === 'complete' && $request->products) {
             foreach ($request->products as $product) {
                 SaleDetail::create([
@@ -91,8 +91,10 @@ class CashierController extends Controller
                     'sub_total'  => $product['sub_total'],
                 ]);
 
-                // Reduce stock
-                Product::where('id', $product['id'])->decrement('stock', $product['amount']);
+                // Reduce stock safely
+                $productModel = Product::findOrFail($product['id']);
+                $productModel->stock -= $product['amount'];
+                $productModel->save();
             }
         }
 
@@ -105,6 +107,7 @@ class CashierController extends Controller
 
         return redirect()->route('cashier.index')->with('success', "Sale {$status} successfully!");
     }
+
     public function print($id)
     {
         $sale = Sale::with(['member', 'details.product'])->findOrFail($id);
