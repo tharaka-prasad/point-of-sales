@@ -65,20 +65,18 @@
                                 </div>
                             </div>
 
-                            <!-- Product Section (barcode + product select) -->
+                            <!-- Product Section -->
                             <div class="row mb-2">
                                 <div class="col-md-6">
                                     <label>Barcode / Product</label>
-                                    <!-- Barcode input -->
                                     <input type="text" id="barcodeInput" class="form-control"
                                         placeholder="Scan or type barcode">
-
-                                    <!-- Product select -->
                                     <select id="productSelect" class="form-control mt-1">
                                         <option value="">-- Select Product --</option>
                                         @foreach ($products as $product)
                                             <option value="{{ $product->id }}"
-                                                data-sell_price="{{ $product->sell_price }}">
+                                                data-sell_price="{{ $product->sell_price }}"
+                                                data-discount="{{ $product->discount ?? 0 }}">
                                                 {{ $product->name }} ({{ $product->sell_price }})
                                             </option>
                                         @endforeach
@@ -104,6 +102,7 @@
                                             <th>Product Name</th>
                                             <th>S.P</th>
                                             <th>Qty</th>
+                                            <th>Discount</th>
                                             <th>SubTotal</th>
                                             <th>Action</th>
                                         </tr>
@@ -158,7 +157,7 @@
 @push('scripts')
 <script>
     const customers = @json($customers);
-    const products = @json($products); // include 'code'
+    const products = @json($products);
 
     // Customer select
     document.getElementById('customerSelect').addEventListener('change', function() {
@@ -191,11 +190,8 @@
     const productSelect = document.getElementById('productSelect');
     const qtyInput = document.getElementById('qty');
 
-    // prevent barcode Enter from submitting form
     barcodeInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-        }
+        if (e.key === 'Enter') e.preventDefault();
     });
 
     barcodeInput.addEventListener('input', function() {
@@ -205,11 +201,9 @@
         if (product) {
             productSelect.value = product.id;
             qtyInput.value = 1;
-            // do NOT auto-add
         }
     });
 
-    // reflect product select into barcode
     productSelect.addEventListener('change', function() {
         const productId = this.value;
         if (!productId) {
@@ -228,11 +222,12 @@
         const productId = selected.value;
         const productName = selected.text;
         const sellPrice = parseFloat(selected.getAttribute('data-sell_price')) || 0;
+        const discount = parseFloat(selected.getAttribute('data-discount')) || 0;
         const qty = parseInt(qtyInput.value) || 1;
 
         if (!productId) return alert('Please select a product.');
 
-        const subtotal = sellPrice * qty;
+        const subtotal = (sellPrice - discount) * qty;
         const tableBody = document.querySelector('#productsTable tbody');
 
         const row = document.createElement('tr');
@@ -241,6 +236,8 @@
             <td>${productName}</td>
             <td>${sellPrice.toFixed(2)}<input type="hidden" name="products[${productId}][sale_price]" value="${sellPrice.toFixed(2)}"></td>
             <td>${qty}<input type="hidden" name="products[${productId}][amount]" value="${qty}"></td>
+            <td><input type="number" class="form-control discountInput" value="${discount}" min="0" style="width:80px"
+                name="products[${productId}][discount]"></td>
             <td class="subtotal">${subtotal.toFixed(2)}<input type="hidden" name="products[${productId}][sub_total]" value="${subtotal.toFixed(2)}"></td>
             <td><button type="button" class="btn btn-sm btn-danger removeRow">X</button></td>
         `;
@@ -257,6 +254,20 @@
     document.querySelector('#productsTable').addEventListener('click', function(e) {
         if (e.target.classList.contains('removeRow')) {
             e.target.closest('tr').remove();
+            updateTotals();
+        }
+    });
+
+    // Discount change listener
+    document.querySelector('#productsTable').addEventListener('input', function(e) {
+        if (e.target.classList.contains('discountInput')) {
+            const row = e.target.closest('tr');
+            const price = parseFloat(row.querySelector('td:nth-child(3)').textContent) || 0;
+            const qty = parseInt(row.querySelector('td:nth-child(4)').textContent) || 0;
+            const discount = parseFloat(e.target.value) || 0;
+            const subtotal = (price - discount) * qty;
+            row.querySelector('.subtotal').textContent = subtotal.toFixed(2);
+            row.querySelector('input[name$="[sub_total]"]').value = subtotal.toFixed(2);
             updateTotals();
         }
     });
