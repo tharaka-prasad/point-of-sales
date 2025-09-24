@@ -65,11 +65,16 @@
                                 </div>
                             </div>
 
-                            <!-- Product Section -->
+                            <!-- Product Section (barcode + product select) -->
                             <div class="row mb-2">
                                 <div class="col-md-6">
-                                    <label>Product</label>
-                                    <select id="productSelect" class="form-control">
+                                    <label>Barcode / Product</label>
+                                    <!-- Barcode input -->
+                                    <input type="text" id="barcodeInput" class="form-control"
+                                        placeholder="Scan or type barcode">
+
+                                    <!-- Product select -->
+                                    <select id="productSelect" class="form-control mt-1">
                                         <option value="">-- Select Product --</option>
                                         @foreach ($products as $product)
                                             <option value="{{ $product->id }}"
@@ -82,8 +87,7 @@
                                 <div class="col-md-6">
                                     <label>Quantity</label>
                                     <div class="input-group">
-                                        <input type="number" class="form-control" id="qty" value="1"
-                                            min="1">
+                                        <input type="number" class="form-control" id="qty" value="1" min="1">
                                         <button type="button" class="btn btn-success" id="addProduct">
                                             <i class="fas fa-plus"></i> Add
                                         </button>
@@ -120,7 +124,7 @@
                         <div class="card mb-4 p-3">
                             <div class="mb-2">
                                 <label>Invoice No:</label>
-                                <span class="badge bg-warning">IN00000502</span>
+                                <span class="badge bg-warning" id="invoiceNumber">IN00000502</span>
                             </div>
                             <div class="mb-2">
                                 <label>Cash</label>
@@ -133,11 +137,13 @@
                             </div>
                             <div class="d-grid gap-2">
                                 <button class="btn btn-primary" type="submit"
-                                    onclick="document.getElementById('saleForm').action='{{ route('cashier.store') }}'; document.getElementById('saleForm').insertAdjacentHTML('beforeend','<input type=hidden name=action value=save>');">Save</button>
+                                    onclick="document.getElementById('saleForm').insertAdjacentHTML('beforeend','<input type=hidden name=action value=save>');">Save</button>
                                 <button class="btn btn-success" type="submit"
-                                    onclick="document.getElementById('saleForm').action='{{ route('cashier.store') }}'; document.getElementById('saleForm').insertAdjacentHTML('beforeend','<input type=hidden name=action value=print>');">Print</button>
-                                <button class="btn btn-secondary">Find</button> <button class="btn btn-info">Adv</button>
-                                <button class="btn btn-warning">Ret</button> <button class="btn btn-danger">Cancel</button>
+                                    onclick="document.getElementById('saleForm').insertAdjacentHTML('beforeend','<input type=hidden name=action value=print>');">Print</button>
+                                <button class="btn btn-secondary">Find</button>
+                                <button class="btn btn-info">Adv</button>
+                                <button class="btn btn-warning">Ret</button>
+                                <button type="button" class="btn btn-danger" id="cancelButton">Cancel</button>
                             </div>
                         </div>
                     </div>
@@ -150,103 +156,164 @@
 @endsection
 
 @push('scripts')
-    <script>
-        const customers = @json($customers);
+<script>
+    const customers = @json($customers);
+    const products = @json($products); // include 'code'
 
-        // Customer select
-        document.getElementById('customerSelect').addEventListener('change', function() {
-            const selected = this.options[this.selectedIndex];
-            document.getElementById('customerId').value = selected.value;
-            document.getElementById('customerAddress').value = selected.getAttribute('data-address') || '';
-            document.getElementById('customerContact').value = selected.getAttribute('data-contact') || '';
-        });
+    // Customer select
+    document.getElementById('customerSelect').addEventListener('change', function() {
+        const selected = this.options[this.selectedIndex];
+        document.getElementById('customerId').value = selected.value;
+        document.getElementById('customerAddress').value = selected.getAttribute('data-address') || '';
+        document.getElementById('customerContact').value = selected.getAttribute('data-contact') || '';
+    });
 
-        // Contact auto-fill
-        document.getElementById('customerContact').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const contact = this.value.trim();
-                const customer = customers.find(c => c.phone === contact);
-                if (customer) {
-                    document.getElementById('customerId').value = customer.id;
-                    document.getElementById('customerAddress').value = customer.address;
-                    document.getElementById('customerSelect').value = customer.id;
-                } else {
-                    document.getElementById('customerId').value = '';
-                    document.getElementById('customerAddress').value = '';
-                    document.getElementById('customerSelect').value = '';
-                }
+    // Contact Enter
+    document.getElementById('customerContact').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const contact = this.value.trim();
+            const customer = customers.find(c => c.phone == contact);
+            if (customer) {
+                document.getElementById('customerId').value = customer.id;
+                document.getElementById('customerAddress').value = customer.address;
+                document.getElementById('customerSelect').value = customer.id;
+            } else {
+                document.getElementById('customerId').value = '';
+                document.getElementById('customerAddress').value = '';
+                document.getElementById('customerSelect').value = '';
             }
-        });
+        }
+    });
 
-        // Add product
-        document.getElementById('addProduct').addEventListener('click', function() {
-            const productSelect = document.getElementById('productSelect');
-            const qtyInput = document.getElementById('qty');
-            const tableBody = document.querySelector('#productsTable tbody');
+    // Barcode logic
+    const barcodeInput = document.getElementById('barcodeInput');
+    const productSelect = document.getElementById('productSelect');
+    const qtyInput = document.getElementById('qty');
 
-            const selected = productSelect.options[productSelect.selectedIndex];
-            const productId = selected.value;
-            const productName = selected.text;
-            const sellPrice = parseFloat(selected.getAttribute('data-sell_price')) || 0;
-            const qty = parseInt(qtyInput.value) || 1;
+    // prevent barcode Enter from submitting form
+    barcodeInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    });
 
-            if (!productId) return alert('Please select a product.');
-
-            const subtotal = sellPrice * qty;
-
-            const row = document.createElement('tr');
-            row.innerHTML = `
-        <td>${productId}<input type="hidden" name="products[${productId}][id]" value="${productId}"></td>
-        <td>${productName}</td>
-        <td>${sellPrice.toFixed(2)}<input type="hidden" name="products[${productId}][sale_price]" value="${sellPrice.toFixed(2)}"></td>
-        <td>${qty}<input type="hidden" name="products[${productId}][amount]" value="${qty}"></td>
-        <td class="subtotal">${subtotal.toFixed(2)}<input type="hidden" name="products[${productId}][sub_total]" value="${subtotal.toFixed(2)}"></td>
-        <td><button type="button" class="btn btn-sm btn-danger removeRow">X</button></td>
-    `;
-            tableBody.appendChild(row);
+    barcodeInput.addEventListener('input', function() {
+        const code = this.value.trim();
+        if (!code) return;
+        const product = products.find(p => String(p.code) === String(code));
+        if (product) {
+            productSelect.value = product.id;
             qtyInput.value = 1;
+            // do NOT auto-add
+        }
+    });
+
+    // reflect product select into barcode
+    productSelect.addEventListener('change', function() {
+        const productId = this.value;
+        if (!productId) {
+            barcodeInput.value = '';
+            return;
+        }
+        const product = products.find(p => String(p.id) === String(productId));
+        if (product) {
+            barcodeInput.value = product.code || '';
+        }
+    });
+
+    // Add product
+    document.getElementById('addProduct').addEventListener('click', function() {
+        const selected = productSelect.options[productSelect.selectedIndex];
+        const productId = selected.value;
+        const productName = selected.text;
+        const sellPrice = parseFloat(selected.getAttribute('data-sell_price')) || 0;
+        const qty = parseInt(qtyInput.value) || 1;
+
+        if (!productId) return alert('Please select a product.');
+
+        const subtotal = sellPrice * qty;
+        const tableBody = document.querySelector('#productsTable tbody');
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${productId}<input type="hidden" name="products[${productId}][id]" value="${productId}"></td>
+            <td>${productName}</td>
+            <td>${sellPrice.toFixed(2)}<input type="hidden" name="products[${productId}][sale_price]" value="${sellPrice.toFixed(2)}"></td>
+            <td>${qty}<input type="hidden" name="products[${productId}][amount]" value="${qty}"></td>
+            <td class="subtotal">${subtotal.toFixed(2)}<input type="hidden" name="products[${productId}][sub_total]" value="${subtotal.toFixed(2)}"></td>
+            <td><button type="button" class="btn btn-sm btn-danger removeRow">X</button></td>
+        `;
+        tableBody.appendChild(row);
+
+        qtyInput.value = 1;
+        productSelect.value = '';
+        barcodeInput.value = '';
+
+        updateTotals();
+    });
+
+    // Remove product row
+    document.querySelector('#productsTable').addEventListener('click', function(e) {
+        if (e.target.classList.contains('removeRow')) {
+            e.target.closest('tr').remove();
             updateTotals();
-        });
-
-        // Remove row
-        document.querySelector('#productsTable').addEventListener('click', function(e) {
-            if (e.target.classList.contains('removeRow')) {
-                e.target.closest('tr').remove();
-                updateTotals();
-            }
-        });
-
-        // Totals & balance
-        function updateTotals() {
-            let totalAmount = 0,
-                totalItems = 0;
-            const rows = document.querySelectorAll('#productsTable tbody tr');
-            rows.forEach(row => {
-                const subtotal = parseFloat(row.querySelector('.subtotal').textContent) || 0;
-                const qty = parseInt(row.querySelector('td:nth-child(4)').textContent) || 0;
-                totalAmount += subtotal;
-                totalItems += qty;
-            });
-
-            document.getElementById('totalItems').textContent = totalItems;
-            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
-            document.getElementById('totalItemInput').value = totalItems;
-            document.getElementById('totalPriceInput').value = totalAmount.toFixed(2);
-
-            updateBalance();
         }
+    });
 
-        function updateBalance() {
-            const cash = parseFloat(document.getElementById('cashInput').value) || 0;
-            const total = parseFloat(document.getElementById('totalAmount').textContent) || 0;
-            const balance = cash - total;
+    // Totals
+    function updateTotals() {
+        let totalAmount = 0, totalItems = 0;
+        document.querySelectorAll('#productsTable tbody tr').forEach(row => {
+            const subtotal = parseFloat(row.querySelector('.subtotal').textContent) || 0;
+            const qty = parseInt(row.querySelector('td:nth-child(4)').textContent) || 0;
+            totalAmount += subtotal;
+            totalItems += qty;
+        });
+        document.getElementById('totalItems').textContent = totalItems;
+        document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+        document.getElementById('totalItemInput').value = totalItems;
+        document.getElementById('totalPriceInput').value = totalAmount.toFixed(2);
+        updateBalance();
+    }
+
+    function updateBalance() {
+        const cash = parseFloat(document.getElementById('cashInput').value) || 0;
+        const total = parseFloat(document.getElementById('totalAmount').textContent) || 0;
+        const balance = cash - total;
+        const balanceInput = document.getElementById('balanceInput');
+        balanceInput.value = balance.toFixed(2);
+        balanceInput.classList.toggle('text-danger', balance < 0);
+        balanceInput.classList.toggle('text-success', balance >= 0);
+    }
+
+    document.getElementById('cashInput').addEventListener('input', updateBalance);
+
+    // Cancel button logic
+    document.addEventListener('DOMContentLoaded', function() {
+        const cancelBtn = document.getElementById('cancelButton');
+        if (!cancelBtn) return;
+        cancelBtn.addEventListener('click', function() {
+            const form = document.getElementById('saleForm');
+            form.querySelectorAll('input[type="hidden"][name="action"]').forEach(el => el.remove());
+            form.reset();
+            document.querySelector('#productsTable tbody').innerHTML = '';
+            document.getElementById('totalItems').textContent = 0;
+            document.getElementById('totalAmount').textContent = '0.00';
+            document.getElementById('totalItemInput').value = 0;
+            document.getElementById('totalPriceInput').value = 0;
             const balanceInput = document.getElementById('balanceInput');
-            balanceInput.value = balance.toFixed(2);
-            balanceInput.classList.toggle('text-danger', balance < 0);
-            balanceInput.classList.toggle('text-success', balance >= 0);
-        }
-
-        document.getElementById('cashInput').addEventListener('input', updateBalance);
-    </script>
+            balanceInput.value = '0.00';
+            balanceInput.classList.remove('text-success', 'text-danger');
+            document.getElementById('customerSelect').value = '';
+            document.getElementById('customerId').value = '';
+            document.getElementById('customerAddress').value = '';
+            document.getElementById('customerContact').value = '';
+            document.getElementById('productSelect').value = '';
+            document.getElementById('qty').value = 1;
+            document.getElementById('barcodeInput').value = '';
+            document.getElementById('invoiceNumber').textContent = 'IN00000502';
+        });
+    });
+</script>
 @endpush

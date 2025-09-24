@@ -20,6 +20,37 @@ class ProductController extends Controller
         return view("product.index", compact("menu", "categories"));
     }
 
+ public function autoCode()
+    {
+        $lastProduct = Product::latest()->first();
+        $lastCode = $lastProduct ? $lastProduct->code : '';
+        $newNumber = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
+        $code = 'P' . code_generator($newNumber, 5); // e.g., P00001
+
+        return response()->json(['code' => $code]);
+    }
+
+    // Store product
+    public function store(Request $request)
+    {
+        // If code empty, generate one (extra safety)
+        if (!$request->filled('code')) {
+            $lastProduct = Product::latest()->first();
+            $lastCode = $lastProduct ? $lastProduct->code : '';
+            $newNumber = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
+            $request['code'] = 'P' . code_generator($newNumber, 5);
+        }
+
+        // Save product
+        $product = Product::create($request->all());
+
+        return response()->json([
+            'message' => 'Product added successfully.',
+            'product' => $product
+        ], 201);
+    }
+
+    // Example DataTable method
     public function data()
     {
         $products = Product::with('category')->latest()->get();
@@ -52,21 +83,6 @@ class ProductController extends Controller
             })
             ->rawColumns(["select_all_product", "code", "action"])
             ->make(true);
-    }
-
-    public function store(Request $request)
-    {
-        // Generate Product Code
-        $product = Product::all();
-        $product_code = !$product->isEmpty() ? Product::select("code")->latest()->first()->code : '';
-        $new_code = ($product_code !== '') ? $product_code[5] + 1 : 1;
-        $request["code"] = "P" . code_generator($new_code, 5);  # example result: P00001
-
-        $product = Product::create($request->all());
-
-        if ($product) {
-            return response()->json("Add product successfully.", 201);
-        }
     }
 
     public function show(string $id)

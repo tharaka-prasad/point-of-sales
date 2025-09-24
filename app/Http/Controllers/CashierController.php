@@ -6,7 +6,8 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleDetail;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Mike42\Escpos\Printer;
+use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 
 class CashierController extends Controller
 {
@@ -117,6 +118,20 @@ class CashierController extends Controller
             : now()->format('Y-m-d H:i');
 
         session()->forget('last_sale_id');
+
+        // ✅ Cash drawer open karanna
+        try {
+            // Windows walin: Printer name eka "Devices and Printers" list eke thiyena name ekata match karanna
+            $connector = new WindowsPrintConnector("EPSON");
+            $printer   = new Printer($connector);
+
+            // Drawer open pulse
+            $printer->pulse();
+
+            $printer->close();
+        } catch (\Exception $e) {
+            // \Log::error("Cash drawer not opened: " . $e->getMessage());
+        }
 
         return view('cashier.print', [
             'sale'       => $sale,
