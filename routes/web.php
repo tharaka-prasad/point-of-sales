@@ -15,6 +15,8 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GrnController;
+
 
 // Login
 Route::get("/", fn() => redirect()->route("login"));
@@ -26,6 +28,13 @@ Route::middleware([
 ])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, "index"])->name("dashboard.index");
+
+    //GRN
+    Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');
+    Route::get('/grn/create', [GrnController::class, 'create'])->name('grn.create');
+    Route::post('/grn', [GrnController::class, 'store'])->name('grn.store');
+    Route::get('/grn/{grn}', [GrnController::class, 'show'])->name('grn.show');
+
 
     Route::middleware(['level:1'])->group(function () {
         // Category
