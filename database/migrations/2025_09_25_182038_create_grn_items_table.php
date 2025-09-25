@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('grn_items', function (Blueprint $table) {
-            $table->id();
+            $table->id('grn_item_id');
             $table->unsignedBigInteger('grn_id');
             $table->unsignedBigInteger('product_id');
             $table->string('uom', 50)->nullable(); // Unit of Measurement
@@ -24,11 +24,10 @@ return new class extends Migration
             $table->decimal('total', 12, 2)->nullable();
             $table->text('remarks')->nullable();
             $table->enum('status', ['draft', 'complete', 'pending', 'reject'])->default('draft');
+            $table->integer('created_by')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
 
-            // Foreign keys
-            $table->foreign('grn_id')->references('id')->on('grns')->onDelete('cascade');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
 

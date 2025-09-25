@@ -9,6 +9,8 @@ class GrnItem extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'grn_item_id';
+
     protected $fillable = [
         'grn_id',
         'product_id',
@@ -21,16 +23,29 @@ class GrnItem extends Model
         'total',
         'remarks',
         'status',
+        'created_by',
+        'description',
     ];
 
-    // Relationships
+    // Relationship: GRN Item belongs to GRN
     public function grn()
     {
-        return $this->belongsTo(Grn::class);
+        return $this->belongsTo(Grn::class, 'grn_id');
     }
 
+    // Relationship: GRN Item belongs to Product
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    // Optional: automatically calculate total when unit_price or qty_received changes
+    protected static function booted()
+    {
+        static::saving(function ($item) {
+            if ($item->unit_price && $item->qty_received) {
+                $item->total = $item->unit_price * $item->qty_received;
+            }
+        });
     }
 }

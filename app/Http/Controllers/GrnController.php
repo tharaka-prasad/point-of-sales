@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Grn;
-use App\Models\Supplier;
 use App\Models\Product;
-use App\Models\GrnItem;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,10 +14,10 @@ class GrnController extends Controller
      */
     public function index()
     {
-        $menu = 'GRN';
+        $menu      = 'GRN';
         $suppliers = Supplier::all();
         $products  = Product::all();
-        $grns = Grn::with('items.product', 'supplier')->latest()->paginate(10);
+        $grns      = Grn::with('items.product', 'supplier')->latest()->paginate(10);
 
         return view('grn.index', compact('menu', 'suppliers', 'products', 'grns'));
     }
@@ -27,65 +25,58 @@ class GrnController extends Controller
     /**
      * Show the form for creating a new GRN.
      */
+
     public function create()
     {
-        $menu = 'Create GRN';
+        $menu      = 'Create GRN';
         $suppliers = Supplier::all();
-        $products  = Product::all();
-
-        return view('grn.form', compact('menu', 'suppliers', 'products'));
+        return view('grn.form', compact('menu', 'suppliers'));
     }
-
-    /**
-     * Store a newly created GRN in storage.
-     */
- public function store(Request $request)
-{
-    $validated = $request->validate([
-        'grn_no' => 'required|unique:grns,grn_no',
-        'date' => 'required|date',
-        'supplier' => 'required|string',
-        'po_no' => 'nullable|string',
-        'invoice_no' => 'nullable|string',
-        'general_remarks' => 'nullable|string',
-        'items' => 'required|array|min:1',
-        'items.*.code' => 'required|string',
-        'items.*.desc' => 'required|string',
-        'items.*.received' => 'required|numeric',
-        'items.*.accepted' => 'required|numeric',
-        'items.*.price' => 'required|numeric',
-    ]);
-
-    DB::transaction(function () use ($validated) {
-        // Save main GRN
-        $grn = Grn::create([
-            'grn_no' => $validated['grn_no'],
-            'date' => $validated['date'],
-            'supplier' => $validated['supplier'],
-            'po_no' => $validated['po_no'] ?? null,
-            'invoice_no' => $validated['invoice_no'] ?? null,
-            'general_remarks' => $validated['general_remarks'] ?? null,
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'date'             => 'required|date',
+            'supplier'         => 'required|exists:suppliers,id',
+            'po_no'            => 'required|string',
+            'invoice_no'       => 'required|string',
+            'general_remarks'  => 'nullable|string',
+            'items'            => 'nullable|array',
+            'items.*.code'     => 'required|string',
+            'items.*.desc'     => 'required|string',
+            'items.*.received' => 'required|numeric',
+            'items.*.accepted' => 'required|numeric',
+            'items.*.price'    => 'required|numeric',
         ]);
 
-        // Save items
-        foreach ($validated['items'] as $item) {
-            $grn->items()->create([
-                'item_code' => $item['code'],
-                'description' => $item['desc'],
-                'uom' => $item['uom'] ?? null,
-                'qty_ordered' => $item['ordered'] ?? 0,
-                'qty_received' => $item['received'],
-                'qty_accepted' => $item['accepted'],
-                'qty_rejected' => $item['rejected'] ?? 0,
-                'unit_price' => $item['price'],
-                'total_price' => $item['accepted'] * $item['price'],
-                'remarks' => $item['remarks'] ?? null,
+        DB::transaction(function () use ($validated) {
+            $grn = Grn::create([
+                'date'            => $validated['date'],
+                'supplier_id'     => $validated['supplier'],
+                'po_no'           => $validated['po_no'],
+                'invoice_no'      => $validated['invoice_no'],
+                'general_remarks' => $validated['general_remarks'] ?? null,
+                'created_by'      => auth()->id(),
             ]);
-        }
-    });
 
-    return redirect()->route('grn.index')->with('success', 'GRN and items saved successfully.');
-}
+            foreach ($validated['items'] as $item) {
+                $grn->items()->create([
+                    'item_code'    => $item['code'],
+                    'description'  => $item['desc'],
+                    'uom'          => $item['uom'] ?? null,
+                    'qty_ordered'  => $item['ordered'] ?? 0,
+                    'qty_received' => $item['received'],
+                    'qty_accepted' => $item['accepted'],
+                    'qty_rejected' => ($item['received'] ?? 0) - ($item['accepted'] ?? 0),
+                    'unit_price'   => $item['price'],
+                    'total'        => $item['accepted'] * $item['price'],
+                    'remarks'      => $item['remarks'] ?? null,
+                    'created_by'   => auth()->id(),
+                ]);
+            }
+        });
+
+        return redirect()->route('grn.create')->with('success', 'GRN saved successfully!');
+    }
 
     /**
      * Display the specified GRN.
@@ -119,11 +110,11 @@ class GrnController extends Controller
     public function update(Request $request, Grn $grn)
     {
         $request->validate([
-            'supplier_id' => 'required|exists:suppliers,id',
-            'date' => 'required|date',
-            'items' => 'required|array',
+            'supplier_id'        => 'required|exists:suppliers,id',
+            'date'               => 'required|date',
+            'items'              => 'required|array',
             'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|numeric|min:1',
+            'items.*.quantity'   => 'required|numeric|min:1',
             'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
