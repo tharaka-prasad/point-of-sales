@@ -16,7 +16,8 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GrnController;
-
+use App\Http\Controllers\PoController;
+use App\Http\Controllers\PurchaseOrderController;
 
 // Login
 Route::get("/", fn() => redirect()->route("login"));
@@ -28,6 +29,9 @@ Route::middleware([
 ])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, "index"])->name("dashboard.index");
+
+    //PO Controller
+    Route::get('/po', [PurchaseOrderController::class, "index"])->name("po.index");
 
     //GRN
     Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');

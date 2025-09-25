@@ -56,6 +56,12 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a href="{{ route('po.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-cart-plus"></i>
+                            <p>PO</p>
+                        </a>
+                    </li>
 
                     <li class="nav-item">
                         <a href="{{ route('grn.index') }}" class="nav-link">
@@ -123,72 +129,6 @@
                         <a href="{{ route('report.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
                             <p>Daily Sales Summary</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Sales by Item</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Discounts Report</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Return & Cancelled Bill</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Stock Balance Report</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Low Stock Report</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Expiry Report</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Credit Customer Balance</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Top Customers</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Cashier Shift Closing</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Profit & Loss Summary</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>VAT & Tax Report</p>
                         </a>
                     </li>
 
