@@ -137,13 +137,20 @@
     </div>
 
     <div class="center" style="margin-top:10px;">
-        <button id="printBtn" onclick="window.print()">🖨️ Print Receipt (F9)</button>
+        <button id="printBtn" type="button">🖨️ Print Receipt (F9)</button>
     </div>
+
     <script>
         function printReceipt() {
             window.print();
         }
 
+        // Button click -> direct print
+        document.getElementById('printBtn').addEventListener('click', function() {
+            printReceipt();
+        });
+
+        // F9 shortcut
         document.addEventListener('keydown', function(event) {
             if (event.key === 'F9') {
                 event.preventDefault();
@@ -151,9 +158,10 @@
             }
         });
 
-        // Uncomment this to auto-print on page load:
+        // Optional: auto-print as soon as page loads
         // window.onload = printReceipt;
     </script>
+
 </body>
 
 </html>
