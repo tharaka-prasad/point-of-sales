@@ -193,8 +193,12 @@
           <div class="small">Supermarket GRN — record goods received from a supplier</div>
         </div>
         <div class="no-print">
-          <button id="printBtn">Save as PDF</button>
-        </div>
+        <a href="{{ route('grn.index') }}">
+            <button class="secondary">← Back</button>
+        </a>
+        <button id="printBtn">Save as PDF</button>
+    </div>
+
       </header>
 
       <div id="pdfStatus" class="pdf-status"></div>
