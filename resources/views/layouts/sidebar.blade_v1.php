@@ -106,7 +106,6 @@
                     </li>
 
                     <li class="nav-header">REPORT</li>
-
                     <li class="nav-item">
                         <a href="{{ route('report.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
@@ -243,3 +242,8 @@
     </div>
     <!-- /.sidebar -->
 </aside>
+
+{{-- Form Logout --}}
+<form action="{{ route('logout') }}" method="post" class="d-none" id="logout-form">
+    @csrf
+</form>
