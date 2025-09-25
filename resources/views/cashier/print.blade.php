@@ -1,109 +1,159 @@
-@extends('layouts.master')
+<!DOCTYPE html>
+<html>
 
-@section('title')
-<h3>Invoice: {{ $sale->id }}</h3>
-@endsection
+<head>
+    <meta charset="UTF-8">
+    <title>Receipt</title>
+    <style>
+        body {
+            width: 72mm;
+            font-family: Arial;
+            font-size: 11px;
+            margin: 0;
+            padding: 5px;
+        }
 
-@section('content')
-<div class="container mt-4 d-flex justify-content-center">
-    <div class="receipt p-3 shadow-sm">
-        <!-- Company Info -->
-        <h4 class="text-center mb-0">Ekrain & Technology</h4>
-        <p class="text-center mb-1">Tel: 0114845935</p>
+        .center {
+            text-align: center;
+        }
 
-        <!-- Invoice Info -->
-        <p class="text-center mb-2">
-            Invoice #{{ $sale->id }} <br>
-            {{ $created_at }} <!-- ✅ Only Date -->
-        </p>
-        <hr>
+        .bold {
+            font-weight: bold;
+        }
 
-        <!-- Customer -->
-        <p><strong>Customer:</strong> {{ $sale->member->name ?? 'Walk-in' }}</p>
+        .line {
+            border-top: 1px dashed #000;
+            margin: 5px 0;
+        }
 
-        <!-- Products -->
-        <table class="w-100 mb-2">
-            <thead>
-                <tr>
-                    <th class="text-start">Item</th>
-                    <th class="text-end">Qty</th>
-                    <th class="text-end">Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($sale->details as $d)
-                <tr>
-                    <td>{{ $d->product->name ?? 'Deleted' }}</td>
-                    <td class="text-end">{{ $d->amount }}</td>
-                    <td class="text-end">{{ number_format($d->sub_total,2) }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-        <hr>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-        <!-- Totals -->
-        <p class="d-flex justify-content-between">
-            <span>Subtotal</span>
-            <span>{{ number_format($sale->total_price + $sale->discount,2) }}</span>
-        </p>
-        @if($sale->discount > 0)
-        <p class="d-flex justify-content-between">
-            <span>Discount</span>
-            <span>-{{ number_format($sale->discount,2) }}</span>
-        </p>
-        @endif
-        <p class="d-flex justify-content-between fw-bold">
-            <span>Total</span>
-            <span>{{ number_format($sale->total_price,2) }}</span>
-        </p>
-        <p class="d-flex justify-content-between">
-            <span>Cash</span>
-            <span>{{ number_format($sale->pay,2) }}</span>
-        </p>
-        <p class="d-flex justify-content-between">
-            <span>Balance</span>
-            <span>{{ number_format($sale->pay - $sale->total_price,2) }}</span>
-        </p>
+        .items td,
+        .items th {
+            padding: 3px 0;
+        }
 
-        <hr>
-        <p class="text-center">*** Thank You! Come Again! ***</p>
+        .items .name {
+            width: 50%;
+        }
 
-        <div class="text-center mt-2 no-print">
-            <button class="btn btn-primary btn-sm" onclick="window.print()">Print</button>
-        </div>
+        .items .qty,
+        .items .price,
+        .items .total {
+            text-align: right;
+            width: 16%;
+        }
+
+        .totals td {
+            padding: 3px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        @media print {
+            #printBtn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="center">
+        {{-- <div class="line">
+            <img src="{{ asset('admin/images/logo-2025-09-18074601.jpg') }}" alt="Logo"
+                class="brand-image img-circle elevation-3" style="opacity: 0.8; width: 60px; height: 60px;">
+        </div> --}}
+        <span class="bold" style="font-size: 18px;">Ekrain Technologies & Solutions (Pvt) Ltd</span><br>
+        No.118/115, Kandewaththa Road, Nugegoda, Sri Lanka <br>
+        Tel: 011-4845935
     </div>
-</div>
-@endsection
 
-@push('styles')
-<style>
-.receipt {
-    width: 80mm; /* ✅ thermal paper size */
-    font-family: "Courier New", monospace;
-    background: #fff;
-    border: 1px dashed #aaa;
-}
-.receipt table {
-    font-size: 14px;
-}
-.receipt th, .receipt td {
-    padding: 2px 0;
-}
-@media print {
-    body * {
-        visibility: hidden;
-    }
-    .receipt, .receipt * {
-        visibility: visible;
-    }
-    .receipt {
-        margin: 0;
-        padding: 0;
-        border: none;
-        width: 80mm;
-    }
-    .no-print { display: none !important; }
-}
-</style>
-@endpush
+    <div class="line"></div>
+
+    <div>
+        Date: {{ $sale->created_at->format('Y-m-d') }} &nbsp;&nbsp;&nbsp;
+        Time: {{ $sale->created_at->format('H:i') }}<br>
+        Receipt No: {{ str_pad($sale->id, 8, '0', STR_PAD_LEFT) }}<br>
+        Cashier: {{ $sale->cashier->name ?? 'N/A' }}
+    </div>
+
+    <div class="line"></div>
+
+    <table class="items">
+        <tr>
+            <th class="name">Item</th>
+            <th class="qty">Qty</th>
+            <th class="price">Unit Price</th>
+            <th class="total">Total</th>
+        </tr>
+        @foreach ($sale->items as $item)
+            <tr>
+                <td class="name">{{ $item->product->name ?? 'N/A' }}</td>
+                <td class="qty">{{ $item->amount }}</td>
+                <td class="price">Rs. {{ number_format($item->sale_price, 2) }}</td>
+                <td class="total">Rs. {{ number_format($item->sub_total, 2) }}</td>
+            </tr>
+        @endforeach
+    </table>
+
+    <div class="line"></div>
+
+    <table class="totals">
+        <tr>
+            <td>Subtotal</td>
+            <td style="text-align:right;">Rs. {{ number_format($subtotal, 2) }}</td>
+        </tr>
+        <tr>
+            <td>Discount</td>
+            <td style="text-align:right;">− Rs. {{ number_format($discount, 2) }}</td>
+        </tr>
+        <tr class="bold">
+            <td>Total</td>
+            <td style="text-align:right;">Rs. {{ number_format($total, 2) }}</td>
+        </tr>
+        <tr>
+            <td>Paid</td>
+            <td style="text-align:right;">Rs. {{ number_format($paid, 2) }}</td>
+        </tr>
+        <tr>
+            <td>Change</td>
+            <td style="text-align:right;">Rs. {{ number_format($change, 2) }}</td>
+        </tr>
+    </table>
+
+    <div class="line"></div>
+
+    <div class="footer">
+        Thank you for shopping at Ekrain Technologies!<br>
+        Prices include government taxes.<br>
+        * Prices and items may vary by branch.
+    </div>
+
+    <div class="center" style="margin-top:10px;">
+        <button id="printBtn" onclick="window.print()">🖨️ Print Receipt (F9)</button>
+    </div>
+    <script>
+        function printReceipt() {
+            window.print();
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'F9') {
+                event.preventDefault();
+                printReceipt();
+            }
+        });
+
+        // Uncomment this to auto-print on page load:
+        // window.onload = printReceipt;
+    </script>
+</body>
+
+</html>

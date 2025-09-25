@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\CashierShiftController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
@@ -38,7 +39,6 @@ Route::middleware([
         Route::post('/product/delete-selected', [ProductController::class, "deleteSelected"])->name("product.deleteSelected");
         Route::post('/product/print-barcode', [ProductController::class, "printBarcode"])->name("product.printBarcode");
         Route::get('/product/autocode', [ProductController::class, 'autoCode'])->name('product.autocode');
-
 
         // Member
         Route::get('/member/data', [MemberController::class, "data"])->name("member.data");
@@ -85,6 +85,14 @@ Route::middleware([
         Route::post('/cashier', [CashierController::class, "store"])->name("cashier.store");
         Route::get('/cashier/print/{sale}', [CashierController::class, 'print'])->name('cashier.print');
 
+        // Cashier Shift
+        Route::prefix('cashier_shifts')->name('cashierShifts.')->group(function () {
+            Route::get('/', [CashierShiftController::class, 'index'])->name('index');
+            Route::get('/data', [CashierShiftController::class, 'data'])->name('data');
+            Route::post('/', [CashierShiftController::class, 'store'])->name('store');
+            Route::post('/{id}/close', [CashierShiftController::class, 'close'])->name('close');
+            Route::delete('/{id}', [CashierShiftController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // Transaction

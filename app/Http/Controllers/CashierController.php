@@ -6,8 +6,8 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleDetail;
 use Illuminate\Http\Request;
-use Mike42\Escpos\Printer;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+use Mike42\Escpos\Printer;
 
 class CashierController extends Controller
 {
@@ -111,23 +111,26 @@ class CashierController extends Controller
 
     public function print($id)
     {
-        $sale = Sale::with(['member', 'details.product'])->findOrFail($id);
+        $sale = Sale::with(['member', 'items.product', 'cashier'])->findOrFail($id);
 
         $created_at = $sale->created_at
             ? $sale->created_at->format('Y-m-d H:i')
             : now()->format('Y-m-d H:i');
 
+        // Calculate totals
+        $subtotal = $sale->total_price;
+        $discount = $sale->discount ?? 0;
+        $total    = $subtotal - $discount;
+        $paid     = $sale->pay;
+        $change   = $paid - $total;
+
         session()->forget('last_sale_id');
 
-        // ✅ Cash drawer open karanna
+        // ✅ Cash drawer pulse (optional)
         try {
-            // Windows walin: Printer name eka "Devices and Printers" list eke thiyena name ekata match karanna
             $connector = new WindowsPrintConnector("EPSON");
             $printer   = new Printer($connector);
-
-            // Drawer open pulse
             $printer->pulse();
-
             $printer->close();
         } catch (\Exception $e) {
             // \Log::error("Cash drawer not opened: " . $e->getMessage());
@@ -136,6 +139,11 @@ class CashierController extends Controller
         return view('cashier.print', [
             'sale'       => $sale,
             'created_at' => $created_at,
+            'subtotal'   => $subtotal,
+            'discount'   => $discount,
+            'total'      => $total,
+            'paid'       => $paid,
+            'change'     => $change,
             'menu'       => 'Invoice',
         ]);
     }
