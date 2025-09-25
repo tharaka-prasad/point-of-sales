@@ -1,9 +1,9 @@
 @extends('layouts.master')
 
 @section('title')
-    <h3 class="mb-0">{{ $menu }}</h3>
+    <h3 class="mb-0">{{ $menu ?? 'Purchase Order' }}</h3>
 @endsection
 
-@section('content')
-    <h1>PO</h1>
+@section('conrtainer')
+    <h1>Hello</h1>
 @endsection
