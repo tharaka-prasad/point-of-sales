@@ -46,6 +46,8 @@ Route::middleware([
         Route::resource('/product', ProductController::class);
         Route::post('/product/delete-selected', [ProductController::class, "deleteSelected"])->name("product.deleteSelected");
         Route::post('/product/print-barcode', [ProductController::class, "printBarcode"])->name("product.printBarcode");
+        Route::get('/product/autocode', [ProductController::class, 'autoCode'])->name('product.autocode');
+
 
         // Member
         Route::get('/member/data', [MemberController::class, "data"])->name("member.data");
