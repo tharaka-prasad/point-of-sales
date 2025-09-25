@@ -12,10 +12,22 @@
                     </button>
                 </div>
                 <div class="modal-body">
+
+                    <div class="form-group row">
+                        <input type="text" name="supplier_name" id="supplier_name" class="form-control"
+                            placeholder="Enter Supplier Name" required>
+                    </div>
+
+                     <div class="form-group row">
+                        <input type="text" name="company_name" id="company_name" class="form-control"
+                            placeholder="Enter Company Name" required>
+                    </div>
+
                     <div class="form-group row">
                         <input type="text" name="name" id="name" class="form-control"
                             placeholder="Enter Category Name" required>
                     </div>
+
                     <div class="form-group row">
                         <input type="number" name="phone" id="phone" class="form-control"
                             placeholder="Enter Phone" required>

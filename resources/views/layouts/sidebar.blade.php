@@ -63,6 +63,12 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a href="{{ route('po.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-cart-plus"></i>
+                            <p>PO</p>
+                        </a>
+                    </li>
 
                     <li class="nav-item">
                         <a href="{{ route('grn.index') }}" class="nav-link">
@@ -126,6 +132,26 @@
                         <a href="{{ route('report.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
                             <p>Report</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="https://quickbooks.intuit.com/" target="_blank" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>QuickBooks</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('report.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Daily Sales Summary</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-header">USER MANAGEMENT</li>
+                    <li class="nav-item">
+                        <a href="{{ route('user.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>User</p>
                         </a>
                     </li>
 

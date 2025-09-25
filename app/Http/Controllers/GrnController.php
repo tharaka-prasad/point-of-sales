@@ -18,7 +18,7 @@ class GrnController extends Controller
         $grns = Grn::with('items.product', 'supplier')->latest()->paginate(10);
 
         // make sure this is the blade you actually use (resources/views/grn/grn.blade.php)
-        return view('grn.grn', compact('menu', 'suppliers', 'products', 'grns'));
+        return view('grn.index', compact('menu', 'suppliers', 'products', 'grns'));
     }
 
     public function create()
