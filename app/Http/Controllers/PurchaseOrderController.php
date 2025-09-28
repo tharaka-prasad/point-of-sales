@@ -2,92 +2,111 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PurchaseOrder;
+use App\Models\GrnItem;
+use App\Models\Grn;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
-class PurchaseOrderController extends Controller
+class GrnItemController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of GRN items.
      */
     public function index()
     {
-        $purchaseOrders = PurchaseOrder::latest()->get();
-        return view('po.index', compact('purchaseOrders'))->with('menu');
+        $items = GrnItem::with(['grn', 'product'])->get();
+
+        return view('grn_items.index', compact('items'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new GRN item.
      */
     public function create()
     {
-        return view('po.create');
+        $grns = Grn::all();
+        $products = Product::all();
+
+        return view('grn_items.create', compact('grns', 'products'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created GRN item.
      */
     public function store(Request $request)
     {
         $request->validate([
-            'purchase_company' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'quantity' => 'required|integer|min:1',
-            'rate' => 'required|numeric|min:0',
+            'grn_id'       => 'required|exists:grns,id',
+            'product_id'   => 'required|exists:products,id',
+            'uom'          => 'required|string|max:50',
+            'qty_ordered'  => 'required|numeric|min:0',
+            'qty_received' => 'required|numeric|min:0',
+            'qty_accepted' => 'nullable|numeric|min:0',
+            'qty_rejected' => 'nullable|numeric|min:0',
+            'unit_price'   => 'required|numeric|min:0',
+            'remarks'      => 'nullable|string',
+            'status'       => 'required|in:draft,complete,pending,reject',
+            'description'  => 'nullable|string',
         ]);
 
-        PurchaseOrder::create($request->all());
+        GrnItem::create([
+            'grn_id'       => $request->grn_id,
+            'product_id'   => $request->product_id,
+            'uom'          => $request->uom,
+            'qty_ordered'  => $request->qty_ordered,
+            'qty_received' => $request->qty_received,
+            'qty_accepted' => $request->qty_accepted ?? 0,
+            'qty_rejected' => $request->qty_rejected ?? 0,
+            'unit_price'   => $request->unit_price,
+            'remarks'      => $request->remarks,
+            'status'       => $request->status,
+            'created_by'   => auth()->id(),
+            'description'  => $request->description,
+        ]);
 
-        return redirect()->route('purchase_orders.index')
-                         ->with('success', 'Purchase Order created successfully.');
+        return redirect()->route('grn_items.index')->with('success', 'GRN Item added successfully.');
     }
 
     /**
-     * Display the specified resource.
+     * Show the form for editing the specified GRN item.
      */
-    public function show(PurchaseOrder $purchaseOrder)
+    public function edit(GrnItem $grnItem)
     {
-        return view('po.show', compact('purchaseOrder'));
+        $grns = Grn::all();
+        $products = Product::all();
+
+        return view('grn_items.edit', compact('grnItem', 'grns', 'products'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Update the specified GRN item.
      */
-    public function edit(PurchaseOrder $purchaseOrder)
-    {
-        return view('po.edit', compact('purchaseOrder'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, PurchaseOrder $purchaseOrder)
+    public function update(Request $request, GrnItem $grnItem)
     {
         $request->validate([
-            'purchase_company' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'quantity' => 'required|integer|min:1',
-            'rate' => 'required|numeric|min:0',
+            'uom'          => 'required|string|max:50',
+            'qty_ordered'  => 'required|numeric|min:0',
+            'qty_received' => 'required|numeric|min:0',
+            'qty_accepted' => 'nullable|numeric|min:0',
+            'qty_rejected' => 'nullable|numeric|min:0',
+            'unit_price'   => 'required|numeric|min:0',
+            'remarks'      => 'nullable|string',
+            'status'       => 'required|in:draft,complete,pending,reject',
+            'description'  => 'nullable|string',
         ]);
 
-        $purchaseOrder->update($request->all());
+        $grnItem->update($request->all());
 
-        // Recalculate total
-        $purchaseOrder->total = $purchaseOrder->quantity * $purchaseOrder->rate;
-        $purchaseOrder->save();
-
-        return redirect()->route('po.index')
-                         ->with('success', 'Purchase Order updated successfully.');
+        return redirect()->route('grn_items.index')->with('success', 'GRN Item updated successfully.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified GRN item.
      */
-    public function destroy(PurchaseOrder $purchaseOrder)
+    public function destroy(GrnItem $grnItem)
     {
-        $purchaseOrder->delete();
+        $grnItem->delete();
 
-        return redirect()->route('purchase_orders.index')
-                         ->with('success', 'Purchase Order deleted successfully.');
+        return redirect()->route('grn_items.index')->with('success', 'GRN Item deleted successfully.');
     }
 }

@@ -18,6 +18,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GrnItemController;
 
 // Login
 Route::get("/", fn() => redirect()->route("login"));
@@ -32,6 +33,9 @@ Route::middleware([
 
     //PO Controller
     Route::get('/po', [PurchaseOrderController::class, "index"])->name("po.index");
+
+    //GRN_ITEM
+    Route::resource('grn_items', GrnItemController::class);
 
     //GRN
     Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');
