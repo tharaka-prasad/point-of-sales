@@ -12,15 +12,20 @@ class GrnController extends Controller
     /**
      * Display a listing of GRNs.
      */
-    public function index()
-    {
-        $menu      = 'GRN';
-        $suppliers = Supplier::all();
-        $products  = Product::all();
-        $grns      = Grn::with('items.product', 'supplier')->latest()->paginate(10);
+   public function index()
+{
+    $menu      = 'GRN';
+    $suppliers = Supplier::all();
+    $products  = Product::all();
 
-        return view('grn.index', compact('menu', 'suppliers', 'products', 'grns'));
-    }
+    // Eager load supplier, creator, and items
+    $grns = Grn::with('items.product', 'supplier', 'creator')
+                ->latest()
+                ->paginate(10);
+
+    return view('grn.index', compact('menu', 'suppliers', 'products', 'grns'));
+}
+
 
     /**
      * Show the form for creating a new GRN.
@@ -32,6 +37,7 @@ class GrnController extends Controller
         $suppliers = Supplier::all();
         return view('grn.form', compact('menu', 'suppliers'));
     }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -58,20 +64,22 @@ class GrnController extends Controller
                 'created_by'      => auth()->id(),
             ]);
 
-            foreach ($validated['items'] as $item) {
-                $grn->items()->create([
-                    'item_code'    => $item['code'],
-                    'description'  => $item['desc'],
-                    'uom'          => $item['uom'] ?? null,
-                    'qty_ordered'  => $item['ordered'] ?? 0,
-                    'qty_received' => $item['received'],
-                    'qty_accepted' => $item['accepted'],
-                    'qty_rejected' => ($item['received'] ?? 0) - ($item['accepted'] ?? 0),
-                    'unit_price'   => $item['price'],
-                    'total'        => $item['accepted'] * $item['price'],
-                    'remarks'      => $item['remarks'] ?? null,
-                    'created_by'   => auth()->id(),
-                ]);
+            if (! empty($validated['items'])) {
+                foreach ($validated['items'] as $item) {
+                    $grn->items()->create([
+                        'product_id'   => $item['product_id'] ?? null, // add this line
+                        'description'  => $item['desc'],
+                        'uom'          => $item['uom'] ?? null,
+                        'qty_ordered'  => $item['ordered'] ?? 0,
+                        'qty_received' => $item['received'],
+                        'qty_accepted' => $item['accepted'],
+                        'qty_rejected' => ($item['received'] ?? 0) - ($item['accepted'] ?? 0),
+                        'unit_price'   => $item['price'],
+                        'total'        => $item['accepted'] * $item['price'],
+                        'remarks'      => $item['remarks'] ?? null,
+                        'created_by'   => auth()->id(),
+                    ]);
+                }
             }
         });
 

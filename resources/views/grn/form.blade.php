@@ -14,7 +14,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-/* --- Existing styles --- */
 body { font-family: Arial, sans-serif; margin:20px; background:#f9f9f9; }
 .container { max-width:1200px; margin:auto; }
 .card { background:#fff; padding:20px; border-radius:8px; box-shadow:0 0 6px rgba(0,0,0,0.1); }
@@ -68,7 +67,9 @@ button { margin:5px; padding:8px 16px; cursor:pointer; border:none; border-radiu
             </div>
         </header>
 
-        <div id="pdfStatus" class="pdf-status"></div>
+        @if(session('success'))
+            <div class="pdf-status success">{{ session('success') }}</div>
+        @endif
 
         <form method="POST" action="{{ route('grn.store') }}">
             @csrf
@@ -192,18 +193,22 @@ function generateGRN() {
 }
 
 function addRow(data={}) {
+    const index = tbody.querySelectorAll("tr").length;
     const tr = document.createElement("tr");
     tr.innerHTML = `
-        <td><input name="items[][code]" class="code" value="${data.code||''}"></td>
-        <td><input name="items[][desc]" class="desc" value="${data.desc||''}"></td>
-        <td><input name="items[][uom]" class="uom" value="${data.uom||''}"></td>
-        <td><input name="items[][ordered]" class="ordered" type="number" value="${data.ordered||0}"></td>
-        <td><input name="items[][received]" class="received" type="number" value="${data.received||0}"></td>
-        <td><input name="items[][accepted]" class="accepted" type="number" value="${data.accepted||0}"></td>
-        <td><input name="items[][rejected]" class="rejected" type="number" value="${data.rejected||0}" readonly></td>
-        <td><input name="items[][price]" class="price" type="number" step="0.01" value="${data.price||0}"></td>
-        <td class="total" data-value="0.00">0.00</td>
-        <td><input name="items[][remarks]" class="remarks" value="${data.remarks||''}"></td>
+        <td><input name="items[${index}][code]" class="code" value="${data.code||''}"></td>
+        <td><input name="items[${index}][desc]" class="desc" value="${data.desc||''}"></td>
+        <td><input name="items[${index}][uom]" class="uom" value="${data.uom||''}"></td>
+        <td><input name="items[${index}][ordered]" class="ordered" type="number" value="${data.ordered||0}"></td>
+        <td><input name="items[${index}][received]" class="received" type="number" value="${data.received||0}"></td>
+        <td><input name="items[${index}][accepted]" class="accepted" type="number" value="${data.accepted||0}"></td>
+        <td><input name="items[${index}][rejected]" class="rejected" type="number" value="${data.rejected||0}" readonly></td>
+        <td><input name="items[${index}][price]" class="price" type="number" step="0.01" value="${data.price||0}"></td>
+        <td>
+            <span class="total">0.00</span>
+            <input type="hidden" name="items[${index}][total]" class="totalInput" value="0">
+        </td>
+        <td><input name="items[${index}][remarks]" class="remarks" value="${data.remarks||''}"></td>
         <td class="no-print"><button type="button" class="del warn">X</button></td>
     `;
     tr.querySelector(".del").onclick = () => { tr.remove(); recalc(); };
@@ -224,6 +229,7 @@ function recalc() {
         r.querySelector(".rejected").value = rejected;
         const total = accepted*price;
         r.querySelector(".total").textContent = total.toFixed(2);
+        r.querySelector(".totalInput").value = total.toFixed(2);
         rec += received;
         acc += accepted;
         gTotal += total;

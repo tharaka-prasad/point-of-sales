@@ -36,7 +36,7 @@ Route::middleware([
     //GRN
     Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');
     Route::get('/grn/create', [GrnController::class, 'create'])->name('grn.create');
-    Route::post('/grn/store', [GrnController::class, 'store'])->name('grn.store');
+    Route::post('/grn', [GrnController::class, 'store'])->name('grn.store');
     Route::get('/grn/{grn}', [GrnController::class, 'show'])->name('grn.show');
 
     Route::middleware(['level:1'])->group(function () {
