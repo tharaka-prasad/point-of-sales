@@ -63,12 +63,12 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ route('po.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-cart-plus"></i>
                             <p>PO</p>
                         </a>
-                    </li>
+                    </li> --}}
 
                     <li class="nav-item">
                         <a href="{{ route('grn.index') }}" class="nav-link">
@@ -172,7 +172,7 @@
                     </li>
                 @else
                     <li class="nav-header">TRANSACTION</li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ route('transaction.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-cart-arrow-down"></i>
                             <p>Active Transaction</p>
@@ -183,7 +183,7 @@
                             <i class="nav-icon fas fa-cart-plus"></i>
                             <p>New Transaction</p>
                         </a>
-                    </li>
+                    </li> --}}
                     <li class="nav-header">SYSTEM</li>
                     <li class="nav-item">
                         <a href="javascript:void(0)" class="nav-link"

@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::create('grns', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('grn_id');
-            $table->unsignedBigInteger('product_id');
-            $table->decimal('quantity', 15, 2);
-            $table->decimal('unit_price', 15, 2);
-            $table->decimal('total_price', 15, 2);
-            $table->string('batch_number')->nullable();
-            $table->date('expiry_date')->nullable();
-            $table->text('remarks')->nullable();
+            $table->string('grn_no')->unique(); // e.g., GRN-1001
+            $table->integer('supplier_id');
+            $table->unsignedBigInteger('created_by');
+            $table->string('po_no')->nullable();
+            $table->date('date')->nullable();
+            $table->string('invoice_no')->nullable();
+            $table->text('general_remarks')->nullable();
             $table->timestamps();
         });
     }

@@ -5,10 +5,12 @@ use App\Http\Controllers\CashierShiftController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\GrnController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseDetailController;
+use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SaleDetailController;
@@ -16,9 +18,6 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\GrnController;
-use App\Http\Controllers\PoController;
-use App\Http\Controllers\PurchaseOrderController;
 
 // Login
 Route::get("/", fn() => redirect()->route("login"));
@@ -39,7 +38,6 @@ Route::middleware([
     Route::get('/grn/create', [GrnController::class, 'create'])->name('grn.create');
     Route::post('/grn', [GrnController::class, 'store'])->name('grn.store');
     Route::get('/grn/{grn}', [GrnController::class, 'show'])->name('grn.show');
-
 
     Route::middleware(['level:1'])->group(function () {
         // Category
