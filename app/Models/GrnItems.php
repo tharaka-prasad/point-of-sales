@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class GrnItem extends Model
+class GrnItems extends Model
 {
-    use HasFactory;
+   use HasFactory;
 
     protected $primaryKey = 'grn_item_id';
 
@@ -48,4 +48,5 @@ class GrnItem extends Model
             }
         });
     }
+
 }
