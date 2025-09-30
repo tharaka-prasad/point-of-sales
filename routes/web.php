@@ -31,9 +31,6 @@ Route::middleware([
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, "index"])->name("dashboard.index");
 
-    //PO Controller
-    Route::get('/po', [PurchaseOrderController::class, "index"])->name("po.index");
-
     //GRN_ITEM
     Route::resource('grn_items', GrnItemController::class);
 
@@ -42,6 +39,12 @@ Route::middleware([
     Route::get('/grn/create', [GrnController::class, 'create'])->name('grn.create');
     Route::post('/grn/store', [GrnController::class, 'store'])->name('grn.store');
     Route::get('/grn/{grn}', [GrnController::class, 'show'])->name('grn.show');
+
+        // PO
+    Route::get('/po/', [PurchaseOrderController::class, 'index'])->name('po.index');
+    Route::get('/po/data', [PurchaseOrderController::class, "data"])->name("po.data");
+    Route::resource('/po', PurchaseOrderController::class);
+    Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');
 
     Route::middleware(['level:1'])->group(function () {
         // Category
@@ -64,6 +67,9 @@ Route::middleware([
         // Supplier
         Route::get('/supplier/data', [SupplierController::class, "data"])->name("supplier.data");
         Route::resource('/supplier', SupplierController::class);
+
+
+
 
         // Expense
         Route::get('/expense/data', [ExpenseController::class, "data"])->name("expense.data");

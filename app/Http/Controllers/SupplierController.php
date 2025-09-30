@@ -63,7 +63,7 @@ class SupplierController extends Controller
             $supplier->address = $request->address;
             $supplier->update();
 
-            return response()->json("Update supplier successfully.");
+            return response()->json("Update purchase order successfully.");
         }
     }
 

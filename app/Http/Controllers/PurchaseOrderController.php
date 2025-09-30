@@ -2,111 +2,103 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\GrnItem;
-use App\Models\Grn;
-use App\Models\Product;
+use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
 
-class GrnItemController extends Controller
+class PurchaseOrderController extends Controller
 {
-    /**
-     * Display a listing of GRN items.
-     */
     public function index()
     {
-        $items = GrnItem::with(['grn', 'product'])->get();
-
-        return view('grn_items.index', compact('items'));
+        $menu = "PO";
+        return view("po.index", compact("menu"));
     }
 
-    /**
-     * Show the form for creating a new GRN item.
-     */
+    public function data()
+    {
+        $purchaseOrders = PurchaseOrder::latest();
+
+        return datatables()
+            ->of($purchaseOrders)
+            ->addIndexColumn()
+            ->addColumn("action", function ($po) {
+                return "
+                <div class='btn-group'>
+                    <button class='btn btn-xs btn-warning mr-3' onclick='editPurchaseOrder(`". route("po.show", $po->id) ."`)'><i class='fa fa-pencil-alt'></i></button>
+                    <button class='btn btn-xs btn-danger' onclick='deletePurchaseOrder(`". route("po.destroy", $po->id) ."`)'><i class='fa fa-trash-alt'></i></button>
+                </div>
+                ";
+            })
+            ->rawColumns(["action"])
+            ->make(true);
+    }
+
     public function create()
     {
-        $grns = Grn::all();
-        $products = Product::all();
+        //$menu = "PO";
 
-        return view('grn_items.create', compact('grns', 'products'));
+        // get last PO and parse its numeric part (expects format like "PO-1000")
+        $last = PurchaseOrder::orderBy('id', 'desc')->first();
+
+        $nextNumber = 1000; // default start
+        if ($last && preg_match('/PO-(\d+)/', $last->po_number, $m)) {
+            $nextNumber = (int) $m[1] + 1;
+        }
+
+        // keep the numeric width (e.g. PO-1000)
+        $nextPoNumber = 'PO-' . $nextNumber;
+
+        return view('po.form', compact('menu', 'nextPoNumber'));
     }
 
-    /**
-     * Store a newly created GRN item.
-     */
     public function store(Request $request)
     {
-        $request->validate([
-            'grn_id'       => 'required|exists:grns,id',
-            'product_id'   => 'required|exists:products,id',
-            'uom'          => 'required|string|max:50',
-            'qty_ordered'  => 'required|numeric|min:0',
-            'qty_received' => 'required|numeric|min:0',
-            'qty_accepted' => 'nullable|numeric|min:0',
-            'qty_rejected' => 'nullable|numeric|min:0',
-            'unit_price'   => 'required|numeric|min:0',
-            'remarks'      => 'nullable|string',
-            'status'       => 'required|in:draft,complete,pending,reject',
-            'description'  => 'nullable|string',
-        ]);
+        $po = PurchaseOrder::create($request->all());
 
-        GrnItem::create([
-            'grn_id'       => $request->grn_id,
-            'product_id'   => $request->product_id,
-            'uom'          => $request->uom,
-            'qty_ordered'  => $request->qty_ordered,
-            'qty_received' => $request->qty_received,
-            'qty_accepted' => $request->qty_accepted ?? 0,
-            'qty_rejected' => $request->qty_rejected ?? 0,
-            'unit_price'   => $request->unit_price,
-            'remarks'      => $request->remarks,
-            'status'       => $request->status,
-            'created_by'   => auth()->id(),
-            'description'  => $request->description,
-        ]);
-
-        return redirect()->route('grn_items.index')->with('success', 'GRN Item added successfully.');
+        if ($po) {
+            return response()->json("Purchase Order added successfully.", 201);
+        }
     }
 
-    /**
-     * Show the form for editing the specified GRN item.
-     */
-    public function edit(GrnItem $grnItem)
+    public function show(string $id)
     {
-        $grns = Grn::all();
-        $products = Product::all();
+        $po = PurchaseOrder::findOrFail($id);
 
-        return view('grn_items.edit', compact('grnItem', 'grns', 'products'));
+        if ($po) {
+            return response()->json($po);
+        }
     }
 
-    /**
-     * Update the specified GRN item.
-     */
-    public function update(Request $request, GrnItem $grnItem)
+    public function edit(string $id)
     {
-        $request->validate([
-            'uom'          => 'required|string|max:50',
-            'qty_ordered'  => 'required|numeric|min:0',
-            'qty_received' => 'required|numeric|min:0',
-            'qty_accepted' => 'nullable|numeric|min:0',
-            'qty_rejected' => 'nullable|numeric|min:0',
-            'unit_price'   => 'required|numeric|min:0',
-            'remarks'      => 'nullable|string',
-            'status'       => 'required|in:draft,complete,pending,reject',
-            'description'  => 'nullable|string',
-        ]);
-
-        $grnItem->update($request->all());
-
-        return redirect()->route('grn_items.index')->with('success', 'GRN Item updated successfully.');
+        // using show() for modal data
     }
 
-    /**
-     * Remove the specified GRN item.
-     */
-    public function destroy(GrnItem $grnItem)
+    public function update(Request $request, string $id)
     {
-        $grnItem->delete();
+        $po = PurchaseOrder::findOrFail($id);
 
-        return redirect()->route('grn_items.index')->with('success', 'GRN Item deleted successfully.');
+        if ($po) {
+            $po->po_number     = $request->po_number;
+            $po->company_name  = $request->company_name;
+            $po->supplier_name = $request->supplier_name;
+            $po->description   = $request->description;
+            $po->contact_no    = $request->contact_no;
+            $po->quantity      = $request->quantity;
+            $po->rate          = $request->rate;
+            $po->status        = $request->status;
+            $po->save();
+
+            return response()->json("Purchase Order updated successfully.");
+        }
+    }
+
+    public function destroy(string $id)
+    {
+        $po = PurchaseOrder::findOrFail($id);
+
+        if ($po) {
+            $po->delete();
+            return response()->json("Purchase Order deleted successfully.");
+        }
     }
 }
