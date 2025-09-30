@@ -40,7 +40,7 @@ Route::middleware([
     Route::post('/grn', [GrnController::class, 'store'])->name('grn.store');
     Route::get('/grn/{grn}', [GrnController::class, 'show'])->name('grn.show');
 
-        // PO
+    // PO
     Route::get('/po/', [PurchaseOrderController::class, 'index'])->name('po.index');
     Route::get('/po/data', [PurchaseOrderController::class, "data"])->name("po.data");
     Route::resource('/po', PurchaseOrderController::class);
