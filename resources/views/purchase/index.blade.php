@@ -38,9 +38,9 @@
                                         <th>Date</th>
                                         <th>Supplier</th>
                                         <th>Total Item</th>
-                                        <th>Total Price (Rp)</th>
+                                        <th>Total Price (Rs)</th>
                                         <th>Dicount (%)</th>
-                                        <th>Pay (Rp)</th>
+                                        <th>Pay (Rs)</th>
                                         <th>
                                             <i class="fas fa-cog"></i>
                                         </th>
@@ -69,7 +69,7 @@
 
         $(function() {
             $("body").addClass("sidebar-collapse");
-            
+
             purchase_table = $("#purchase_table")
                 .DataTable({
                     responsive: true,

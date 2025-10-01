@@ -54,7 +54,7 @@
 
         function printSmallNote(url, title) {
             // Open Pop-up Window
-            centerPopup(url, title, 625, 500);
+            centeRsopup(url, title, 625, 500);
         }
 
         function printBigNote(url, title) {

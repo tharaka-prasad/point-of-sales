@@ -1,18 +1,18 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{{ route('dashboard.index') }}" class="brand-link">
-        <img src="{{ $setting->path_logo ? url($setting->path_logo) : asset('admin/img/AdminLTELogo.png') }}"
-            alt="Point Of Sale v1 Logo" class="brand-image img-circle elevation-3" style="opacity: 0.8" />
+        @php
+            $logoPath = $setting->path_logo ?? null;
+        @endphp
+        <img src="{{ $logoPath && file_exists(public_path($logoPath)) ? asset($logoPath) : asset('admin/images/logo-2025-09-18074601.jpg') }}"
+            alt="Point Of Sale Logo" class="brand-image img-circle elevation-3" style="opacity: 0.8">
         <span class="brand-text font-weight-light">{{ $setting->company_name ?? config('app.name') }}</span>
     </a>
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex ">
-            <div class="image">
-                <img src="{{ Auth::user()->profile_photo_path ? url(Auth::user()->profile_photo_path) : asset('admin/img/user2-160x160.jpg') }}"
-                    class="img-circle elevation-2 img_profile" alt="User Image" />
-            </div>
+        <!-- User Panel -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="info">
                 <a href="{{ route('user.profile') }}" class="d-block">{{ Auth::user()->name }}</a>
             </div>
@@ -22,6 +22,8 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                 data-accordion="false">
+
+                <!-- Dashboard -->
                 <li class="nav-item">
                     <a href="{{ route('dashboard.index') }}" class="nav-link">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -30,6 +32,7 @@
                 </li>
 
                 @if (Auth::user()->current_team_id == 1)
+                    <!-- MASTER Section -->
                     <li class="nav-header">MASTER</li>
                     <li class="nav-item">
                         <a href="{{ route('category.index') }}" class="nav-link">
@@ -55,6 +58,21 @@
                             <p>Supplier</p>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('po.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-cart-plus"></i>
+                            <p>PO</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('grn.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-cart-plus"></i>
+                            <p>GRN</p>
+                        </a>
+                    </li>
+
 
                     <li class="nav-header">TRANSACTION</li>
                     <li class="nav-item">
@@ -87,13 +105,8 @@
                             <p>New Transaction</p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ route('transaction.new') }}" class="nav-link">
-                            <i class="nav-icon fas fa-cart-plus"></i>
-                            <p>GRN</p>
-                        </a>
-                    </li>
 
+                    <!-- CASHIER Section -->
                     <li class="nav-header">CASHIER</li>
                     <li class="nav-item">
                         <a href="{{ route('cashier.index') }}" class="nav-link">
@@ -101,8 +114,16 @@
                             <p>Cashier</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('cashierShifts.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-cash-register"></i>
+                            <p>Cashier Shift</p>
+                        </a>
+                    </li>
 
+                    <!-- REPORT Section -->
                     <li class="nav-header">REPORT</li>
+
                     <li class="nav-item">
                         <a href="{{ route('report.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
@@ -121,72 +142,6 @@
                             <p>Daily Sales Summary</p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Sales by Item</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Discounts Report</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Return & Cancelled Bill</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Stock Balance Report</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Low Stock Report</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Expiry Report</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Credit Customer Balance</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Top Customers</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Cashier Shift Closing</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Profit & Loss Summary</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>VAT & Tax Report</p>
-                        </a>
-                    </li>
 
                     <li class="nav-header">USER MANAGEMENT</li>
                     <li class="nav-item">
@@ -196,6 +151,7 @@
                         </a>
                     </li>
 
+                    <!-- SYSTEM Section -->
                     <li class="nav-header">SYSTEM</li>
                     <li class="nav-item">
                         <a href="{{ route('setting.index') }}" class="nav-link">
@@ -212,7 +168,7 @@
                     </li>
                 @else
                     <li class="nav-header">TRANSACTION</li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ route('transaction.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-cart-arrow-down"></i>
                             <p>Active Transaction</p>
@@ -223,7 +179,7 @@
                             <i class="nav-icon fas fa-cart-plus"></i>
                             <p>New Transaction</p>
                         </a>
-                    </li>
+                    </li> --}}
                     <li class="nav-header">SYSTEM</li>
                     <li class="nav-item">
                         <a href="javascript:void(0)" class="nav-link"
@@ -239,8 +195,3 @@
     </div>
     <!-- /.sidebar -->
 </aside>
-
-{{-- Form Logout --}}
-<form action="{{ route('logout') }}" method="post" class="d-none" id="logout-form">
-    @csrf
-</form>

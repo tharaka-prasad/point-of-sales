@@ -31,7 +31,7 @@
                                         <th>#</th>
                                         <th>Date</th>
                                         <th>Description</th>
-                                        <th>Amount (Rp)</th>
+                                        <th>Amount (Rs)</th>
                                         <th>
                                             <i class="fas fa-cog"></i>
                                         </th>
@@ -59,7 +59,7 @@
 
         $(function() {
             $("body").addClass("sidebar-collapse");
-            
+
             expense_table = $("#expense_table")
                 .DataTable({
                     responsive: true,

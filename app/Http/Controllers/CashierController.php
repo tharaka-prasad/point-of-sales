@@ -6,7 +6,8 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleDetail;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+use Mike42\Escpos\Printer;
 
 class CashierController extends Controller
 {
@@ -79,7 +80,7 @@ class CashierController extends Controller
             'return_products' => [],
         ]);
 
-        // ✅ Save details only if complete
+        // ✅ Save details + reduce stock only if complete
         if ($status === 'complete' && $request->products) {
             foreach ($request->products as $product) {
                 SaleDetail::create([
@@ -91,8 +92,10 @@ class CashierController extends Controller
                     'sub_total'  => $product['sub_total'],
                 ]);
 
-                // Reduce stock
-                Product::where('id', $product['id'])->decrement('stock', $product['amount']);
+                // Reduce stock safely
+                $productModel = Product::findOrFail($product['id']);
+                $productModel->stock -= $product['amount'];
+                $productModel->save();
             }
         }
 
@@ -105,19 +108,42 @@ class CashierController extends Controller
 
         return redirect()->route('cashier.index')->with('success', "Sale {$status} successfully!");
     }
+
     public function print($id)
     {
-        $sale = Sale::with(['member', 'details.product'])->findOrFail($id);
+        $sale = Sale::with(['member', 'items.product', 'cashier'])->findOrFail($id);
 
         $created_at = $sale->created_at
             ? $sale->created_at->format('Y-m-d H:i')
             : now()->format('Y-m-d H:i');
 
+        // Calculate totals
+        $subtotal = $sale->total_price;
+        $discount = $sale->discount ?? 0;
+        $total    = $subtotal - $discount;
+        $paid     = $sale->pay;
+        $change   = $paid - $total;
+
         session()->forget('last_sale_id');
+
+        // ✅ Cash drawer pulse (optional)
+        try {
+            $connector = new WindowsPrintConnector("EPSON");
+            $printer   = new Printer($connector);
+            $printer->pulse();
+            $printer->close();
+        } catch (\Exception $e) {
+            // \Log::error("Cash drawer not opened: " . $e->getMessage());
+        }
 
         return view('cashier.print', [
             'sale'       => $sale,
             'created_at' => $created_at,
+            'subtotal'   => $subtotal,
+            'discount'   => $discount,
+            'total'      => $total,
+            'paid'       => $paid,
+            'change'     => $change,
             'menu'       => 'Invoice',
         ]);
     }

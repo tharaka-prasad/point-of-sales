@@ -1,92 +1,167 @@
-@extends('layouts.master')
+<!DOCTYPE html>
+<html>
 
-@section('title')
-<h3>Invoice: {{ $sale->id }}</h3>
-@endsection
+<head>
+    <meta charset="UTF-8">
+    <title>Receipt</title>
+    <style>
+        body {
+            width: 72mm;
+            font-family: Arial;
+            font-size: 11px;
+            margin: 0;
+            padding: 5px;
+        }
 
-@section('content')
-<div class="container mt-5">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <div>
-                <h4 class="mb-0">Invoice #{{ $sale->id }}</h4>
-                <small>{{ $created_at }}</small>
-            </div>
-            <div>
-                <a href="{{ route('cashier.pdf', $sale->id) }}" class="btn btn-success me-2">
-                    <i class="fas fa-file-pdf"></i> Download PDF
-                </a>
-                <button class="btn btn-light" onclick="window.print()">
-                    <i class="fas fa-print"></i> Print
-                </button>
-            </div>
-        </div>
+        .center {
+            text-align: center;
+        }
 
-        <div class="card-body">
-            <!-- Customer Info -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <h6>Customer</h6>
-                    <p>{{ $sale->member->name ?? 'Walk-in' }}</p>
-                    @if($sale->member)
-                    <p>{{ $sale->member->address }}</p>
-                    <p>{{ $sale->member->phone }}</p>
-                    @endif
-                </div>
-                <div class="col-md-6 text-end">
-                    <h6>Payment Details</h6>
-                    <p>Total: <strong>{{ number_format($sale->total_price,2) }}</strong></p>
-                    <p>Cash: <strong>{{ number_format($sale->pay,2) }}</strong></p>
-                    <p>Balance: <strong>{{ number_format($sale->pay - $sale->total_price,2) }}</strong></p>
-                    <p>Status: <span class="badge bg-{{ $sale->status === 'complete' ? 'success' : 'warning' }}">{{ ucfirst($sale->status) }}</span></p>
-                </div>
-            </div>
+        .bold {
+            font-weight: bold;
+        }
 
-            <!-- Product Table -->
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>#</th>
-                            <th>Product</th>
-                            <th>Price</th>
-                            <th>Qty</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($sale->details as $index => $d)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $d->product->name ?? 'Deleted Product' }}</td>
-                            <td>{{ number_format($d->sale_price,2) }}</td>
-                            <td>{{ $d->amount }}</td>
-                            <td>{{ number_format($d->sub_total,2) }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+        .line {
+            border-top: 1px dashed #000;
+            margin: 5px 0;
+        }
 
-            <div class="text-end mt-4">
-                <h5>Grand Total: <strong>{{ number_format($sale->total_price,2) }}</strong></h5>
-            </div>
-        </div>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-        <div class="card-footer text-muted text-center">
-            Thank you for your purchase!
-        </div>
+        .items td,
+        .items th {
+            padding: 3px 0;
+        }
+
+        .items .name {
+            width: 50%;
+        }
+
+        .items .qty,
+        .items .price,
+        .items .total {
+            text-align: right;
+            width: 16%;
+        }
+
+        .totals td {
+            padding: 3px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        @media print {
+            #printBtn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="center">
+        {{-- <div class="line">
+            <img src="{{ asset('admin/images/logo-2025-09-18074601.jpg') }}" alt="Logo"
+                class="brand-image img-circle elevation-3" style="opacity: 0.8; width: 60px; height: 60px;">
+        </div> --}}
+        <span class="bold" style="font-size: 18px;">Ekrain Technologies & Solutions (Pvt) Ltd</span><br>
+        No.118/115, Kandewaththa Road, Nugegoda, Sri Lanka <br>
+        Tel: 011-4845935
     </div>
-</div>
-@endsection
 
-@push('styles')
-<style>
-    @media print {
-        .card-footer, .btn { display: none !important; }
-    }
-    .card {
-        border-radius: 15px;
-    }
-</style>
-@endpush
+    <div class="line"></div>
+
+    <div>
+        Date: {{ $sale->created_at->format('Y-m-d') }} &nbsp;&nbsp;&nbsp;
+        Time: {{ $sale->created_at->format('H:i') }}<br>
+        Receipt No: {{ str_pad($sale->id, 8, '0', STR_PAD_LEFT) }}<br>
+        Cashier: {{ $sale->cashier->name ?? 'N/A' }}
+    </div>
+
+    <div class="line"></div>
+
+    <table class="items">
+        <tr>
+            <th class="name">Item</th>
+            <th class="qty">Qty</th>
+            <th class="price">Unit Price</th>
+            <th class="total">Total</th>
+        </tr>
+        @foreach ($sale->items as $item)
+            <tr>
+                <td class="name">{{ $item->product->name ?? 'N/A' }}</td>
+                <td class="qty">{{ $item->amount }}</td>
+                <td class="price">Rs. {{ number_format($item->sale_price, 2) }}</td>
+                <td class="total">Rs. {{ number_format($item->sub_total, 2) }}</td>
+            </tr>
+        @endforeach
+    </table>
+
+    <div class="line"></div>
+
+    <table class="totals">
+        <tr>
+            <td>Subtotal</td>
+            <td style="text-align:right;">Rs. {{ number_format($subtotal, 2) }}</td>
+        </tr>
+        <tr>
+            <td>Discount</td>
+            <td style="text-align:right;">− Rs. {{ number_format($discount, 2) }}</td>
+        </tr>
+        <tr class="bold">
+            <td>Total</td>
+            <td style="text-align:right;">Rs. {{ number_format($total, 2) }}</td>
+        </tr>
+        <tr>
+            <td>Paid</td>
+            <td style="text-align:right;">Rs. {{ number_format($paid, 2) }}</td>
+        </tr>
+        <tr>
+            <td>Change</td>
+            <td style="text-align:right;">Rs. {{ number_format($change, 2) }}</td>
+        </tr>
+    </table>
+
+    <div class="line"></div>
+
+    <div class="footer">
+        Thank you for shopping at Ekrain Technologies!<br>
+        Prices include government taxes.<br>
+        * Prices and items may vary by branch.
+    </div>
+
+    <div class="center" style="margin-top:10px;">
+        <button id="printBtn" type="button">🖨️ Print Receipt (F9)</button>
+    </div>
+
+    <script>
+        function printReceipt() {
+            window.print();
+        }
+
+        // Button click -> direct print
+        document.getElementById('printBtn').addEventListener('click', function() {
+            printReceipt();
+        });
+
+        // F9 shortcut
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'F9') {
+                event.preventDefault();
+                printReceipt();
+            }
+        });
+
+        // Optional: auto-print as soon as page loads
+        // window.onload = printReceipt;
+    </script>
+
+</body>
+
+</html>

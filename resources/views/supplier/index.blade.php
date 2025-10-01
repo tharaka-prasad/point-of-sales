@@ -29,7 +29,9 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Name</th>
+                                        <th>Supplier Name</th>
+                                        <th>Company Name</th>
+                                        <th>Catogery</th>
                                         <th>Phone</th>
                                         <th>Address</th>
                                         <th>
@@ -59,7 +61,7 @@
 
         $(function() {
             $("body").addClass("sidebar-collapse");
-            
+
             supplier_table = $("#supplier_table")
                 .DataTable({
                     responsive: true,
@@ -76,6 +78,12 @@
                             sortable: false
                         },
                         {
+                            data: "supplier_name"
+                        },
+                        {
+                            data: "company_name"
+                        },
+                           {
                             data: "name"
                         },
                         {
@@ -134,6 +142,9 @@
             $.get(url)
                 .done(response => {
                     // Success
+                    suplier_name
+                    $("#modalForm [name=supplier_name]").val(response.name);
+                    $("#modalForm [name=company_name]").val(response.name);
                     $("#modalForm [name=name]").val(response.name);
                     $("#modalForm [name=phone]").val(response.phone);
                     $("#modalForm [name=address]").val(response.address);

@@ -36,4 +36,13 @@ class Sale extends Model
     {
         return $this->hasMany(SaleDetail::class, "sale_id", "id");
     }
+    public function items()
+    {
+        return $this->hasMany(SaleDetail::class);
+    }
+    public function cashier()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
 }

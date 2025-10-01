@@ -25,9 +25,9 @@
                                         <th>Date</th>
                                         <th>Member Code</th>
                                         <th>Total Item</th>
-                                        <th>Total Price (Rp)</th>
+                                        <th>Total Price (Rs)</th>
                                         <th>Dicount (%)</th>
-                                        <th>Total Pay (Rp)</th>
+                                        <th>Total Pay (Rs)</th>
                                         <th>Cashier</th>
                                         <th>
                                             <i class="fas fa-cog"></i>

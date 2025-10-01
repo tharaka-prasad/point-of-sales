@@ -1,13 +1,16 @@
 <?php
 
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\CashierShiftController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\GrnController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseDetailController;
+use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SaleDetailController;
@@ -15,6 +18,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GrnItemController;
 
 // Login
 Route::get("/", fn() => redirect()->route("login"));
@@ -37,6 +41,7 @@ Route::middleware([
         Route::resource('/product', ProductController::class);
         Route::post('/product/delete-selected', [ProductController::class, "deleteSelected"])->name("product.deleteSelected");
         Route::post('/product/print-barcode', [ProductController::class, "printBarcode"])->name("product.printBarcode");
+        Route::get('/product/autocode', [ProductController::class, 'autoCode'])->name('product.autocode');
 
         // Member
         Route::get('/member/data', [MemberController::class, "data"])->name("member.data");
@@ -47,6 +52,22 @@ Route::middleware([
         // Supplier
         Route::get('/supplier/data', [SupplierController::class, "data"])->name("supplier.data");
         Route::resource('/supplier', SupplierController::class);
+
+        // PO
+        Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');
+        Route::resource('po', PurchaseOrderController::class);
+        Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');
+        Route::get('/po/{id}', [PurchaseOrderController::class, 'show'])->name('po.show');
+
+         //GRN_ITEM
+         Route::resource('grn_items', GrnItemController::class);
+
+        //GRN
+        Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');
+        Route::get('/grn/create', [GrnController::class, 'create'])->name('grn.create');
+        Route::post('/grn', [GrnController::class, 'store'])->name('grn.store');
+        Route::get('/grn/{grn}', [GrnController::class, 'show'])->name('grn.show');
+
 
         // Expense
         Route::get('/expense/data', [ExpenseController::class, "data"])->name("expense.data");
@@ -83,6 +104,14 @@ Route::middleware([
         Route::post('/cashier', [CashierController::class, "store"])->name("cashier.store");
         Route::get('/cashier/print/{sale}', [CashierController::class, 'print'])->name('cashier.print');
 
+        // Cashier Shift
+        Route::prefix('cashier_shifts')->name('cashierShifts.')->group(function () {
+        Route::get('/', [CashierShiftController::class, 'index'])->name('index');
+        Route::get('/data', [CashierShiftController::class, 'data'])->name('data');
+        Route::post('/', [CashierShiftController::class, 'store'])->name('store');
+        Route::post('/{id}/close', [CashierShiftController::class, 'close'])->name('close');
+        Route::delete('/{id}', [CashierShiftController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // Transaction

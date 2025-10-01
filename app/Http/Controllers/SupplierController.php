@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
@@ -56,12 +55,14 @@ class SupplierController extends Controller
         $supplier = Supplier::findOrFail($id);
 
         if ($supplier) {
+            $supplier->suplier_name = $request->name;
+            $supplier->company_name = $request->name;
             $supplier->name = $request->name;
             $supplier->phone = $request->phone;
             $supplier->address = $request->address;
             $supplier->update();
 
-            return response()->json("Update supplier successfully.");
+            return response()->json("Update purchase order successfully.");
         }
     }
 

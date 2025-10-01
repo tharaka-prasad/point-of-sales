@@ -64,7 +64,7 @@
                 <!--BOX_4-->
                 <div class="small-box bg-warning shadow-sm" style="border-radius:10px;overflow:hidden;">
                     <div class="inner">
-                        <h4>Total Hold Orders</h4>
+                        <h4>Total Products</h4>
                         <h3>{{ $total_product }}</h3>
                     </div>
                     <div class="icon">

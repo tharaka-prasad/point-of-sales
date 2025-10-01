@@ -13,16 +13,16 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group row">
-                        <input type="text" name="name" id="name" class="form-control placeholder="Enter
-                            Member Name" required>
+                        <input type="text" name="name" id="name" class="form-control"
+                            placeholder="Enter Member Name" required>
                     </div>
                     <div class="form-group row">
                         <input type="number" name="phone" id="phone" class="form-control"
                             placeholder="Enter Phone" required>
                     </div>
                     <div class="form-group row">
-                        <textarea name="address" id="address" class="form-control" cols="30" rows="10"
-                            placeholder="Enter Address" required></textarea>
+                        <textarea name="address" id="address" class="form-control" cols="30" rows="10" placeholder="Enter Address"
+                            required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
