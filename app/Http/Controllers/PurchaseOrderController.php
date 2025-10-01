@@ -11,7 +11,13 @@ class PurchaseOrderController extends Controller
     public function index()
     {
         $menu = 'PO';
+        //loadingding supplier and items on the table
         $pos = PurchaseOrder::with('supplier')->paginate(10); // eager load supplier
+
+        // Calculate grand_total for each PO
+        foreach ($pos as $po) {
+            $po->grand_total = $po->quantity * $po->rate; // calculate from PO columns
+        }
 
         return view('po.index', compact('menu', 'pos'));
     }

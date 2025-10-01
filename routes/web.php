@@ -31,22 +31,6 @@ Route::middleware([
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, "index"])->name("dashboard.index");
 
-    //GRN_ITEM
-    Route::resource('grn_items', GrnItemController::class);
-
-    //GRN
-    Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');
-    Route::get('/grn/create', [GrnController::class, 'create'])->name('grn.create');
-    Route::post('/grn', [GrnController::class, 'store'])->name('grn.store');
-    Route::get('/grn/{grn}', [GrnController::class, 'show'])->name('grn.show');
-
-    // PO
-    Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');
-    Route::resource('po', PurchaseOrderController::class);
-    Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');
-    Route::get('/po/{id}', [PurchaseOrderController::class, 'show'])->name('po.show');
-
-
     Route::middleware(['level:1'])->group(function () {
         // Category
         Route::get('/category/data', [CategoryController::class, "data"])->name("category.data");
@@ -69,7 +53,20 @@ Route::middleware([
         Route::get('/supplier/data', [SupplierController::class, "data"])->name("supplier.data");
         Route::resource('/supplier', SupplierController::class);
 
+        // PO
+        Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');
+        Route::resource('po', PurchaseOrderController::class);
+        Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');
+        Route::get('/po/{id}', [PurchaseOrderController::class, 'show'])->name('po.show');
 
+         //GRN_ITEM
+         Route::resource('grn_items', GrnItemController::class);
+
+        //GRN
+        Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');
+        Route::get('/grn/create', [GrnController::class, 'create'])->name('grn.create');
+        Route::post('/grn', [GrnController::class, 'store'])->name('grn.store');
+        Route::get('/grn/{grn}', [GrnController::class, 'show'])->name('grn.show');
 
 
         // Expense
@@ -109,11 +106,11 @@ Route::middleware([
 
         // Cashier Shift
         Route::prefix('cashier_shifts')->name('cashierShifts.')->group(function () {
-            Route::get('/', [CashierShiftController::class, 'index'])->name('index');
-            Route::get('/data', [CashierShiftController::class, 'data'])->name('data');
-            Route::post('/', [CashierShiftController::class, 'store'])->name('store');
-            Route::post('/{id}/close', [CashierShiftController::class, 'close'])->name('close');
-            Route::delete('/{id}', [CashierShiftController::class, 'destroy'])->name('destroy');
+        Route::get('/', [CashierShiftController::class, 'index'])->name('index');
+        Route::get('/data', [CashierShiftController::class, 'data'])->name('data');
+        Route::post('/', [CashierShiftController::class, 'store'])->name('store');
+        Route::post('/{id}/close', [CashierShiftController::class, 'close'])->name('close');
+        Route::delete('/{id}', [CashierShiftController::class, 'destroy'])->name('destroy');
         });
     });
 

@@ -24,7 +24,7 @@
                         <th>PO No</th>
                         <th>Invoice No</th>
                         <th>Prepared By</th>
-                        <th>Total</th>
+                        <th>Total(Rs)</th>
                         <th width="160">Actions</th>
                     </tr>
                 </thead>
