@@ -41,10 +41,11 @@ Route::middleware([
     Route::get('/grn/{grn}', [GrnController::class, 'show'])->name('grn.show');
 
     // PO
-    Route::get('/po/', [PurchaseOrderController::class, 'index'])->name('po.index');
-    Route::get('/po/data', [PurchaseOrderController::class, "data"])->name("po.data");
-    Route::resource('/po', PurchaseOrderController::class);
+    Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');
+    Route::resource('po', PurchaseOrderController::class);
     Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');
+    Route::get('/po/{id}', [PurchaseOrderController::class, 'show'])->name('po.show');
+
 
     Route::middleware(['level:1'])->group(function () {
         // Category

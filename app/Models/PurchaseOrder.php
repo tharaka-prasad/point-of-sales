@@ -14,12 +14,17 @@ class PurchaseOrder extends Model
     protected $fillable = [
         'po_number',
         'purchase_company',
-        'supplier_name',
+        'supplier_id',
         'description',
         'contact_no',
         'quantity',
         'rate',
         'status'
     ];
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id', 'id');
+    }
 
 }
