@@ -47,11 +47,11 @@ class GrnController extends Controller
             'invoice_no'       => 'required|string',
             'general_remarks'  => 'nullable|string',
             'items'            => 'nullable|array',
-            'items.*.code'     => 'required|string',
-            'items.*.desc'     => 'required|string',
-            'items.*.received' => 'required|numeric',
-            'items.*.accepted' => 'required|numeric',
-            'items.*.price'    => 'required|numeric',
+            'items.*.code'     => 'nullable|string',
+            'items.*.desc'     => 'nullable|string',
+            'items.*.received' => 'nullable|numeric',
+            'items.*.accepted' => 'nullable|numeric',
+            'items.*.price'    => 'nullable|numeric',
         ]);
 
         DB::transaction(function () use ($validated) {
@@ -67,15 +67,14 @@ class GrnController extends Controller
             if (! empty($validated['items'])) {
                 foreach ($validated['items'] as $item) {
                     $grn->items()->create([
-                        'product_id'   => $item['product_id'] ?? null, // add this line
-                        'description'  => $item['desc'],
+                        'description'  => $item['desc']?? null,
                         'uom'          => $item['uom'] ?? null,
                         'qty_ordered'  => $item['ordered'] ?? 0,
-                        'qty_received' => $item['received'],
-                        'qty_accepted' => $item['accepted'],
+                        'qty_received' => $item['received']?? 0,
+                        'qty_accepted' => $item['accepted'] ?? 0,
                         'qty_rejected' => ($item['received'] ?? 0) - ($item['accepted'] ?? 0),
-                        'unit_price'   => $item['price'],
-                        'total'        => $item['accepted'] * $item['price'],
+                        'unit_price'   => $item['price'] ?? 0,
+                        'total'        => ($item['accepted'] ?? 0) * ($item['price'] ?? 0),
                         'remarks'      => $item['remarks'] ?? null,
                         'created_by'   => auth()->id(),
                     ]);
@@ -83,7 +82,7 @@ class GrnController extends Controller
             }
         });
 
-        return redirect()->route('grn.create')->with('success', 'GRN saved successfully!');
+        return redirect()->route('grn.index')->with('success', 'GRN saved successfully!');
     }
 
     /**

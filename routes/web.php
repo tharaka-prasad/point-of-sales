@@ -78,16 +78,7 @@ Route::middleware([
         Route::get('/expense/data', [ExpenseController::class, "data"])->name("expense.data");
         Route::resource('/expense', ExpenseController::class);
 
-        // Purchase
-        Route::get('/purchase/data', [PurchaseController::class, "data"])->name("purchase.data");
-        Route::get('/purchase/{id}/create', [PurchaseController::class, "create"]);
-        Route::resource('/purchase', PurchaseController::class)->except("create");
-
-        // Purchase Detail
-        Route::get('/purchase_detail/{id}/data', [PurchaseDetailController::class, "data"])->name("purchase_detail.data");
-        Route::get('/purchase_detail/load-form/{discount}/{total}', [PurchaseDetailController::class, "loadForm"])->name("purchase_detail.loadForm");
-        Route::resource('/purchase_detail', PurchaseDetailController::class)->except("create", "show", "edit");
-
+       
         // Sale
         Route::get('/sale/data', [SaleController::class, "data"])->name("sale.data");
         Route::resource('/sale', SaleController::class)->except("edit", "update");
