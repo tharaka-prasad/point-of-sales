@@ -5,12 +5,13 @@
 @endsection
 
 @section('content')
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Goods Received Notes (GRN)</h4>
-            <a href="{{ route('grn.create') }}" class="btn btn-primary">+ New GRN</a>
-        </div>
+    <div class="container mt-4">
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Goods Received Notes (GRN)</h4>
+                <a href="{{ route('grn.create') }}" class="btn btn-primary ">+ New GRN</a>
+            </div>
 
         <div class="card-body">
             <table class="table table-bordered table-hover table-striped">
@@ -23,7 +24,7 @@
                         <th>PO No</th>
                         <th>Invoice No</th>
                         <th>Prepared By</th>
-                        <th>Total</th>
+                        <th>Total(Rs)</th>
                         <th width="160">Actions</th>
                     </tr>
                 </thead>
@@ -51,11 +52,11 @@
                 </tbody>
             </table>
 
-            {{-- Pagination --}}
-            <div class="d-flex justify-content-center">
-                {{ $grns->links() }}
+                {{-- Pagination --}}
+                <div class="d-flex justify-content-center">
+                    {{ $grns->links() }}
+                </div>
             </div>
         </div>
     </div>
-</div>
 @endsection

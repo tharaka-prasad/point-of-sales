@@ -14,6 +14,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
+/* --- Existing styles --- */
 body { font-family: Arial, sans-serif; margin:20px; background:#f9f9f9; }
 .container { max-width:1200px; margin:auto; }
 .card { background:#fff; padding:20px; border-radius:8px; box-shadow:0 0 6px rgba(0,0,0,0.1); }
@@ -67,155 +68,153 @@ button { margin:5px; padding:8px 16px; cursor:pointer; border:none; border-radiu
             </div>
         </header>
 
-        @if(session('success'))
-            <div class="pdf-status success">{{ session('success') }}</div>
-        @endif
+        <div id="pdfStatus" class="pdf-status"></div>
 
-        <form method="POST" action="{{ route('grn.store') }}">
-            @csrf
-            <input type="hidden" name="grn_no" id="grnNo">
+                <form method="POST" action="{{ route('grn.store') }}">
+                    @csrf
+                    <input type="hidden" name="grn_no" id="grn_no">
 
-            <div class="grid">
-                <div class="card inner">
-                    <div class="meta">
-                        <div class="field">
-                            <label>Date</label>
-                            <input id="grnDate" type="date" name="date" required />
+                    <div class="grid">
+                        <div class="card inner">
+                            <div class="meta">
+                                <div class="field">
+                                    <label>Date</label>
+                                    <input id="grnDate" type="date" name="date" required />
+                                </div>
+                                <div class="field">
+                                    <label>Supplier Name</label>
+                                    <select id="supplier" name="supplier" required>
+                                        <option value="">-- Select Supplier --</option>
+                                        @foreach ($suppliers as $supplier)
+                                            <option value="{{ $supplier->id }}">{{ $supplier->supplier_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>PO No</label>
+                                    <input id="poNo" type="text" name="po_no" placeholder="PO-123" />
+                                </div>
+                                <div class="field">
+                                    <label>Invoice No</label>
+                                    <input id="invNo" type="text" name="invoice_no" placeholder="INV-456" />
+                                </div>
+                            </div>
                         </div>
-                        <div class="field">
-                            <label>Supplier Name</label>
-                            <select id="supplier" name="supplier" required>
-                                <option value="">-- Select Supplier --</option>
-                                @foreach ($suppliers as $supplier)
-                                    <option value="{{ $supplier->id }}">{{ $supplier->supplier_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label>PO No</label>
-                            <input id="poNo" type="text" name="po_no" placeholder="PO-123" />
-                        </div>
-                        <div class="field">
-                            <label>Invoice No</label>
-                            <input id="invNo" type="text" name="invoice_no" placeholder="INV-456" />
+
+                        <div class="card inner">
+                            <div class="meta">
+                                <div class="field">
+                                    <label>General Remarks</label><br />
+                                    <textarea id="generalRemarks" name="general_remarks" rows="6" placeholder="Enter remarks here..."></textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="card inner">
-                    <div class="meta">
-                        <div class="field">
-                            <label>General Remarks</label><br />
-                            <textarea id="generalRemarks" name="general_remarks" rows="6" placeholder="Enter remarks here..."></textarea>
+                    <div class="table-wrap">
+                        <table id="itemsTable">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>UOM</th>
+                                    <th>Qty Ordered</th>
+                                    <th>Qty Received</th>
+                                    <th>Qty Accepted</th>
+                                    <th>Qty Rejected</th>
+                                    <th>Unit Price</th>
+                                    <th>Total Price</th>
+                                    <th>Remarks</th>
+                                    <th class="no-print">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody"></tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="8" style="text-align:right; font-weight:bold;">Grand Total</td>
+                                    <td id="grandTotal" data-value="0.00">0.00</td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="actions no-print">
+                        <button type="button" id="addRow">+ Add Row</button>
+                        <button type="button" class="secondary" id="clearRows">Clear All</button>
+                    </div>
+
+                    <div class="totals">
+                        <div class="box">
+                            <div class="small">Total Items</div>
+                            <div id="totalItems">0</div>
+                        </div>
+                        <div class="box">
+                            <div class="small">Total Qty Received</div>
+                            <div id="totalReceived">0</div>
+                        </div>
+                        <div class="box">
+                            <div class="small">Total Qty Accepted</div>
+                            <div id="totalAccepted">0</div>
                         </div>
                     </div>
-                </div>
+
+                    <div class="footer">
+                        <div class="signatures">
+                            <div class="small">Prepared By</div>
+                            <div class="line"></div>
+                            <div class="small">Checked By</div>
+                            <div class="line"></div>
+                            <div class="small">Approved By</div>
+                            <div class="line"></div>
+                        </div>
+                    </div>
+
+                    <div class="no-print buttons">
+                        <button type="submit" class="secondary">Save GRN</button>
+                        <button type="button" id="resetAll" class="warn">Reset Form</button>
+                    </div>
+                </form>
             </div>
+        </div>
 
-            <div class="table-wrap">
-                <table id="itemsTable">
-                    <thead>
-                        <tr>
-                            <th>Item Code</th>
-                            <th>Description</th>
-                            <th>UOM</th>
-                            <th>Qty Ordered</th>
-                            <th>Qty Received</th>
-                            <th>Qty Accepted</th>
-                            <th>Qty Rejected</th>
-                            <th>Unit Price</th>
-                            <th>Total Price</th>
-                            <th>Remarks</th>
-                            <th class="no-print">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody"></tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="8" style="text-align:right; font-weight:bold;">Grand Total</td>
-                            <td id="grandTotal" data-value="0.00">0.00</td>
-                            <td colspan="2"></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
+        <script>
+            const tbody = document.getElementById("tbody");
+            const totalItems = document.getElementById("totalItems");
+            const totalReceived = document.getElementById("totalReceived");
+            const totalAccepted = document.getElementById("totalAccepted");
+            const grandTotalCell = document.getElementById("grandTotal");
+            const grnNoInput = document.getElementById("grnNo");
 
-            <div class="actions no-print">
-                <button type="button" id="addRow">+ Add Row</button>
-                <button type="button" class="secondary" id="clearRows">Clear All</button>
-            </div>
-
-            <div class="totals">
-                <div class="box">
-                    <div class="small">Total Items</div>
-                    <div id="totalItems">0</div>
-                </div>
-                <div class="box">
-                    <div class="small">Total Qty Received</div>
-                    <div id="totalReceived">0</div>
-                </div>
-                <div class="box">
-                    <div class="small">Total Qty Accepted</div>
-                    <div id="totalAccepted">0</div>
-                </div>
-            </div>
-
-            <div class="footer">
-                <div class="signatures">
-                    <div class="small">Prepared By</div>
-                    <div class="line"></div>
-                    <div class="small">Checked By</div>
-                    <div class="line"></div>
-                    <div class="small">Approved By</div>
-                    <div class="line"></div>
-                </div>
-            </div>
-
-            <div class="no-print buttons">
-                <button type="submit" class="secondary">Save GRN</button>
-                <button type="button" id="resetAll" class="warn">Reset Form</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-const tbody = document.getElementById("tbody");
-const totalItems = document.getElementById("totalItems");
-const totalReceived = document.getElementById("totalReceived");
-const totalAccepted = document.getElementById("totalAccepted");
-const grandTotalCell = document.getElementById("grandTotal");
-const grnNoInput = document.getElementById("grnNo");
-
-function generateGRN() {
-    const d = new Date();
-    return "GRN-" + d.getFullYear() + (d.getMonth() + 1) + d.getDate() + "-" + Math.floor(Math.random() * 900 + 100);
-}
+            function generateGRN() {
+                const d = new Date();
+                return "GRN-" + d.getFullYear() + (d.getMonth() + 1) + d.getDate() + "-" + Math.floor(Math.random() * 900 +
+                100);
+            }
 
 function addRow(data={}) {
-    const index = tbody.querySelectorAll("tr").length;
     const tr = document.createElement("tr");
     tr.innerHTML = `
-        <td><input name="items[${index}][code]" class="code" value="${data.code||''}"></td>
-        <td><input name="items[${index}][desc]" class="desc" value="${data.desc||''}"></td>
-        <td><input name="items[${index}][uom]" class="uom" value="${data.uom||''}"></td>
-        <td><input name="items[${index}][ordered]" class="ordered" type="number" value="${data.ordered||0}"></td>
-        <td><input name="items[${index}][received]" class="received" type="number" value="${data.received||0}"></td>
-        <td><input name="items[${index}][accepted]" class="accepted" type="number" value="${data.accepted||0}"></td>
-        <td><input name="items[${index}][rejected]" class="rejected" type="number" value="${data.rejected||0}" readonly></td>
-        <td><input name="items[${index}][price]" class="price" type="number" step="0.01" value="${data.price||0}"></td>
-        <td>
-            <span class="total">0.00</span>
-            <input type="hidden" name="items[${index}][total]" class="totalInput" value="0">
-        </td>
-        <td><input name="items[${index}][remarks]" class="remarks" value="${data.remarks||''}"></td>
+        <td><input name="items[][code]" class="code" value="${data.code||''}"></td>
+        <td><input name="items[][desc]" class="desc" value="${data.desc||''}"></td>
+        <td><input name="items[][uom]" class="uom" value="${data.uom||''}"></td>
+        <td><input name="items[][ordered]" class="ordered" type="number" value="${data.ordered||0}"></td>
+        <td><input name="items[][received]" class="received" type="number" value="${data.received||0}"></td>
+        <td><input name="items[][accepted]" class="accepted" type="number" value="${data.accepted||0}"></td>
+        <td><input name="items[][rejected]" class="rejected" type="number" value="${data.rejected||0}" readonly></td>
+        <td><input name="items[][price]" class="price" type="number" step="0.01" value="${data.price||0}"></td>
+        <td class="total" data-value="0.00">0.00</td>
+        <td><input name="items[][remarks]" class="remarks" value="${data.remarks||''}"></td>
         <td class="no-print"><button type="button" class="del warn">X</button></td>
     `;
-    tr.querySelector(".del").onclick = () => { tr.remove(); recalc(); };
-    tr.querySelectorAll("input").forEach(i => i.oninput = recalc);
-    tbody.appendChild(tr);
-    recalc();
-}
+                tr.querySelector(".del").onclick = () => {
+                    tr.remove();
+                    recalc();
+                };
+                tr.querySelectorAll("input").forEach(i => i.oninput = recalc);
+                tbody.appendChild(tr);
+                recalc();
+            }
 
 function recalc() {
     const rows = tbody.querySelectorAll("tr");
@@ -229,7 +228,6 @@ function recalc() {
         r.querySelector(".rejected").value = rejected;
         const total = accepted*price;
         r.querySelector(".total").textContent = total.toFixed(2);
-        r.querySelector(".totalInput").value = total.toFixed(2);
         rec += received;
         acc += accepted;
         gTotal += total;
@@ -239,11 +237,24 @@ function recalc() {
     grandTotalCell.textContent = gTotal.toFixed(2);
 }
 
-document.getElementById("addRow").onclick = () => addRow();
-document.getElementById("clearRows").onclick = () => { tbody.innerHTML=""; recalc(); };
-document.getElementById("resetAll").onclick = () => { tbody.innerHTML=""; recalc(); document.querySelector("form").reset(); grnNoInput.value = generateGRN(); };
-window.onload = () => { grnNoInput.value = generateGRN(); document.getElementById("grnDate").value = new Date().toISOString().split("T")[0]; addRow(); };
-</script>
-</body>
-</html>
+            document.getElementById("addRow").onclick = () => addRow();
+            document.getElementById("clearRows").onclick = () => {
+                tbody.innerHTML = "";
+                recalc();
+            };
+            document.getElementById("resetAll").onclick = () => {
+                tbody.innerHTML = "";
+                recalc();
+                document.querySelector("form").reset();
+                grnNoInput.value = generateGRN();
+            };
+            window.onload = () => {
+                grnNoInput.value = generateGRN();
+                document.getElementById("grnDate").value = new Date().toISOString().split("T")[0];
+                addRow();
+            };
+        </script>
+    </body>
+
+    </html>
 @endsection

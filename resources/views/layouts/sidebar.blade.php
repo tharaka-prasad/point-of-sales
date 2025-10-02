@@ -4,12 +4,8 @@
         @php
             $logoPath = $setting->path_logo ?? null;
         @endphp
-        <img
-            src="{{ $logoPath && file_exists(public_path($logoPath)) ? asset($logoPath) : asset('admin/images/logo-2025-09-18074601.jpg') }}"
-            alt="Point Of Sale Logo"
-            class="brand-image img-circle elevation-3"
-            style="opacity: 0.8"
-        >
+        <img src="{{ $logoPath && file_exists(public_path($logoPath)) ? asset($logoPath) : asset('admin/images/logo-2025-09-18074601.jpg') }}"
+            alt="Point Of Sale Logo" class="brand-image img-circle elevation-3" style="opacity: 0.8">
         <span class="brand-text font-weight-light">{{ $setting->company_name ?? config('app.name') }}</span>
     </a>
 
@@ -35,7 +31,7 @@
                     </a>
                 </li>
 
-                @if(Auth::user()->current_team_id == 1)
+                @if (Auth::user()->current_team_id == 1)
                     <!-- MASTER Section -->
                     <li class="nav-header">MASTER</li>
                     <li class="nav-item">
@@ -63,12 +59,12 @@
                         </a>
                     </li>
 
-                    {{-- <li class="nav-item">
+                    <li class="nav-item">
                         <a href="{{ route('po.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-cart-plus"></i>
                             <p>PO</p>
                         </a>
-                    </li> --}}
+                    </li>
 
                     <li class="nav-item">
                         <a href="{{ route('grn.index') }}" class="nav-link">
@@ -165,7 +161,7 @@
                     </li>
                     <li class="nav-item">
                         <a href="javascript:void(0)" class="nav-link"
-                           onclick="document.getElementById('logout-form').submit()">
+                            onclick="document.getElementById('logout-form').submit()">
                             <i class="nav-icon fas fa-sign-out-alt"></i>
                             <p>Logout</p>
                         </a>
@@ -187,7 +183,7 @@
                     <li class="nav-header">SYSTEM</li>
                     <li class="nav-item">
                         <a href="javascript:void(0)" class="nav-link"
-                           onclick="document.getElementById('logout-form').submit()">
+                            onclick="document.getElementById('logout-form').submit()">
                             <i class="nav-icon fas fa-sign-out-alt"></i>
                             <p>Logout</p>
                         </a>

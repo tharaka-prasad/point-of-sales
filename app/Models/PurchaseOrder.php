@@ -9,22 +9,22 @@ class PurchaseOrder extends Model
 {
     use HasFactory;
 
+    protected $table = 'pos';
+
     protected $fillable = [
-        'po_number', 'purchase_company', 'description', 'quantity', 'rate', 'total', 'issue_date', 'issue_time'
+        'po_number',
+        'purchase_company',
+        'supplier_id',
+        'description',
+        'contact_no',
+        'quantity',
+        'rate',
+        'status'
     ];
 
-    // Generate PO number automatically
-    protected static function boot()
+    public function supplier()
     {
-        parent::boot();
-
-        static::creating(function ($po) {
-            $lastPo = Po::latest('id')->first();
-            $poNumber = $lastPo ? 1000 + $lastPo->id + 1 : 1000;
-            $po->po_number = 'PO-' . $poNumber;
-            $po->issue_date = date('Y-m-d'); // today
-            $po->issue_time = date('H:i:s'); // current time
-            $po->total = $po->quantity * $po->rate; // calculate total
-        });
+        return $this->belongsTo(Supplier::class, 'supplier_id', 'id');
     }
+
 }
