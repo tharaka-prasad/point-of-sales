@@ -15,16 +15,16 @@ return new class extends Migration
             $table->id('grn_item_id');
             $table->foreignId('grn_id')->constrained('grns')->onDelete('cascade');
             $table->foreignId('product_id')->nullable()->constrained('products');
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->string('uom')->nullable();
-            $table->integer('qty_ordered')->default(0);
-            $table->integer('qty_received');
-            $table->integer('qty_accepted');
-            $table->integer('qty_rejected');
-            $table->decimal('unit_price', 12, 2);
+            $table->integer('qty_ordered')->default(0)->nullable();
+            $table->integer('qty_received')->nullable();
+            $table->integer('qty_accepted')->nullable();
+            $table->integer('qty_rejected')->nullable();
+            $table->decimal('unit_price', 12, 2)->nullable();
             $table->decimal('total', 12, 2)->nullable();
             $table->string('remarks')->nullable();
-            $table->integer('created_by');
+            $table->integer('created_by')->nullable();
             $table->timestamps();
         });
     }
