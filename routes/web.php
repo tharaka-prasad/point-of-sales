@@ -19,6 +19,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GrnItemController;
+use App\Http\Controllers\QuickBooksController;
 
 // Login
 Route::get("/", fn() => redirect()->route("login"));
@@ -30,6 +31,10 @@ Route::middleware([
 ])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, "index"])->name("dashboard.index");
+
+    //Quick-Books
+    Route::get('/qbo/connect', [QuickBooksController::class, 'connect']);
+    Route::get('/qbo/callback', [QuickBooksController::class, 'callback']);
 
     Route::middleware(['level:1'])->group(function () {
         // Category
