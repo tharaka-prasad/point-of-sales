@@ -16,6 +16,8 @@ class Grn extends Model
         'date',
         'invoice_no',
         'general_remarks',
+        'grn_total',
+        'status',
     ];
 
     protected static function booted()
