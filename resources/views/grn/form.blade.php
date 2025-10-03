@@ -286,7 +286,8 @@
                             <thead>
                                 <tr>
                                     <th>Item Code</th>
-                                    <th>Description</th>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
                                     <th>UOM</th>
                                     <th>Qty Ordered</th>
                                     <th>Qty Received</th>
@@ -294,18 +295,19 @@
                                     <th>Qty Rejected</th>
                                     <th>Unit Price</th>
                                     <th>Total Price</th>
-                                    <th>Remarks</th>
                                     <th class="no-print">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody"></tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="8" style="text-align:right; font-weight:bold;">Grand Total</td>
-                                    <td id="grandTotal" data-value="0.00">0.00</td>
+                                    <td colspan="9" style="text-align:right; font-weight:bold;">Grand Total</td>
+                                    <td id="grandTotal">0.00</td>
                                     <td colspan="2"></td>
                                 </tr>
                             </tfoot>
+                            <input type="hidden" name="grn_total" id="grandTotalInput" value="0">
+
                         </table>
                     </div>
 
@@ -361,7 +363,7 @@
             function generateGRN() {
                 const d = new Date();
                 return "GRN-" + d.getFullYear() + (d.getMonth() + 1) + d.getDate() + "-" + Math.floor(Math.random() * 900 +
-                100);
+                    100);
             }
 
             function addRow(data = {}) {
@@ -370,6 +372,7 @@
                 tr.innerHTML = `
             <td><input name="items[${rowIndex}][code]" class="code" value="${data.code || ''}"></td>
             <td><input name="items[${rowIndex}][desc]" class="desc" value="${data.desc || ''}"></td>
+            <td><input name="items[${rowIndex}][remarks]" class="remarks" value="${data.remarks || ''}"></td>
             <td><input name="items[${rowIndex}][uom]" class="uom" value="${data.uom || ''}"></td>
             <td><input name="items[${rowIndex}][ordered]" class="ordered" type="number" value="${data.ordered || 0}"></td>
             <td><input name="items[${rowIndex}][received]" class="received" type="number" value="${data.received || 0}"></td>
@@ -377,7 +380,6 @@
             <td><input name="items[${rowIndex}][rejected]" class="rejected" type="number" value="${data.rejected || 0}" readonly></td>
             <td><input name="items[${rowIndex}][price]" class="price" type="number" step="0.01" value="${data.price || 0}"></td>
             <td class="total" data-value="0.00">0.00</td>
-            <td><input name="items[${rowIndex}][remarks]" class="remarks" value="${data.remarks || ''}"></td>
             <td class="no-print"><button type="button" class="del warn">X</button></td>
         `;
 
@@ -417,6 +419,8 @@
                 totalReceived.textContent = rec;
                 totalAccepted.textContent = acc;
                 grandTotalCell.textContent = gTotal.toFixed(2);
+                document.getElementById("grandTotalInput").value = gTotal.toFixed(2);
+
             }
 
             document.getElementById("addRow").onclick = () => addRow();

@@ -63,22 +63,17 @@ Route::middleware([
         Route::resource('po', PurchaseOrderController::class);
         Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');
         Route::get('/po/{id}', [PurchaseOrderController::class, 'show'])->name('po.show');
-
-         //GRN_ITEM
-         Route::resource('grn_items', GrnItemController::class);
-
         //GRN
         Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');
         Route::get('/grn/create', [GrnController::class, 'create'])->name('grn.create');
         Route::post('/grn', [GrnController::class, 'store'])->name('grn.store');
         Route::get('/grn/{grn}', [GrnController::class, 'show'])->name('grn.show');
 
-
         // Expense
         Route::get('/expense/data', [ExpenseController::class, "data"])->name("expense.data");
         Route::resource('/expense', ExpenseController::class);
 
-       
+
         // Sale
         Route::get('/sale/data', [SaleController::class, "data"])->name("sale.data");
         Route::resource('/sale', SaleController::class)->except("edit", "update");

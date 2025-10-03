@@ -1,7 +1,9 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Grn;
+use App\Models\GrnItems;
 use App\Models\Product;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
@@ -12,20 +14,19 @@ class GrnController extends Controller
     /**
      * Display a listing of GRNs.
      */
-   public function index()
-{
-    $menu      = 'GRN';
-    $suppliers = Supplier::all();
-    $products  = Product::all();
+    public function index()
+    {
+        $menu      = 'GRN';
+        $suppliers = Supplier::all();
+        $products  = Product::all();
 
-    // Eager load supplier, creator, and items
-    $grns = Grn::with('items.product', 'supplier', 'creator')
-                ->latest()
-                ->paginate(10);
+        // Eager load supplier, creator, and items
+        $grns = Grn::with('items.product', 'supplier', 'creator')
+            ->latest()
+            ->paginate(10);
 
-    return view('grn.index', compact('menu', 'suppliers', 'products', 'grns'));
-}
-
+        return view('grn.index', compact('menu', 'suppliers', 'products', 'grns'));
+    }
 
     /**
      * Show the form for creating a new GRN.
@@ -38,65 +39,111 @@ class GrnController extends Controller
         return view('grn.form', compact('menu', 'suppliers'));
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'date'             => 'required|date',
-            'supplier'         => 'required|exists:suppliers,id',
-            'po_no'            => 'required|string',
-            'invoice_no'       => 'required|string',
-            'general_remarks'  => 'nullable|string',
-            'items'            => 'nullable|array',
-            'items.*.code'     => 'nullable|string',
-            'items.*.desc'     => 'nullable|string',
-            'items.*.received' => 'nullable|numeric',
-            'items.*.accepted' => 'nullable|numeric',
-            'items.*.price'    => 'nullable|numeric',
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'date'             => 'required|date',
+        'supplier'         => 'required|exists:suppliers,id',
+        'po_no'            => 'required|string',
+        'invoice_no'       => 'required|string',
+        'general_remarks'  => 'nullable|string',
+        'grn_total'        => 'required|numeric',
+        'items'            => 'nullable|array',
+        'items.*.code'     => 'nullable|string', // barcode / product reference
+        'items.*.desc'     => 'nullable|string',
+        'items.*.uom'      => 'nullable|string',
+        'items.*.remarks'  => 'nullable|string', // category name
+        'items.*.ordered'  => 'nullable|numeric',
+        'items.*.received' => 'nullable|numeric',
+        'items.*.accepted' => 'nullable|numeric',
+        'items.*.price'    => 'nullable|numeric',
+    ]);
+
+    DB::transaction(function () use ($validated) {
+
+        // 1️⃣ Create GRN main record
+        $grn = Grn::create([
+            'date'            => $validated['date'],
+            'supplier_id'     => $validated['supplier'],
+            'po_no'           => $validated['po_no'],
+            'invoice_no'      => $validated['invoice_no'],
+            'general_remarks' => $validated['general_remarks'] ?? null,
+            'grn_total'       => $validated['grn_total'],
+            'created_by'      => auth()->id(),
         ]);
 
-        DB::transaction(function () use ($validated) {
-            $grn = Grn::create([
-                'date'            => $validated['date'],
-                'supplier_id'     => $validated['supplier'],
-                'po_no'           => $validated['po_no'],
-                'invoice_no'      => $validated['invoice_no'],
-                'general_remarks' => $validated['general_remarks'] ?? null,
-                'created_by'      => auth()->id(),
-            ]);
+        // 2️⃣ Loop through items
+        if (!empty($validated['items'])) {
+            foreach ($validated['items'] as $item) {
 
-            if (! empty($validated['items'])) {
-                foreach ($validated['items'] as $item) {
-                    $grn->items()->create([
-                        'description'  => $item['desc']?? null,
-                        'uom'          => $item['uom'] ?? null,
-                        'qty_ordered'  => $item['ordered'] ?? 0,
-                        'qty_received' => $item['received']?? 0,
-                        'qty_accepted' => $item['accepted'] ?? 0,
-                        'qty_rejected' => ($item['received'] ?? 0) - ($item['accepted'] ?? 0),
-                        'unit_price'   => $item['price'] ?? 0,
-                        'total'        => ($item['accepted'] ?? 0) * ($item['price'] ?? 0),
-                        'remarks'      => $item['remarks'] ?? null,
-                        'created_by'   => auth()->id(),
+                // 2a. Handle Category (from remarks)
+                $categoryName = $item['remarks'] ?? 'Uncategorized';
+                $category = Category::firstOrCreate(['name' => $categoryName]);
+
+                // 2b. Handle Product
+                $product = Product::where('code', $item['code'] ?? null)
+                                  ->orderBy('id', 'desc')
+                                  ->first();
+
+                // If product not exists or unit price changed → create new product
+                if (!$product || ($item['price'] && $item['price'] != $product->price)) {
+
+                    // generate unique code if not provided
+                    $uniqueCode = $item['code'] ?? uniqid('P-');
+                    while (Product::where('code', $uniqueCode)->exists()) {
+                        $uniqueCode = uniqid('P-');
+                    }
+
+                    $product = Product::create([
+                        'code'        => $uniqueCode,
+                        'name'        => $item['desc'] ?? 'Unnamed Product',
+                        'category_id' => $category->id,
+                        'price'       => $item['price'] ?? 0,
+                        'sell_price'  => $item['price'] ?? 0,
+                        'stock'       => 0,
                     ]);
                 }
-            }
-        });
 
-        return redirect()->route('grn.index')->with('success', 'GRN saved successfully!');
-    }
+                // 2c. Update stock with accepted qty
+                $acceptedQty = $item['accepted'] ?? 0;
+                $product->stock += $acceptedQty;
+                $product->save();
+
+                // 2d. Save GRN Item
+                GrnItems::create([
+                    'grn_id'       => $grn->id,
+                    'product_id'   => $product->id,
+                    'description'  => $item['desc'] ?? null,
+                    'uom'          => $item['uom'] ?? null,
+                    'qty_ordered'  => $item['ordered'] ?? 0,
+                    'qty_received' => $item['received'] ?? 0,
+                    'qty_accepted' => $acceptedQty,
+                    'qty_rejected' => ($item['received'] ?? 0) - $acceptedQty,
+                    'unit_price'   => $product->price,
+                    'total'        => $acceptedQty * $product->price,
+                    'remarks'      => $category->name,
+                    'created_by'   => auth()->id(),
+                ]);
+            }
+        }
+    });
+
+    return redirect()->route('grn.index')->with('success', 'GRN saved successfully!');
+}
+
 
     /**
      * Display the specified GRN.
      */
-    // public function show(Grn $grn)
-    // {
-    //     $menu = 'View GRN';
-    //     $suppliers = Supplier::all();
-    //     $products  = Product::all();
-    //     $grn->load('items.product', 'supplier');
+    public function show($id)
+    {
+        $grn = Grn::with('supplier', 'items')->findOrFail($id);
 
-    //     return view('grn.show', compact('menu', 'grn', 'suppliers', 'products'));
-    // }
+        return view('grn.show', [
+            'menu' => 'View GRN',
+            'grn'  => $grn,
+        ]);
+    }
 
     /**
      * Show the form for editing the specified GRN.
