@@ -41,14 +41,17 @@
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $po->po_number }}</td>
                                 <td>{{ $po->purchase_company }}</td>
-                                <td>{{ $po->supplier_id }}</td>
+                                <td>{{ $po->supplier_name ?? 'N/A' }}</td>
                                 <td>{{ $po->description }}</td>
                                 <td>{{ $po->contact_no }}</td>
                                 <td>{{ $po->quantity }}</td>
                                 <td>{{ $po->rate }}</td>
                                 <td>{{ $po->status }}</td>
                                 <td>{{ number_format($po->grand_total, 2) }}</td>
-                                <td></td>
+                                <td>
+                                    <a href="{{ route('po.show', $po->id) }}" class="btn btn-sm btn-info">View</a>
+                                {{-- Optional actions: Edit, PDF, Delete --}}
+                                </td>
                             </tr>
                         @empty
                             <tr>

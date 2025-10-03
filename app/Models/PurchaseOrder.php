@@ -26,5 +26,9 @@ class PurchaseOrder extends Model
     {
         return $this->belongsTo(Supplier::class, 'supplier_id', 'id');
     }
+    public function getSupplierNameAttribute()
+    {
+        return $this->supplier ? $this->supplier->supplier_name : '-';
+    }
 
 }

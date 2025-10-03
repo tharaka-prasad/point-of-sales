@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('po_items', function (Blueprint $table) {
             $table->id();
+
             $table->string('item_name')->nullable();
             $table->string('category')->nullable();
             $table->string('uom')->nullable();
             $table->string('qty')->nullable();
-            $table->string('rate')->nullable();
+            $table->decimal('rate', 10, 2)->nullable(); // Rs
             $table->string('remarks')->nullable();
+            
             $table->timestamps();
         });
     }

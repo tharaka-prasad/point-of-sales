@@ -11,7 +11,6 @@ class PurchaseOrderController extends Controller
     public function index()
     {
         $menu = 'PO';
-        //loadingding supplier and items on the table
         $pos = PurchaseOrder::with('supplier')->paginate(10); // eager load supplier
 
         // Calculate grand_total for each PO
@@ -66,7 +65,10 @@ class PurchaseOrderController extends Controller
     // Show specific PO
     public function show(PurchaseOrder $po)
     {
-        return view('po.show', compact('po'));
+        $menu = 'PO';
+        //$pos = PurchaseOrder::with('supplier')->paginate(10);
+
+        return view('po.show', compact('menu','po'));
     }
 
     // Show form to edit PO
