@@ -13,11 +13,8 @@ class PurchaseOrder extends Model
 
     protected $fillable = [
         'po_number',
-        'purchase_company',
         'supplier_id',
         'description',
-        'contact_no',
-        'quantity',
         'rate',
         'status'
     ];
@@ -26,5 +23,19 @@ class PurchaseOrder extends Model
     {
         return $this->belongsTo(Supplier::class, 'supplier_id', 'id');
     }
+    
+    public function product()
+    {
+        return $this->belongsTo(product::class, 'product_id', 'id');
+    }
 
+    public function getSupplierNameAttribute()
+    {
+        return $this->supplier ? $this->supplier->supplier_name : '-';
+    }
+
+    public function items()
+    {
+        return $this->hasMany(PurchaseOrderItem::class, 'purchase_order_id', 'id');
+    }
 }

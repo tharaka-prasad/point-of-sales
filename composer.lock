@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "16af0a07ef73a56076673dfd7855e626",
+    "content-hash": "518896f52a37c7c25023475109d0f614",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1391,6 +1391,7 @@
         },
         {
             "name": "laravel/fortify",
+<<<<<<< Updated upstream
             "version": "v1.31.0",
             "source": {
                 "type": "git",
@@ -1401,6 +1402,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/laravel/fortify/zipball/67116b14bd6b480d027f8b8075c2cd75363904e8",
                 "reference": "67116b14bd6b480d027f8b8075c2cd75363904e8",
+=======
+            "version": "v1.31.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/fortify.git",
+                "reference": "e39a49592e1440508337a765cdc913ff5bcba66f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/fortify/zipball/e39a49592e1440508337a765cdc913ff5bcba66f",
+                "reference": "e39a49592e1440508337a765cdc913ff5bcba66f",
+>>>>>>> Stashed changes
                 "shasum": ""
             },
             "require": {
@@ -1452,7 +1465,11 @@
                 "issues": "https://github.com/laravel/fortify/issues",
                 "source": "https://github.com/laravel/fortify"
             },
+<<<<<<< Updated upstream
             "time": "2025-09-30T10:06:29+00:00"
+=======
+            "time": "2025-10-03T09:10:57+00:00"
+>>>>>>> Stashed changes
         },
         {
             "name": "laravel/framework",
@@ -4117,6 +4134,66 @@
                 "source": "https://github.com/bobthecow/psysh/tree/v0.12.12"
             },
             "time": "2025-09-20T13:46:31+00:00"
+        },
+        {
+            "name": "quickbooks/v3-php-sdk",
+            "version": "v6.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/intuit/QuickBooks-V3-PHP-SDK.git",
+                "reference": "5e4cafc5d19f4e2a1cba5ef3c22b34fe5a52d930"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/intuit/QuickBooks-V3-PHP-SDK/zipball/5e4cafc5d19f4e2a1cba5ef3c22b34fe5a52d930",
+                "reference": "5e4cafc5d19f4e2a1cba5ef3c22b34fe5a52d930",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-mbstring": "*",
+                "guzzlehttp/guzzle": "^7.9",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "php-mock/php-mock": "^2.3",
+                "php-mock/php-mock-phpunit": "^2.6",
+                "phpunit/phpunit": "^5.0 || ^6.0 || ^7.0 || ^8"
+            },
+            "suggest": {
+                "ext-curl": "Uses Curl to make HTTP Requests",
+                "guzzlehttp/guzzle": "Uses Guzzle to make HTTP Requests"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "QuickBooksOnline\\API\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "abisalehalliprasan",
+                    "email": "anil_kumar3@intuit.com"
+                }
+            ],
+            "description": "The Official PHP SDK for QuickBooks Online Accounting API",
+            "homepage": "http://developer.intuit.com",
+            "keywords": [
+                "api",
+                "http",
+                "quickbooks",
+                "rest",
+                "smallbusiness"
+            ],
+            "support": {
+                "issues": "https://github.com/intuit/QuickBooks-V3-PHP-SDK/issues",
+                "source": "https://github.com/intuit/QuickBooks-V3-PHP-SDK/tree/v6.2.1"
+            },
+            "time": "2025-09-22T05:32:32+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
