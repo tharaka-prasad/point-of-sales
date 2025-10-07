@@ -1391,6 +1391,7 @@
         },
         {
             "name": "laravel/fortify",
+<<<<<<< Updated upstream
             "version": "v1.31.0",
             "source": {
                 "type": "git",
@@ -1401,6 +1402,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/laravel/fortify/zipball/67116b14bd6b480d027f8b8075c2cd75363904e8",
                 "reference": "67116b14bd6b480d027f8b8075c2cd75363904e8",
+=======
+            "version": "v1.31.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/fortify.git",
+                "reference": "e39a49592e1440508337a765cdc913ff5bcba66f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/fortify/zipball/e39a49592e1440508337a765cdc913ff5bcba66f",
+                "reference": "e39a49592e1440508337a765cdc913ff5bcba66f",
+>>>>>>> Stashed changes
                 "shasum": ""
             },
             "require": {
@@ -1452,7 +1465,11 @@
                 "issues": "https://github.com/laravel/fortify/issues",
                 "source": "https://github.com/laravel/fortify"
             },
+<<<<<<< Updated upstream
             "time": "2025-09-30T10:06:29+00:00"
+=======
+            "time": "2025-10-03T09:10:57+00:00"
+>>>>>>> Stashed changes
         },
         {
             "name": "laravel/framework",
