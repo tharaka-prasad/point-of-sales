@@ -63,6 +63,9 @@ Route::middleware([
         Route::get('/grn/create', [GrnController::class, 'create'])->name('grn.create');
         Route::post('/grn', [GrnController::class, 'store'])->name('grn.store');
         Route::get('/grn/{grn}', [GrnController::class, 'show'])->name('grn.show');
+        Route::get('/grn/{grn}/edit', [GrnController::class, 'edit'])->name('grn.edit');
+        Route::post('/grn/{grn}', [GrnController::class, 'update'])->name('grn.update');
+        Route::delete('/grn/{grn}', [GrnController::class, 'destroy'])->name('grn.destroy');
 
         // Expense
         Route::get('/expense/data', [ExpenseController::class, "data"])->name("expense.data");

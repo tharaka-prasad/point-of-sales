@@ -41,7 +41,8 @@
                             <td>{{ number_format($grn->grand_total, 2) }}</td>
                             <td>
                                 <a href="{{ route('grn.show', $grn->id) }}" class="btn btn-sm btn-info">View</a>
-                                {{-- Optional actions: Edit, PDF, Delete --}}
+                                <a href="{{ route('grn.edit', $grn->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <a href="{{ route('grn.destroy', $grn->id) }}" class="btn btn-sm btn-danger">Delete</a>
                             </td>
                         </tr>
                     @empty
