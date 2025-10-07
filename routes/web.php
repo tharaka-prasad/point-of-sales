@@ -63,6 +63,7 @@ Route::middleware([
         Route::resource('po', PurchaseOrderController::class);
         Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');
         Route::get('/po/{id}', [PurchaseOrderController::class, 'show'])->name('po.show');
+        
         //GRN
         Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');
         Route::get('/grn/create', [GrnController::class, 'create'])->name('grn.create');
