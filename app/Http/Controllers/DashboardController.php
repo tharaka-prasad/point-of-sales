@@ -36,11 +36,11 @@ class DashboardController extends Controller
                 $data_date[] = (int) substr($first_date, 8, 2);
 
                 $total_sale = Sale::whereDate('created_at', $first_date)->sum('pay');
-                $total_purchase = Purchase::whereDate('created_at', $first_date)->sum('pay');
+                // $total_purchase = Purchase::whereDate('created_at', $first_date)->sum('pay');
                 $total_expense = Expense::whereDate('created_at', $first_date)->sum('amount');
 
-                $income = $total_sale - $total_purchase - $total_expense;
-                $data_income[] = $income;
+                // $income = $total_sale - $total_purchase - $total_expense;
+                // $data_income[] = $income;
 
                 $first_date = date("Y-m-d", strtotime("+1 day", strtotime($first_date)));
             }

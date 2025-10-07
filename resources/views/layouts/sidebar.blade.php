@@ -82,30 +82,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('purchase.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-shopping-cart"></i>
-                            <p>Purchase</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a href="{{ route('sale.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-th"></i>
                             <p>Sale</p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ route('transaction.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-cart-arrow-down"></i>
-                            <p>Active Transaction</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('transaction.new') }}" class="nav-link">
-                            <i class="nav-icon fas fa-cart-plus"></i>
-                            <p>New Transaction</p>
-                        </a>
-                    </li>
-
+                   
                     <!-- CASHIER Section -->
                     <li class="nav-header">CASHIER</li>
                     <li class="nav-item">

@@ -1,11 +1,8 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\{
-    Category,
-    Product,
-};
+use App\Models\Category;
+use App\Models\Product;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -20,12 +17,12 @@ class ProductController extends Controller
         return view("product.index", compact("menu", "categories"));
     }
 
- public function autoCode()
+    public function autoCode()
     {
         $lastProduct = Product::latest()->first();
-        $lastCode = $lastProduct ? $lastProduct->code : '';
-        $newNumber = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
-        $code = 'P' . code_generator($newNumber, 5); // e.g., P00001
+        $lastCode    = $lastProduct ? $lastProduct->code : '';
+        $newNumber   = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
+        $code        = 'P' . code_generator($newNumber, 5); // e.g., P00001
 
         return response()->json(['code' => $code]);
     }
@@ -34,10 +31,10 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         // If code empty, generate one (extra safety)
-        if (!$request->filled('code')) {
-            $lastProduct = Product::latest()->first();
-            $lastCode = $lastProduct ? $lastProduct->code : '';
-            $newNumber = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
+        if (! $request->filled('code')) {
+            $lastProduct     = Product::latest()->first();
+            $lastCode        = $lastProduct ? $lastProduct->code : '';
+            $newNumber       = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
             $request['code'] = 'P' . code_generator($newNumber, 5);
         }
 
@@ -46,7 +43,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message' => 'Product added successfully.',
-            'product' => $product
+            'product' => $product,
         ], 201);
     }
 
@@ -87,8 +84,8 @@ class ProductController extends Controller
 
     public function show(string $id)
     {
-        $product = Product::with('category')->findOrFail($id);
-        $product->category_id = $product->category->id;
+        $product                = Product::with('category')->findOrFail($id);
+        $product->category_id   = $product->category->id;
         $product->category_name = $product->category->name;
 
         if ($product) {
@@ -100,11 +97,31 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
-        if ($product) {
-            $product->update($request->all());
+        $request->validate([
+            'code'        => 'required|unique:products,code,' . $product->id,
+            'name'        => 'required',
+            'category_id' => 'required',
+            'price'       => 'required|numeric',
+            'sell_price'  => 'required|numeric',
+            'stock'       => 'required|integer',
+            // add more validation if needed
+        ]);
 
-            return response()->json("Update product successfully.");
-        }
+        $product->update($request->only([
+            'code',
+            'name',
+            'category_id',
+            'brand',
+            'price',
+            'discount',
+            'sell_price',
+            'stock',
+        ]));
+
+        return response()->json([
+            'message' => 'Product updated successfully.',
+            'product' => $product,
+        ]);
     }
 
     public function destroy(string $id)
@@ -138,11 +155,11 @@ class ProductController extends Controller
     public function printBarcode(Request $request)
     {
         if ($request->has('product_id') && is_array($request->product_id)) {
-            $data_product = array();
+            $data_product    = [];
             $data_product_id = $request->product_id;
 
             foreach ($data_product_id as $product_id) {
-                $product = Product::findOrFail($product_id);
+                $product        = Product::findOrFail($product_id);
                 $data_product[] = $product;
             }
 

@@ -58,30 +58,19 @@ Route::middleware([
         Route::resource('po', PurchaseOrderController::class);
         Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');
         Route::get('/po/{id}', [PurchaseOrderController::class, 'show'])->name('po.show');
-
-         //GRN_ITEM
-         Route::resource('grn_items', GrnItemController::class);
-
         //GRN
         Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');
         Route::get('/grn/create', [GrnController::class, 'create'])->name('grn.create');
         Route::post('/grn', [GrnController::class, 'store'])->name('grn.store');
         Route::get('/grn/{grn}', [GrnController::class, 'show'])->name('grn.show');
-
+        Route::get('/grn/{grn}/edit', [GrnController::class, 'edit'])->name('grn.edit');
+        Route::post('/grn/{grn}', [GrnController::class, 'update'])->name('grn.update');
+        Route::delete('/grn/{grn}', [GrnController::class, 'destroy'])->name('grn.destroy');
 
         // Expense
         Route::get('/expense/data', [ExpenseController::class, "data"])->name("expense.data");
         Route::resource('/expense', ExpenseController::class);
 
-        // Purchase
-        Route::get('/purchase/data', [PurchaseController::class, "data"])->name("purchase.data");
-        Route::get('/purchase/{id}/create', [PurchaseController::class, "create"]);
-        Route::resource('/purchase', PurchaseController::class)->except("create");
-
-        // Purchase Detail
-        Route::get('/purchase_detail/{id}/data', [PurchaseDetailController::class, "data"])->name("purchase_detail.data");
-        Route::get('/purchase_detail/load-form/{discount}/{total}', [PurchaseDetailController::class, "loadForm"])->name("purchase_detail.loadForm");
-        Route::resource('/purchase_detail', PurchaseDetailController::class)->except("create", "show", "edit");
 
         // Sale
         Route::get('/sale/data', [SaleController::class, "data"])->name("sale.data");
