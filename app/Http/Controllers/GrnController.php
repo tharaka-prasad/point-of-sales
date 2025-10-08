@@ -203,15 +203,15 @@ class GrnController extends Controller
     /**
      * Remove the specified GRN from storage.
      */
-   public function destroy(PurchaseOrder $po)
-    {
-        // Delete related PO items first
-        $po->items()->delete();
+//    public function destroy(PurchaseOrder $po)
+//     {
+//         // Delete related PO items first
+//         $po->items()->delete();
 
-        // Then delete the main purchase order
-        $po->delete();
+//         // Then delete the main purchase order
+//         $po->delete();
 
-        return redirect()->route('po.index')->with('success', 'Purchase Order deleted successfully');
-    }
+//         return redirect()->route('po.index')->with('success', 'Purchase Order deleted successfully');
+//     }
 
 }
