@@ -241,7 +241,7 @@
 
                 <form method="POST" action="{{ route('grn.update', $grn->id) }}">
                     @csrf
-                    @method('POST') {{-- RESTful update method --}}
+                    @method('PUT') {{-- RESTful update method --}}
 
                     <input type="hidden" name="grn_no" value="{{ $grn->grn_no }}">
                     <input type="hidden" name="grn_total" id="grandTotalInput" value="{{ $grn->grn_total }}">
