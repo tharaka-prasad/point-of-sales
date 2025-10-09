@@ -68,7 +68,7 @@
 
                     <li class="nav-item">
                         <a href="{{ route('grn.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-cart-plus"></i>
+                            <i class="nav-icon fa fa-check-square"></i>
                             <p>GRN</p>
                         </a>
                     </li>

@@ -38,7 +38,7 @@
                         <h3>{{ $total_supplier }}</h3>
                     </div>
                     <div class="icon">
-                        <i class="fas fa-reply"></i>
+                        <i class="fa fa-truck"></i>
                     </div>
                     <a href="{{ route('supplier.index') }}" class="small-box-footer">More info <i
                             class="fas fa-arrow-circle-right"></i></a>
@@ -53,7 +53,7 @@
                         <h3>{{ $total_member }}</h3>
                     </div>
                     <div class="icon">
-                        <i class="fas fa-reply"></i>
+                        <i class="fa fa-users"></i>
                     </div>
                     <a href="{{ route('member.index') }}" class="small-box-footer">More info <i
                             class="fas fa-arrow-circle-right"></i></a>
@@ -101,7 +101,7 @@
                         <h4>Today Total Returns</h4>
                     </div>
                     <div class="icon">
-                        <i class="fas fa-cubes"></i>
+                        <i class="fa fa-undo"></i>
                     </div>
                     <a href="{{ route('product.index') }}" class="small-box-footer">More info <i
                             class="fas fa-arrow-circle-right"></i></a>
