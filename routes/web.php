@@ -54,6 +54,7 @@ Route::middleware([
         // Supplier
         Route::get('/supplier/data', [SupplierController::class, "data"])->name("supplier.data");
         Route::resource('/supplier', SupplierController::class);
+        Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
 
         // PO
         Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');
