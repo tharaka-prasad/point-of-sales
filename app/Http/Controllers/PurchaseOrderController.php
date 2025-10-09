@@ -18,6 +18,7 @@ class PurchaseOrderController extends Controller
         $menu = 'PO';
         $suppliers = Supplier::all();
         $products = Product::all();
+
          // eager load supplier
         $pos = PurchaseOrder::with('product', 'supplier')
         ->latest()
@@ -59,7 +60,8 @@ class PurchaseOrderController extends Controller
             'supplier_id'      => 'nullable|exists:suppliers,id', # required
             'description'      => 'nullable|string',
             'contact_no'       => 'nullable|string',
-            'status'           => 'nullable|string',
+            'total_price'      => 'nullable|numeric',
+            'status'           => 'string',
             'items'            => 'nullable|array', # required
             'items.*.item_name'=> 'nullable|string', # required
             'items.*.category' => 'nullable|string',
@@ -76,9 +78,8 @@ class PurchaseOrderController extends Controller
                 'po_number'        => $validated['po_number'],
                 'supplier_id'      => $validated['supplier_id'],
                 'description'      => $validated['description'] ?? null,
-                'contact_no'       => $validated['contact_no'] ?? null,
-                'rate'             => collect($validated['items'])->avg('rate'),
-                'status'           => $validated['status'] ?? 'Pending',
+                //'rate'             => collect($validated['items'])->avg('rate'),
+                'status'           => $validated['status'] ?? 'draft',
             ]);
 
             // 2️⃣ Loop through PO Items
@@ -167,7 +168,7 @@ public function show($id)
         $pos->items()->delete();
         $pos->delete();
 
-        return redirect()->route('grn.index')->with('success', 'GRN deleted successfully');
+        return redirect()->route('grn.index')->with('success', 'POS deleted successfully');
     }
 }
 

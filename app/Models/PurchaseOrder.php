@@ -15,6 +15,7 @@ class PurchaseOrder extends Model
         'po_number',
         'supplier_id',
         'description',
+        'total_price',
         'rate',
         'status'
     ];
@@ -23,7 +24,7 @@ class PurchaseOrder extends Model
     {
         return $this->belongsTo(Supplier::class, 'supplier_id', 'id');
     }
-    
+
     public function product()
     {
         return $this->belongsTo(product::class, 'product_id', 'id');
