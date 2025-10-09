@@ -31,7 +31,7 @@
                                         <th>#</th>
                                         <th>Supplier Name</th>
                                         <th>Company Name</th>
-                                        <th>Catogery</th>
+                                        <th>Category</th>
                                         <th>Phone</th>
                                         <th>Address</th>
                                         <th>
@@ -83,7 +83,7 @@
                         {
                             data: "company_name"
                         },
-                           {
+                        {
                             data: "name"
                         },
                         {
@@ -141,19 +141,15 @@
             // Get Data
             $.get(url)
                 .done(response => {
-                    // Success
-                    suplier_name
-                    $("#modalForm [name=supplier_name]").val(response.name);
-                    $("#modalForm [name=company_name]").val(response.name);
-                    $("#modalForm [name=name]").val(response.name);
+                    // Make sure field names match your form input names
+                    $("#modalForm [name=supplier_name]").val(response.supplier_name);
+                    $("#modalForm [name=company_name]").val(response.company_name);
+                    $("#modalForm [name=name]").val(response.name); // if you really have a 'name' field
                     $("#modalForm [name=phone]").val(response.phone);
                     $("#modalForm [name=address]").val(response.address);
                 })
                 .fail(errors => {
-                    // Failed
                     alert("Failed to display data!");
-
-                    return;
                 });
         }
 
