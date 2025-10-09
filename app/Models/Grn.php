@@ -16,6 +16,8 @@ class Grn extends Model
         'date',
         'invoice_no',
         'general_remarks',
+        'grn_total',
+        'status',
     ];
 
     protected static function booted()
@@ -56,5 +58,10 @@ class Grn extends Model
     {
         return $this->items->sum(fn($item) => $item->qty_accepted * $item->unit_price);
     }
+    // newly added methods
+    public function purchaseOrder()
+{
+    return $this->belongsTo(PurchaseOrder::class, 'po_id'); // po_id column in grn table
+}
 
 }

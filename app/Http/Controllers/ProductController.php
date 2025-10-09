@@ -1,11 +1,8 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\{
-    Category,
-    Product,
-};
+use App\Models\Category;
+use App\Models\Product;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -20,12 +17,12 @@ class ProductController extends Controller
         return view("product.index", compact("menu", "categories"));
     }
 
- public function autoCode()
+    public function autoCode()
     {
         $lastProduct = Product::latest()->first();
-        $lastCode = $lastProduct ? $lastProduct->code : '';
-        $newNumber = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
-        $code = 'P' . code_generator($newNumber, 5); // e.g., P00001
+        $lastCode    = $lastProduct ? $lastProduct->code : '';
+        $newNumber   = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
+        $code        = 'P' . code_generator($newNumber, 5); // e.g., P00001
 
         return response()->json(['code' => $code]);
     }
@@ -33,20 +30,41 @@ class ProductController extends Controller
     // Store product
     public function store(Request $request)
     {
-        // If code empty, generate one (extra safety)
-        if (!$request->filled('code')) {
-            $lastProduct = Product::latest()->first();
-            $lastCode = $lastProduct ? $lastProduct->code : '';
-            $newNumber = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
-            $request['code'] = 'P' . code_generator($newNumber, 5);
+        // ✅ Validate input
+        $validated = $request->validate([
+            'code'        => 'nullable|string|max:50|unique:products,code',
+            'name'        => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'brand'       => 'required|string|max:255',
+            'price'       => 'required|numeric|min:1',
+            'sell_price'  => 'required|numeric|min:1|gte:price',
+            'discount'    => 'nullable|numeric|min:0',
+            'stock'       => 'required|integer|min:1',
+        ], [
+            // ✅ Custom messages (optional)
+            'name.required'        => 'Product name is required.',
+            'category_id.required' => 'Please select a category.',
+            'brand.required'       => 'Product brand is required.',
+            'price.required'       => 'Purchase price is required.',
+            'sell_price.gte'       => 'Sell price must be greater than or equal to purchase price.',
+            'stock.min'            => 'Stock must be at least 1.',
+        ]);
+
+        // ✅ Generate auto code if not provided
+        if (empty($validated['code'])) {
+            $lastProduct       = Product::latest()->first();
+            $lastCode          = $lastProduct ? $lastProduct->code : '';
+            $newNumber         = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
+            $validated['code'] = 'P' . code_generator($newNumber, 5);
         }
 
-        // Save product
-        $product = Product::create($request->all());
+        // ✅ Create product
+        $product = Product::create($validated);
 
+        // ✅ Return JSON success response
         return response()->json([
             'message' => 'Product added successfully.',
-            'product' => $product
+            'product' => $product,
         ], 201);
     }
 
@@ -87,8 +105,8 @@ class ProductController extends Controller
 
     public function show(string $id)
     {
-        $product = Product::with('category')->findOrFail($id);
-        $product->category_id = $product->category->id;
+        $product                = Product::with('category')->findOrFail($id);
+        $product->category_id   = $product->category->id;
         $product->category_name = $product->category->name;
 
         if ($product) {
@@ -96,15 +114,46 @@ class ProductController extends Controller
         }
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
 
-        if ($product) {
-            $product->update($request->all());
+        // ✅ Validate input
+        $validated = $request->validate([
+            'code'        => 'nullable|string|max:50|unique:products,code,' . $product->id,
+            'name'        => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'brand'       => 'required|string|max:255',
+            'price'       => 'required|numeric|min:1',
+            'sell_price'  => 'required|numeric|min:1|gte:price',
+            'discount'    => 'nullable|numeric|min:0',
+            'stock'       => 'required|integer|min:1',
+        ], [
+            // ✅ Custom messages (optional)
+            'name.required'        => 'Product name is required.',
+            'category_id.required' => 'Please select a category.',
+            'brand.required'       => 'Product brand is required.',
+            'price.required'       => 'Purchase price is required.',
+            'sell_price.gte'       => 'Sell price must be greater than or equal to purchase price.',
+            'stock.min'            => 'Stock must be at least 1.',
+        ]);
 
-            return response()->json("Update product successfully.");
+        // ✅ Generate auto code if empty
+        if (empty($validated['code'])) {
+            $lastProduct       = Product::latest()->first();
+            $lastCode          = $lastProduct ? $lastProduct->code : '';
+            $newNumber         = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
+            $validated['code'] = 'P' . code_generator($newNumber, 5);
         }
+
+        // ✅ Update product
+        $product->update($validated);
+
+        // ✅ Return JSON success response
+        return response()->json([
+            'message' => 'Product updated successfully.',
+            'product' => $product,
+        ], 200);
     }
 
     public function destroy(string $id)
@@ -138,11 +187,11 @@ class ProductController extends Controller
     public function printBarcode(Request $request)
     {
         if ($request->has('product_id') && is_array($request->product_id)) {
-            $data_product = array();
+            $data_product    = [];
             $data_product_id = $request->product_id;
 
             foreach ($data_product_id as $product_id) {
-                $product = Product::findOrFail($product_id);
+                $product        = Product::findOrFail($product_id);
                 $data_product[] = $product;
             }
 
