@@ -300,7 +300,7 @@
                                 <td colspan="8" align="right"><strong>Grand Total</strong></td>
                                 <td>
                                     <input type="number"
-                                        value="{{ number_format($grn->items->sum(fn($i) => $i->total ?? 0), 2) }}"
+                                        value="{{ number_format($grn->grn_total, 2) }}"
                                         disabled />
                                 </td>
                                 <td></td>
