@@ -32,7 +32,7 @@
                             <th>Rate(Rs)</th>
                             <th>Status</th>
                             <th>Total(Rs)</th>
-                            <th width="160">Actions</th>
+                            <th width="200"><i class="fas fa-cog">Actions</i></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -50,7 +50,7 @@
                                 <td>{{ number_format($po->grand_total, 2) }}</td>
                                 <td>
                                     <a href="{{ route('po.show', $po->id) }}" class="btn btn-sm btn-info">View</a>
-                                {{-- Optional actions: Edit, PDF, Delete --}}
+                                    {{-- Optional actions: Edit, PDF, Delete --}}
                                 </td>
                             </tr>
                         @empty
