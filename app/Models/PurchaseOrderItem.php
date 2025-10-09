@@ -19,6 +19,7 @@ class PurchaseOrderItem  extends Model
         'uom',
         'qty',
         'rate',
+        'total',
         'remarks',
     ];
     public function supplier()

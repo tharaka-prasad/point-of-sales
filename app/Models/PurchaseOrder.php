@@ -16,6 +16,7 @@ class PurchaseOrder extends Model
         'supplier_id',
         'description',
         'total_price',
+        'grand_total',
         'rate',
         'status'
     ];

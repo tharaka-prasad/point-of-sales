@@ -83,7 +83,7 @@
                         {
                             data: "company_name"
                         },
-                           {
+                        {
                             data: "name"
                         },
                         {
@@ -142,9 +142,8 @@
             $.get(url)
                 .done(response => {
                     // Success
-                    suplier_name
-                    $("#modalForm [name=supplier_name]").val(response.name);
-                    $("#modalForm [name=company_name]").val(response.name);
+                    $("#modalForm [name=supplier_name]").val(response.supplier_name);
+                    $("#modalForm [name=company_name]").val(response.company_name);
                     $("#modalForm [name=name]").val(response.name);
                     $("#modalForm [name=phone]").val(response.phone);
                     $("#modalForm [name=address]").val(response.address);

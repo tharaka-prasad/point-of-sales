@@ -43,10 +43,20 @@
                                 <td>{{ $po->description ?? 'N/A'  }}</td>
                                 <td>{{ $po->supplier->phone ?? 'N/A'  }}</td>
                                 <td>{{ $po->status ?? 'N/A'  }}</td>
-                                <td>{{ number_format($po->grand_total, 2) }}</td>
+                                <td>{{ number_format($po->grand_total ?? 0, 2) }}</td>
                                 <td>
                                     <a href="{{ route('po.show', $po->id) }}" class="btn btn-sm btn-info">View</a>
-                                    {{-- Optional actions: Edit, PDF, Delete --}}
+                                    <a href="{{ route('po.edit', $po->id) }}" class="btn btn-sm btn-warning">Edit</a>
+
+                                    <form action="{{ route('po.destroy', $po->id) }}" method="POST"
+                                        style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn mt-1 btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure you want to delete this GRN?');">
+                                            Delete
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @empty

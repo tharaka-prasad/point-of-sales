@@ -8,9 +8,9 @@ class Supplier extends Model
     protected $fillable = [
         'supplier_name',
         'company_name',
-        'name',
-        'address',
+        'name',# this is for category in db table also
         'phone',
+        'address'
     ];
 
 
