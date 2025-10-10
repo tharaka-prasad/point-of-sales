@@ -29,24 +29,25 @@ class PurchaseOrderController extends Controller
 
     // Show form to create new PO - no issue with that
     public function create()
-    {
-        $menu = 'PO';
-        $suppliers = Supplier::all();
+{
+    $menu = 'PO';
+    $suppliers = Supplier::all();
 
-        // Generate next PO number
-        $lastPO = PurchaseOrder::latest('id')->first();
-        if ($lastPO) {
-            $lastNumber = (int) str_replace('PO-', '', $lastPO->po_number);
-            $nextNumber = $lastNumber + 1;
-        } else {
-            $nextNumber = 1000; // starting PO number
-        }
-        $nextPoNumber = 'PO-' . $nextNumber;
-
-        return view('po.form', compact('menu', 'suppliers', 'nextPoNumber'));
+    // Generate next PO number
+    $lastPO = PurchaseOrder::latest('id')->first();
+    $lastNumber = 99;
+    if ($lastPO) {
+        $parts = explode('-', $lastPO->po_number);
+        $lastNumber = (int) end($parts);
     }
+    $nextNumber = $lastNumber + 1;
+    $poNumber = 'PO-' . now()->format('Ymd') . '-' . $nextNumber;
 
-    // Store new PO
+    return view('po.form', compact('suppliers', 'poNumber', 'menu'));
+}
+
+
+
  // Store new PO
 public function store(Request $request)
 {
@@ -83,6 +84,7 @@ public function store(Request $request)
         // 2️⃣ Insert PO Items
         foreach ($validated['items'] as $item) {
             PurchaseOrderItem::create([
+                'purchase_order_id' => $po->id,
                 'item_name' => $item['item_name'],
                 'category'  => $item['category'] ?? null,
                 'uom'       => $item['uom'] ?? null,
@@ -94,7 +96,7 @@ public function store(Request $request)
         }
     });
 
-    return redirect()->route('po.index')->with('success', 'Purchase Order saved successfully!');
+    return redirect()->route('po.index')->with('success', 'Purchase Order saved successfully!', 'menu');
 }
 
 
@@ -113,8 +115,9 @@ public function show($id)
     // Show form to edit PO
     public function edit(PurchaseOrder $po)
     {
+        $menu = 'PO';
         $suppliers = Supplier::all();
-        return view('po.edit', compact('po', 'suppliers'));
+        return view('po.edit', compact('po', 'suppliers', 'menu'));
     }
 
     // Update PO
@@ -156,6 +159,7 @@ public function update(Request $request, PurchaseOrder $po)
 
         foreach ($validated['items'] as $item) {
             PurchaseOrderItem::create([
+                'purchase_order_id' => $po->id,
                 'item_name' => $item['item_name'],
                 'category'  => $item['category'] ?? null,
                 'uom'       => $item['uom'] ?? null,
@@ -170,14 +174,33 @@ public function update(Request $request, PurchaseOrder $po)
     return redirect()->route('po.index')->with('success', 'Purchase Order updated successfully!');
 }
 
-
- public function destroy(pos $po)
+    public function destroy(PurchaseOrder $po)
     {
-        $pos->items()->delete();
-        $pos->delete();
+        DB::transaction(function () use ($po) {
 
-        return redirect()->route('grn.index')->with('success', 'POS deleted successfully');
+            // 1️⃣ Revert stock for all PO items
+            foreach ($po->items as $item) {
+                $product = $item->product;
+                if ($product) {
+                    // Revert stock
+                    $product->stock -= $item->qty_accepted;
+                    if ($product->stock < 0) {
+                        $product->stock = 0; // prevent negative stock
+                    }
+                    $product->save();
+                }
+            }
+
+            // 2️⃣ Delete all PO items
+            $po->items()->delete();
+
+            // 3️⃣ Delete the main PO record
+            $po->delete();
+        });
+
+        return redirect()->route('po.index')->with('success', 'Purchase Order deleted successfully.');
     }
+
 }
 
 

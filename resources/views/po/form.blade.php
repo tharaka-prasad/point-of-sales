@@ -14,7 +14,7 @@
     <div class="container-fluid">
         <div class="card">
 
-            <!-- --- Inline CSS from previous template --- -->
+            <!-- --- Inline CSS --- -->
             <style>
                 body {
                     font-family: Arial, sans-serif;
@@ -213,7 +213,7 @@
                         <div class="meta">
                             <div class="field">
                                 <label>Date</label>
-                                <input id="poDate" type="date" name="date" required />
+                                <input id="poDate" type="date" name="date" value="{{ date('Y-m-d') }}" required />
                             </div>
                             <div class="field">
                                 <label>Supplier Name</label>
@@ -226,7 +226,7 @@
                             </div>
                             <div class="field">
                                 <label>PO No</label>
-                                <input id="poNo" type="text" name="po_number" readonly />
+                                <input type="text" id="po_number" name="po_number" value="{{ $poNumber }}" readonly required>
                             </div>
                         </div>
                     </div>
@@ -303,25 +303,13 @@
 </div>
 
 <script>
+let rowIndex = 0;
 const tbody = document.getElementById("tbody");
 const totalItems = document.getElementById("totalItems");
 const totalReceived = document.getElementById("totalReceived");
 const grandTotalCell = document.getElementById("grandTotal");
-const poNoInput = document.getElementById("poNo");
 
-let rowIndex = 0;
-
-// --- Generate PO Number ---
-function generatePO() {
-    const d = new Date();
-    return "PO-" +
-        d.getFullYear() +
-        (d.getMonth() + 1).toString().padStart(2, '0') +
-        d.getDate().toString().padStart(2, '0') +
-        "-" +
-        Math.floor(Math.random() * 900 + 100);
-}
-
+// --- Add table row ---
 function addRow(data = {}) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -341,6 +329,7 @@ function addRow(data = {}) {
     recalc();
 }
 
+// --- Recalculate totals ---
 function recalc() {
     const rows = tbody.querySelectorAll("tr");
     totalItems.textContent = rows.length;
@@ -362,21 +351,19 @@ function recalc() {
     grandTotalCell.textContent = gTotal.toFixed(2);
 }
 
+// --- Button actions ---
 document.getElementById("addRow").onclick = () => addRow();
-document.getElementById("clearRows").onclick = () => { tbody.innerHTML = ""; recalc(); };
+document.getElementById("clearRows").onclick = () => { tbody.innerHTML = ""; recalc(); rowIndex = 0; addRow(); };
 document.getElementById("resetAll").onclick = () => {
     tbody.innerHTML = "";
     recalc();
     document.querySelector("form").reset();
-    poNoInput.value = generatePO();
     rowIndex = 0;
     addRow();
 };
 
-// --- Initialize form on load ---
+// --- Initialize form on page load ---
 window.onload = () => {
-    poNoInput.value = generatePO(); // ✅ ensures po_number is set
-    document.getElementById("poDate").value = new Date().toISOString().split("T")[0];
     addRow();
 };
 </script>

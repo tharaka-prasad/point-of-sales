@@ -54,12 +54,17 @@ Route::middleware([
         // Supplier
         Route::get('/supplier/data', [SupplierController::class, "data"])->name("supplier.data");
         Route::resource('/supplier', SupplierController::class);
+        Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
 
         // PO
         Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');
         Route::resource('po', PurchaseOrderController::class);
         Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');
         Route::get('/po/{id}', [PurchaseOrderController::class, 'show'])->name('po.show');
+        Route::delete('/po/{po}', [PurchaseOrderController::class, 'destroy'])->name('po.destroy');
+        Route::get('/po/next-number', [PurchaseOrderController::class, 'getNextPoNumber']);
+
+
 
         //GRN
         Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');

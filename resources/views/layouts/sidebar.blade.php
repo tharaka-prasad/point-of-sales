@@ -87,7 +87,7 @@
                             <p>Sale</p>
                         </a>
                     </li>
-                   
+
                     <!-- CASHIER Section -->
                     <li class="nav-header">CASHIER</li>
                     <li class="nav-item">

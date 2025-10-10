@@ -40,4 +40,21 @@ class PurchaseOrder extends Model
     {
         return $this->hasMany(PurchaseOrderItem::class, 'purchase_order_id', 'id');
     }
+    public function getNextPoNumber(){
+        
+        $lastPO = PurchaseOrder::latest('id')->first();
+        $lastNumber = 99; // start from 100 if no PO exists
+
+        if ($lastPO) {
+            $parts = explode('-', $lastPO->po_number);
+            $lastNumber = (int) end($parts);
+        }
+
+        $nextNumber = $lastNumber + 1;
+        $d = now();
+        $poNumber = 'PO-' . $d->format('Ymd') . '-' . $nextNumber;
+
+        return response()->json(['nextPoNumber' => $poNumber]);
+    }
+
 }
