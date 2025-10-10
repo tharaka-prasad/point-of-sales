@@ -107,6 +107,8 @@ Route::middleware([
             Route::post('/', [CashierShiftController::class, 'store'])->name('store');
             Route::post('/{id}/close', [CashierShiftController::class, 'close'])->name('close');
             Route::delete('/{id}', [CashierShiftController::class, 'destroy'])->name('destroy');
+
+
         });
     });
 

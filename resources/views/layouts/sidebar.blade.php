@@ -170,6 +170,7 @@
                             <p>Logout</p>
                         </a>
                     </li>
+
                 @endif
             </ul>
         </nav>

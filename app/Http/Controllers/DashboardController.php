@@ -25,6 +25,10 @@ class DashboardController extends Controller
             $total_product = Product::count();
             $total_supplier = Supplier::count();
             $total_member = Member::count();
+            //$today_total_sales = Casheir::count();
+            //$today_total_return = Casheir::count();
+            //$today_total_purchases = Casheir::count();
+            $today_total_expens = Expense::count();
 
             $first_date = date("Y-m-01");   # From day 1
             $last_date = date("Y-m-d");     # To day now
@@ -45,7 +49,7 @@ class DashboardController extends Controller
                 $first_date = date("Y-m-d", strtotime("+1 day", strtotime($first_date)));
             }
 
-            return view("admin.dashboard", compact("menu", "total_category", "total_product", "total_supplier", "total_member", "data_date", "data_income"));
+            return view("admin.dashboard", compact("menu", "total_category", "total_product", "total_supplier", "total_member", "data_date", "data_income","total_expense"));
         } else {
             return view("cashier.dashboard", compact("menu"));
         }
