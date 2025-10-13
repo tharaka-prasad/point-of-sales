@@ -51,7 +51,6 @@
         </div>
         <!--end::Container-->
     </div>
-
     @includeIf('supplier.form')
 @endsection
 
