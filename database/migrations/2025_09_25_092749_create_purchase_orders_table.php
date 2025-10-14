@@ -17,6 +17,7 @@ return new class extends Migration
             $table->decimal('rate', 10, 2)->nullable(); // Rs
             $table->enum('status', ['draft', 'complete', 'pending', 'reject'])->default('draft');
             
+
             $table->timestamps();
         });
     }

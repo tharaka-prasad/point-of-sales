@@ -11,6 +11,7 @@ class PurchaseOrderItem  extends Model
 
     // ✅ Make sure this table name matches your actual DB table for items
     protected $table = 'po_items';
+    protected $primaryKey = 'grn_item_id';
 
     protected $fillable = [
         'id',
@@ -19,7 +20,10 @@ class PurchaseOrderItem  extends Model
         'uom',
         'qty',
         'rate',
+        'total',
         'remarks',
+        'purchase_order_id',
+
     ];
     public function supplier()
     {

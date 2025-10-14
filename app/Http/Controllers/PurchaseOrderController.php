@@ -18,85 +18,87 @@ class PurchaseOrderController extends Controller
         $menu = 'PO';
         $suppliers = Supplier::all();
         $products = Product::all();
+
          // eager load supplier
         $pos = PurchaseOrder::with('product', 'supplier')
         ->latest()
         ->paginate(10);
-
-        // Calculate grand_total for each PO
-        foreach ($pos as $po) {
-            $po->grand_total = $po->quantity * $po->rate; // calculate from PO columns
-        }
 
         return view('po.index', compact('menu', 'suppliers', 'products', 'pos'));
     }
 
     // Show form to create new PO - no issue with that
     public function create()
-    {
-        $menu = 'PO';
-        $suppliers = Supplier::all();
+{
+    $menu = 'PO';
+    $suppliers = Supplier::all();
 
-        // Generate next PO number
-        $lastPO = PurchaseOrder::latest('id')->first();
-        if ($lastPO) {
-            $lastNumber = (int) str_replace('PO-', '', $lastPO->po_number);
-            $nextNumber = $lastNumber + 1;
-        } else {
-            $nextNumber = 1000; // starting PO number
-        }
-        $nextPoNumber = 'PO-' . $nextNumber;
-
-        return view('po.form', compact('menu', 'suppliers', 'nextPoNumber'));
+    // Generate next PO number
+    $lastPO = PurchaseOrder::latest('id')->first();
+    $lastNumber = 99;
+    if ($lastPO) {
+        $parts = explode('-', $lastPO->po_number);
+        $lastNumber = (int) end($parts);
     }
+    $nextNumber = $lastNumber + 1;
+    $poNumber = 'PO-' . now()->format('Ymd') . '-' . $nextNumber;
 
-    // Store new PO
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'po_number'        => 'nullable|string', # required
-            'purchase_company' => 'nullable|string', # required
-            'supplier_id'      => 'nullable|exists:suppliers,id', # required
-            'description'      => 'nullable|string',
-            'contact_no'       => 'nullable|string',
-            'status'           => 'nullable|string',
-            'items'            => 'nullable|array', # required
-            'items.*.item_name'=> 'nullable|string', # required
-            'items.*.category' => 'nullable|string',
-            'items.*.uom'      => 'nullable|string',
-            'items.*.qty'      => 'nullable|numeric', # required
-            'items.*.rate'     => 'nullable|numeric', # required
-            'items.*.remarks'  => 'nullable|string',
-        ]);
+    return view('po.form', compact('suppliers', 'poNumber', 'menu'));
+}
 
-        DB::transaction(function () use ($validated) {
 
-            // 1️⃣ Create Purchase Order (main record)
-            $po = PurchaseOrder::create([
-                'po_number'        => $validated['po_number'],
-                'supplier_id'      => $validated['supplier_id'],
-                'description'      => $validated['description'] ?? null,
-                'contact_no'       => $validated['contact_no'] ?? null,
-                'rate'             => collect($validated['items'])->avg('rate'),
-                'status'           => $validated['status'] ?? 'Pending',
-            ]);
 
-            // 2️⃣ Loop through PO Items
-            foreach ($validated['items'] as $item) {
-                $poItem = PurchaseOrderItem::create([
-                    'purchase_order_id' => $po->id, // you must have this foreign key in po_items table
-                    'item_name'         => $item['item_name'],
-                    'category'          => $item['category'] ?? null,
-                    'uom'               => $item['uom'] ?? null,
-                    'qty'               => $item['qty'],
-                    'rate'              => $item['rate'],
-                    'remarks'           => $item['remarks'] ?? null,
-                ]);
-            }
+ // Store new PO
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'po_number'        => 'nullable|string',
+        'supplier_id'      => 'nullable|exists:suppliers,id',
+        'description'      => 'nullable|string',
+        'status'           => 'nullable|string',
+        'items'            => 'required|array',
+        'items.*.item_name'=> 'required|string',
+        'items.*.category' => 'nullable|string',
+        'items.*.uom'      => 'nullable|string',
+        'items.*.qty'      => 'required|numeric|min:1',
+        'items.*.rate'     => 'required|numeric|min:0',
+        'items.*.remarks'  => 'nullable|string',
+    ]);
+
+    DB::transaction(function () use ($validated) {
+
+        // 1️⃣ Create Purchase Order
+        $grandTotal = collect($validated['items'])->sum(function($item) {
+            return $item['qty'] * $item['rate'];
         });
 
-        return redirect()->route('po.index')->with('success', 'Purchase Order saved successfully!');
-    }
+        $po = PurchaseOrder::create([
+            'po_number'   => $validated['po_number'],
+            'supplier_id' => $validated['supplier_id'],
+            'description' => $validated['description'] ?? null,
+            'rate'        => collect($validated['items'])->avg('rate'),
+            'grand_total' => $grandTotal,
+            'status'      => $validated['status'] ?? 'draft',
+        ]);
+
+        // 2️⃣ Insert PO Items
+        foreach ($validated['items'] as $item) {
+            PurchaseOrderItem::create([
+                'purchase_order_id' => $po->id,
+                'item_name' => $item['item_name'],
+                'category'  => $item['category'] ?? null,
+                'uom'       => $item['uom'] ?? null,
+                'qty'       => $item['qty'],
+                'rate'      => $item['rate'],
+                'total'     => $item['qty'] * $item['rate'], // auto-calculated
+                'remarks'   => $item['remarks'] ?? null,
+            ]);
+        }
+    });
+
+    return redirect()->route('po.index')->with('success', 'Purchase Order saved successfully!', 'menu');
+}
+
 
    // Show specific PO
 public function show($id)
@@ -113,62 +115,92 @@ public function show($id)
     // Show form to edit PO
     public function edit(PurchaseOrder $po)
     {
+        $menu = 'PO';
         $suppliers = Supplier::all();
-        return view('po.edit', compact('po', 'suppliers'));
+        return view('po.edit', compact('po', 'suppliers', 'menu'));
     }
 
     // Update PO
-    public function update(Request $request, PurchaseOrder $po)
-    {
-        $request->validate([
-            'supplier_id'      => 'required|exists:suppliers,id',
-            'po_number'        => 'required|string|max:50',
-            'purchase_company' => 'required|string|max:255',
-            'description'      => 'nullable|string',
-            'contact_no'       => 'nullable|string|max:20',
-            'status'           => 'nullable|string|max:50',
-            'items'            => 'required|array',
-            'items.*.item_name'=> 'required|string|max:255',
-            'items.*.category' => 'nullable|string|max:255',
-            'items.*.uom'      => 'nullable|string|max:50',
-            'items.*.qty'      => 'required|numeric|min:1',
-            'items.*.rate'     => 'required|numeric|min:0',
-            'items.*.remarks'  => 'nullable|string',
-        ]);
+ // Update existing PO
+public function update(Request $request, PurchaseOrder $po)
+{
+    $validated = $request->validate([
+        'po_number'        => 'required|string|max:50',
+        'supplier_id'      => 'required|exists:suppliers,id',
+        'description'      => 'nullable|string',
+        'status'           => 'nullable|string',
+        'items'            => 'required|array',
+        'items.*.item_name'=> 'required|string|max:255',
+        'items.*.category' => 'nullable|string|max:255',
+        'items.*.uom'      => 'nullable|string|max:50',
+        'items.*.qty'      => 'required|numeric|min:1',
+        'items.*.rate'     => 'required|numeric|min:0',
+        'items.*.remarks'  => 'nullable|string',
+    ]);
 
-        // Update main PO table
+    DB::transaction(function () use ($po, $validated) {
+
+        // 1️⃣ Update main PO
+        $grandTotal = collect($validated['items'])->sum(function($item) {
+            return $item['qty'] * $item['rate'];
+        });
+
         $po->update([
-            'po_number'        => $request->po_number,
-            'purchase_company' => $request->purchase_company,
-            'supplier_id'      => $request->supplier_id,
-            'description'      => $request->description,
-            'contact_no'       => $request->contact_no,
-            'status'           => $request->status ?? $po->status,
+            'po_number'   => $validated['po_number'],
+            'supplier_id' => $validated['supplier_id'],
+            'description' => $validated['description'] ?? null,
+            'rate'        => collect($validated['items'])->avg('rate'),
+            'grand_total' => $grandTotal,
+            'status'      => $validated['status'] ?? $po->status,
         ]);
 
-        // Delete old items and re-insert new ones
+        // 2️⃣ Delete old items & insert updated items
         $po->items()->delete();
 
-        foreach ($request->items as $item) {
-            $po->items()->create([
+        foreach ($validated['items'] as $item) {
+            PurchaseOrderItem::create([
+                'purchase_order_id' => $po->id,
                 'item_name' => $item['item_name'],
                 'category'  => $item['category'] ?? null,
                 'uom'       => $item['uom'] ?? null,
                 'qty'       => $item['qty'],
                 'rate'      => $item['rate'],
+                'total'     => $item['qty'] * $item['rate'], // auto-calculated
                 'remarks'   => $item['remarks'] ?? null,
             ]);
         }
+    });
 
-        return redirect()->route('purchase-orders.index')->with('success', 'Purchase Order updated successfully');
-    }
- public function destroy(pos $po)
+    return redirect()->route('po.index')->with('success', 'Purchase Order updated successfully!');
+}
+
+    public function destroy(PurchaseOrder $po)
     {
-        $pos->items()->delete();
-        $pos->delete();
+        DB::transaction(function () use ($po) {
 
-        return redirect()->route('grn.index')->with('success', 'GRN deleted successfully');
+            // 1️⃣ Revert stock for all PO items
+            foreach ($po->items as $item) {
+                $product = $item->product;
+                if ($product) {
+                    // Revert stock
+                    $product->stock -= $item->qty_accepted;
+                    if ($product->stock < 0) {
+                        $product->stock = 0; // prevent negative stock
+                    }
+                    $product->save();
+                }
+            }
+
+            // 2️⃣ Delete all PO items
+            $po->items()->delete();
+
+            // 3️⃣ Delete the main PO record
+            $po->delete();
+        });
+
+        return redirect()->route('po.index')->with('success', 'Purchase Order deleted successfully.');
     }
+
 }
 
 

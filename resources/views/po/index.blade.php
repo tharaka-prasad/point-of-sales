@@ -28,11 +28,9 @@
                             <th>Supplier</th>
                             <th>Description</th>
                             <th>Contact</th>
-                            <th>Quantity</th>
-                            <th>Rate(Rs)</th>
                             <th>Status</th>
                             <th>Total(Rs)</th>
-                            <th width="160">Actions</th>
+                            <th width="200">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,22 +38,30 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $po->po_number }}</td>
-                                <td>{{ $po->purchase_company }}</td>
-                                <td>{{ $po->supplier_name ?? 'N/A' }}</td>
-                                <td>{{ $po->description }}</td>
-                                <td>{{ $po->contact_no }}</td>
-                                <td>{{ $po->quantity }}</td>
-                                <td>{{ $po->rate }}</td>
-                                <td>{{ $po->status }}</td>
-                                <td>{{ number_format($po->grand_total, 2) }}</td>
+                                <td>{{ $po->supplier->company_name  ?? 'N/A'  }}</td>
+                                <td>{{ $po->supplier->name ?? 'N/A' }}</td>
+                                <td>{{ $po->description ?? 'N/A'  }}</td>
+                                <td>{{ $po->supplier->phone ?? 'N/A'  }}</td>
+                                <td>{{ $po->status ?? 'N/A'  }}</td>
+                                <td>{{ number_format($po->grand_total ?? 0, 2) }}</td>
                                 <td>
                                     <a href="{{ route('po.show', $po->id) }}" class="btn btn-sm btn-info">View</a>
-                                {{-- Optional actions: Edit, PDF, Delete --}}
+                                    <a href="{{ route('po.edit', $po->id) }}" class="btn btn-sm btn-warning">Edit</a>
+
+                                    <form action="{{ route('po.destroy', $po->id) }}" method="POST"
+                                        style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn mt-1 btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure you want to delete this PO?');">
+                                            Delete
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="11" class="text-center text-muted">No pos found</td>
+                                <td colspan="9" class="text-center text-muted">No Purchase Orders found</td>
                             </tr>
                         @endforelse
                     </tbody>

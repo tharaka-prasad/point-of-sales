@@ -38,7 +38,7 @@ class GrnController extends Controller
         $suppliers = Supplier::all();
         return view('grn.form', compact('menu', 'suppliers'));
     }
-
+    // Store new GRN
     public function store(Request $request)
     {
         $validated = $request->validate([
