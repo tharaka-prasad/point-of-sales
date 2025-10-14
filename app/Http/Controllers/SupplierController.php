@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
@@ -6,13 +7,14 @@ use Illuminate\Http\Request;
 
 class SupplierController extends Controller
 {
+    // Show supplier list page
     public function index()
     {
         $menu = "Supplier";
-
         return view("supplier.index", compact("menu"));
     }
 
+    // For DataTables server-side
     public function data()
     {
         $suppliers = Supplier::latest();
@@ -22,58 +24,68 @@ class SupplierController extends Controller
             ->addIndexColumn()
             ->addColumn("action", function ($supplier) {
                 return "
-                <div class='btn-group'>
-                    <button class='btn btn-xs btn-warning mr-3' onclick='editSupplier(`". route("supplier.update", $supplier->id) ."`)'><i class='fa fa-pencil-alt'></i></button>
-                    <button class='btn btn-xs btn-danger' onclick='deleteSupplier(`". route("supplier.destroy", $supplier->id) ."`)'><i class='fa fa-trash-alt'></i></button>
-                </div>
+                    <div class='btn-group'>
+                        <button class='btn btn-xs btn-warning mr-3' onclick='editSupplier(`" . route("supplier.update", $supplier->id) . "`)'>
+                            <i class='fa fa-pencil-alt'></i>
+                        </button>
+                        <button class='btn btn-xs btn-danger' onclick='deleteSupplier(`" . route("supplier.destroy", $supplier->id) . "`)'>
+                            <i class='fa fa-trash-alt'></i>
+                        </button>
+                    </div>
                 ";
             })
             ->rawColumns(["action"])
             ->make(true);
     }
 
+    // Store new supplier
     public function store(Request $request)
     {
         $supplier = Supplier::create($request->all());
 
         if ($supplier) {
-            return response()->json("Add supplier successfully.", 201);
+            return response()->json("Supplier added successfully.", 201);
         }
+
+        return response()->json("Failed to add supplier.", 500);
     }
 
+    // Show single supplier for edit
     public function show(string $id)
     {
         $supplier = Supplier::findOrFail($id);
-
-        if ($supplier) {
-            return response()->json($supplier);
-        }
+        return response()->json($supplier);
     }
 
+    // Update supplier
     public function update(Request $request, string $id)
     {
         $supplier = Supplier::findOrFail($id);
 
-        if ($supplier) {
-            $supplier->supplier_name = $request->name;
-            $supplier->company_name = $request->name;
-            $supplier->name = $request->name;
-            $supplier->phone = $request->phone;
-            $supplier->address = $request->address;
-            $supplier->update();
+        $supplier->update([
+            'supplier_name' => $request->supplier_name,
+            'company_name'  => $request->company_name,
+            'category' =>$request->category,
+            'phone'         => $request->phone,
+            'address'       => $request->address,
+        ]);
 
-            return response()->json("Update purchase order successfully.");
-        }
+        return response()->json("Supplier updated successfully.");
     }
 
+    // Delete supplier
     public function destroy(string $id)
     {
         $supplier = Supplier::findOrFail($id);
+        $supplier->delete();
 
-        if ($supplier) {
-            $supplier->delete();
+        return response()->json("Supplier deleted successfully.");
+    }
 
-            return response()->json("Delete supplier successfully.");
-        }
+    // ✅ Return all suppliers for AJAX dropdowns
+    public function getAll()
+    {
+        $suppliers = Supplier::select('id', 'supplier_name')->get();
+        return response()->json($suppliers);
     }
 }

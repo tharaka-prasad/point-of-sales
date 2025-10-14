@@ -45,8 +45,8 @@
                                             <th>Product Name</th>
                                             <th>Category</th>
                                             <th>Brand</th>
-                                            <th>Purchase Price (Rp)</th>
-                                            <th>Sell Price (Rp)</th>
+                                            <th>Purchase Price (Rs)</th>
+                                            <th>Sell Price (Rs)</th>
                                             <th>Discount</th>
                                             <th>Stock</th>
                                             <th>
@@ -77,7 +77,7 @@
 
         $(function() {
             $("body").addClass("sidebar-collapse");
-            
+
             product_table = $("#product_table").DataTable({
                 responsive: true,
                 lengthChange: false,

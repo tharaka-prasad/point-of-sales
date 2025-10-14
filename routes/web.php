@@ -18,6 +18,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Supplier;
 
 // Login
 Route::get("/", fn() => redirect()->route("login"));
@@ -62,14 +63,18 @@ Route::middleware([
         // Supplier
         Route::get('/supplier/data', [SupplierController::class, "data"])->name("supplier.data");
         Route::resource('/supplier', SupplierController::class);
+        Route::get('/suppliers/all', function() {return response()->json(Supplier::all());});
+        Route::get('/suppliers/all', [SupplierController::class, 'getAll'])->name('suppliers.all');
         //Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
+
 
         // PO
         Route::resource('po', PurchaseOrderController::class);
-        Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');
-        Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');
-        Route::delete('/po/{po}', [PurchaseOrderController::class, 'destroy'])->name('po.destroy');
-        Route::get('/po/next-number', [PurchaseOrderController::class, 'getNextPoNumber']);
+        Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');//view po oders on table
+        Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');// create new po
+        Route::delete('/po/{po}', [PurchaseOrderController::class, 'destroy'])->name('po.destroy');// to delete
+        Route::get('/po/next-number', [PurchaseOrderController::class, 'getNextPoNumber']);// this is generate po numer auto and display
+        Route::get('/po/{po}', [PurchaseOrderController::class, 'show'])->name('po.show');// to view pdf
 
         // GRN
         Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');
@@ -85,7 +90,7 @@ Route::middleware([
         Route::resource('/expense', ExpenseController::class);
 
         // Sale
-        Route::get('/sale/data', [SaleController::class, "data"])->name("sale.data");
+        //Route::get('/sale/data', [SaleController::class, "data"])->name("sale.data");
         Route::resource('/sale', SaleController::class)->except("edit", "update");
 
         // Report

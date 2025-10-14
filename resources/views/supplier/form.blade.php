@@ -11,36 +11,48 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
 
+                <div class="modal-body">
                     <div class="form-group row">
                         <input type="text" name="supplier_name" id="supplier_name" class="form-control"
                             placeholder="Enter Supplier Name" required>
                     </div>
 
-                     <div class="form-group row">
+                    <div class="form-group row">
                         <input type="text" name="company_name" id="company_name" class="form-control"
                             placeholder="Enter Company Name" required>
                     </div>
 
+                    <!-- Dropdown for supplier (loaded dynamically via AJAX) -->
                     <div class="form-group row">
-                        <input type="text" name="name" id="name" class="form-control"
-                            placeholder="Enter Category Name" required>
+                        <input type="text" name="name" id="category" class="form-control"
+                            placeholder="Enter Category" required>
+{{--
+                        <label for="supplier_id">Supplier Name</label>
+                        <select name="supplier_id" id="supplier_id" class="form-control" required>
+                            <option value="">-- Select Supplier --</option>
+                            <!-- Options loaded dynamically -->
+                        </select> --}}
                     </div>
 
                     <div class="form-group row">
                         <input type="number" name="phone" id="phone" class="form-control"
                             placeholder="Enter Phone" required>
                     </div>
+
                     <div class="form-group row">
-                        <textarea name="address" id="address" class="form-control" cols="30" rows="10"
+                        <textarea name="address" id="address" class="form-control" cols="30" rows="5"
                             placeholder="Enter Address" required></textarea>
                     </div>
                 </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i
-                            class="fas fa-times-circle"></i> Close</button>
-                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        <i class="fas fa-times-circle"></i> Close
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Save
+                    </button>
                 </div>
             </div>
         </form>
