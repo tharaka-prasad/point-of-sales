@@ -63,7 +63,7 @@ class CashierController extends Controller
 
         // Calculate totals
         $totalItem  = $request->total_item ?? count($request->products ?? []);
-        $totalPrice = $request->total_price ?? array_sum(array_map(fn($p) => $p['sub_total'] ?? 0, $request->products ?? []));
+        $totalPrice = $request->total_price ?? array_sum(array_map(fn($p) => $p['sub_total'], $request->products ?? []));
         $productIds = $request->products ? array_column($request->products, 'id') : [];
 
         // Create sale
@@ -146,6 +146,16 @@ class CashierController extends Controller
             'change'     => $change,
             'menu'       => 'Invoice',
         ]);
+    }
+
+    public function getDraftSales()
+    {
+        $drafts = Sale::with('member')
+            ->where('status', 'draft')
+            ->orderBy('id', 'desc')
+            ->get();
+        dd($drafts);
+        return response()->json($drafts);
     }
 
     /**

@@ -95,6 +95,7 @@ Route::middleware([
         Route::get('/cashier', [CashierController::class, "index"])->name("cashier.index");
         Route::post('/cashier', [CashierController::class, "store"])->name("cashier.store");
         Route::get('/cashier/print/{sale}', [CashierController::class, 'print'])->name('cashier.print');
+        Route::get('/cashier/drafts', [CashierController::class, 'getDraftSales'])->name('cashier.drafts');
 
         // Cashier Shift
         Route::prefix('cashier_shifts')->name('cashierShifts.')->group(function () {
