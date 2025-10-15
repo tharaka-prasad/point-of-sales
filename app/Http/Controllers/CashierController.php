@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
 
@@ -63,7 +64,7 @@ class CashierController extends Controller
 
         // Calculate totals
         $totalItem  = $request->total_item ?? count($request->products ?? []);
-        $totalPrice = $request->total_price ?? array_sum(array_map(fn($p) => $p['sub_total'] ?? 0, $request->products ?? []));
+        $totalPrice = $request->total_price ?? array_sum(array_map(fn($p) => $p['sub_total'], $request->products ?? []));
         $productIds = $request->products ? array_column($request->products, 'id') : [];
 
         // Create sale
@@ -148,6 +149,110 @@ class CashierController extends Controller
         ]);
     }
 
+    public function getDraftSales()
+    {
+        $drafts = Sale::with('member')
+            ->where('status', 'draft')
+            ->where('user_id', auth()->id()) // only show drafts created by current user
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return response()->json($drafts);
+    }
+
+    public function getDraftSale($id)
+    {
+        $draft = Sale::with(['member', 'details.product']) // eager load products from details
+            ->where('id', $id)
+            ->where('user_id', auth()->id()) // only owner can load
+            ->firstOrFail();
+
+        // Transform details to match frontend expected format
+        $draftData = [
+            'id'          => $draft->id,
+            'member'      => $draft->member,
+            'total_item'  => $draft->total_item,
+            'total_price' => $draft->total_price,
+            'pay'         => $draft->pay,
+            'discount'    => $draft->discount,
+            'products'    => $draft->details->map(fn($d) => [
+                'id'         => $d->product_id,
+                'name'       => $d->product->name ?? '',
+                'sale_price' => $d->sale_price,
+                'amount'     => $d->amount,
+                'discount'   => $d->discount,
+                'sub_total'  => $d->sub_total,
+            ]),
+        ];
+
+        return response()->json($draftData);
+    }
+ public function getCustomerSales($customerId)
+    {
+        $sales = SaleDetail::with(['product', 'sale'])
+            ->whereHas('sale', function ($q) use ($customerId) {
+                $q->where('member_id', $customerId);
+            })
+            ->whereColumn('amount', '>', 'return_qty') // only products that can be returned
+            ->get()
+            ->map(function ($d) {
+                return [
+                    'sale_id'        => $d->sale_id,
+                    'product_id'     => $d->product_id,
+                    'product_name'   => $d->product->name ?? '-',
+                    'qty_purchased'  => $d->amount,
+                    'returnable_qty' => $d->amount - ($d->return_qty ?? 0),
+                    'sale_price'     => $d->sale_price,
+                    'discount'       => $d->discount ?? 0,
+                    'sub_total'      => $d->sub_total,
+                ];
+            });
+
+        return response()->json($sales);
+    }
+
+    // ✅ Save return data
+    public function storeReturn(Request $request)
+    {
+        $request->validate([
+            'customer_id' => 'required|exists:members,id',
+            'products'    => 'required|array|min:1',
+            'products.*.product_id' => 'required|exists:products,id',
+            'products.*.qty'        => 'required|numeric|min:1',
+            'products.*.price'      => 'required|numeric|min:0',
+        ]);
+
+        DB::transaction(function () use ($request) {
+            foreach ($request->products as $item) {
+                $detail = SaleDetail::whereHas('sale', function ($q) use ($request) {
+                        $q->where('member_id', $request->customer_id);
+                    })
+                    ->where('product_id', $item['product_id'])
+                    ->first();
+
+                if ($detail) {
+                    // update returned qty
+                    $detail->return_qty = ($detail->return_qty ?? 0) + $item['qty'];
+                    $detail->save();
+                }
+            }
+
+            // optional: record in Sale table for reference
+            Sale::create([
+                'member_id' => $request->customer_id,
+                'total_item' => count($request->products),
+                'total_price' => collect($request->products)->sum(fn($p) => $p['price'] * $p['qty']),
+                'discount' => 0,
+                'pay' => 0,
+                'accepted' => 0,
+                'user_id' => auth()->id(),
+                'status' => 'return',
+                'return_products' => $request->products,
+            ]);
+        });
+
+        return response()->json(['message' => 'Return saved successfully.']);
+    }
     /**
      * Display the specified resource.
      */

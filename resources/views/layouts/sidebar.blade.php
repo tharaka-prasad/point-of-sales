@@ -81,12 +81,12 @@
                             <p>Expense</p>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ route('sale.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-th"></i>
                             <p>Sale</p>
                         </a>
-                    </li>
+                    </li> --}}
 
                     <!-- CASHIER Section -->
                     <li class="nav-header">CASHIER</li>

@@ -16,9 +16,8 @@ use App\Http\Controllers\SaleDetailController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Supplier;
+use Illuminate\Support\Facades\Route;
 
 // Login
 Route::get("/", fn() => redirect()->route("login"));
@@ -28,7 +27,6 @@ Route::post('/logout', function () {
     Auth::logout();
     return redirect('/login');
 })->name('logout');
-
 
 Route::middleware([
     'auth:sanctum',
@@ -63,7 +61,6 @@ Route::middleware([
         // Supplier
         Route::get('/supplier/data', [SupplierController::class, "data"])->name("supplier.data");
         Route::resource('/supplier', SupplierController::class);
-        Route::get('/suppliers/all', function() {return response()->json(Supplier::all());});
         Route::get('/suppliers/all', [SupplierController::class, 'getAll'])->name('suppliers.all');
         //Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
 
@@ -109,14 +106,18 @@ Route::middleware([
         Route::get('/cashier', [CashierController::class, "index"])->name("cashier.index");
         Route::post('/cashier', [CashierController::class, "store"])->name("cashier.store");
         Route::get('/cashier/print/{sale}', [CashierController::class, 'print'])->name('cashier.print');
+        Route::get('/cashier/drafts', [CashierController::class, 'getDraftSales'])->name('cashier.drafts');
+        Route::get('/cashier/drafts/{id}', [CashierController::class, 'getDraftSale']);
+        Route::get('/sales/customer/{id}', [SaleController::class, 'getCustomerSales'])->name('sales.customer');
+        Route::post('/sales/return', [SaleController::class, 'storeReturn'])->name('sales.return');
 
         // Cashier Shift
         Route::prefix('cashier_shifts')->name('cashierShifts.')->group(function () {
-        Route::get('/', [CashierShiftController::class, 'index'])->name('index');
-        Route::get('/data', [CashierShiftController::class, 'data'])->name('data');
-        Route::post('/', [CashierShiftController::class, 'store'])->name('store');
-        Route::post('/{id}/close', [CashierShiftController::class, 'close'])->name('close');
-        Route::delete('/{id}', [CashierShiftController::class, 'destroy'])->name('destroy');
+            Route::get('/', [CashierShiftController::class, 'index'])->name('index');
+            Route::get('/data', [CashierShiftController::class, 'data'])->name('data');
+            Route::post('/', [CashierShiftController::class, 'store'])->name('store');
+            Route::post('/{id}/close', [CashierShiftController::class, 'close'])->name('close');
+            Route::delete('/{id}', [CashierShiftController::class, 'destroy'])->name('destroy');
 
         });
     });
