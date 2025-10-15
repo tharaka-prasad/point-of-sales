@@ -13,13 +13,16 @@ return new class extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("member_id")->nullable()->constrained()->cascadeOnDelete();
-            $table->integer("total_item");
-            $table->integer("total_price");
-            $table->tinyInteger("discount")->default(0);
-            $table->integer("pay")->default(0);
-            $table->integer("accepted")->default(0);
-            $table->foreignId("user_id")->constrained()->cascadeOnDelete();
+            $table->integer("member_id")->nullable();
+            $table->integer("total_item")->nullable();
+            $table->integer("total_price")->nullable();
+            $table->integer("discount")->default(0)->nullable();
+            $table->integer("pay")->default(0)->nullable();
+            $table->integer("accepted")->default(0)->nullable();
+            $table->integer("user_id")->nullable();
+            $table->json('product_ids')->nullable(); // store product IDs as JSON
+            $table->json('return_products')->nullable();
+            $table->enum('status', ['draft', 'complete', 'approved'])->default('draft')->nullable();
             $table->timestamps();
         });
     }

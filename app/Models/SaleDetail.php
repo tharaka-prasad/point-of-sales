@@ -12,6 +12,7 @@ class SaleDetail extends Model
         'amount',
         'discount',
         'sub_total',
+        'return_qty',
     ];
 
     // Relation

@@ -139,9 +139,16 @@
                                     onclick="document.getElementById('saleForm').insertAdjacentHTML('beforeend','<input type=hidden name=action value=save>');">Save</button>
                                 <button class="btn btn-success" type="submit"
                                     onclick="document.getElementById('saleForm').insertAdjacentHTML('beforeend','<input type=hidden name=action value=print>');">Print</button>
-                                <button type="button" class="btn btn-secondary" id="findDraftsBtn">Find</button>
-                                <button class="btn btn-info">Adv</button>
-                                <button class="btn btn-warning">Ret</button>
+                                <button type="button" id="findDraftsBtn" class="btn btn-info">
+                                    <i class="bi bi-search"></i> Find Drafts
+                                </button>
+                                @include('cashier.draftModal')
+
+                                <button type="button" class="btn btn-info" id="findReturnsBtn">
+                                    <i class="bi bi-search"></i> Find Returns
+                                </button>
+                                @include('cashier.returnModal')
+
                                 <button type="button" class="btn btn-danger" id="cancelButton">Cancel</button>
                             </div>
                         </div>
@@ -151,180 +158,462 @@
         </div>
     </div>
 
-@includeIf('member.form')
+    @includeIf('member.form')
 @endsection
-
 @push('scripts')
     <script>
-        const customers = @json($customers);
-        const products = @json($products);
+        document.addEventListener("DOMContentLoaded", function() {
+            const customers = @json($customers);
+            const products = @json($products);
 
-        // Customer select
-        document.getElementById('customerSelect').addEventListener('change', function() {
-            const selected = this.options[this.selectedIndex];
-            document.getElementById('customerId').value = selected.value;
-            document.getElementById('customerAddress').value = selected.getAttribute('data-address') || '';
-            document.getElementById('customerContact').value = selected.getAttribute('data-contact') || '';
-        });
-
-        // Contact Enter
-        document.getElementById('customerContact').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const contact = this.value.trim();
-                const customer = customers.find(c => c.phone == contact);
-                if (customer) {
-                    document.getElementById('customerId').value = customer.id;
-                    document.getElementById('customerAddress').value = customer.address;
-                    document.getElementById('customerSelect').value = customer.id;
-                } else {
-                    document.getElementById('customerId').value = '';
-                    document.getElementById('customerAddress').value = '';
-                    document.getElementById('customerSelect').value = '';
-                }
-            }
-        });
-
-        // Barcode logic
-        const barcodeInput = document.getElementById('barcodeInput');
-        const productSelect = document.getElementById('productSelect');
-        const qtyInput = document.getElementById('qty');
-
-        barcodeInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') e.preventDefault();
-        });
-
-        barcodeInput.addEventListener('input', function() {
-            const code = this.value.trim();
-            if (!code) return;
-            const product = products.find(p => String(p.code) === String(code));
-            if (product) {
-                productSelect.value = product.id;
-                qtyInput.value = 1;
-            }
-        });
-
-        productSelect.addEventListener('change', function() {
-            const productId = this.value;
-            if (!productId) {
-                barcodeInput.value = '';
-                return;
-            }
-            const product = products.find(p => String(p.id) === String(productId));
-            if (product) {
-                barcodeInput.value = product.code || '';
-            }
-        });
-
-        // Add product
-        document.getElementById('addProduct').addEventListener('click', function() {
-            const selected = productSelect.options[productSelect.selectedIndex];
-            const productId = selected.value;
-            const productName = selected.text;
-            const sellPrice = parseFloat(selected.getAttribute('data-sell_price')) || 0;
-            const discount = parseFloat(selected.getAttribute('data-discount')) || 0;
-            const qty = parseInt(qtyInput.value) || 1;
-
-            if (!productId) return alert('Please select a product.');
-
-            const subtotal = (sellPrice - discount) * qty;
-            const tableBody = document.querySelector('#productsTable tbody');
-
-            const row = document.createElement('tr');
-            row.innerHTML = `
-            <td>${productId}<input type="hidden" name="products[${productId}][id]" value="${productId}"></td>
-            <td>${productName}</td>
-            <td>${sellPrice.toFixed(2)}<input type="hidden" name="products[${productId}][sale_price]" value="${sellPrice.toFixed(2)}"></td>
-            <td>${qty}<input type="hidden" name="products[${productId}][amount]" value="${qty}"></td>
-            <td><input type="number" class="form-control discountInput" value="${discount}" min="0" style="width:80px"
-                name="products[${productId}][discount]"></td>
-            <td class="subtotal">${subtotal.toFixed(2)}<input type="hidden" name="products[${productId}][sub_total]" value="${subtotal.toFixed(2)}"></td>
-            <td><button type="button" class="btn btn-sm btn-danger removeRow">X</button></td>
-        `;
-            tableBody.appendChild(row);
-
-            qtyInput.value = 1;
-            productSelect.value = '';
-            barcodeInput.value = '';
-
-            updateTotals();
-        });
-
-        // Remove product row
-        document.querySelector('#productsTable').addEventListener('click', function(e) {
-            if (e.target.classList.contains('removeRow')) {
-                e.target.closest('tr').remove();
-                updateTotals();
-            }
-        });
-
-        // Discount change listener
-        document.querySelector('#productsTable').addEventListener('input', function(e) {
-            if (e.target.classList.contains('discountInput')) {
-                const row = e.target.closest('tr');
-                const price = parseFloat(row.querySelector('td:nth-child(3)').textContent) || 0;
-                const qty = parseInt(row.querySelector('td:nth-child(4)').textContent) || 0;
-                const discount = parseFloat(e.target.value) || 0;
-                const subtotal = (price - discount) * qty;
-                row.querySelector('.subtotal').textContent = subtotal.toFixed(2);
-                row.querySelector('input[name$="[sub_total]"]').value = subtotal.toFixed(2);
-                updateTotals();
-            }
-        });
-
-        // Totals
-        function updateTotals() {
-            let totalAmount = 0,
-                totalItems = 0;
-            document.querySelectorAll('#productsTable tbody tr').forEach(row => {
-                const subtotal = parseFloat(row.querySelector('.subtotal').textContent) || 0;
-                const qty = parseInt(row.querySelector('td:nth-child(4)').textContent) || 0;
-                totalAmount += subtotal;
-                totalItems += qty;
-            });
-            document.getElementById('totalItems').textContent = totalItems;
-            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
-            document.getElementById('totalItemInput').value = totalItems;
-            document.getElementById('totalPriceInput').value = totalAmount.toFixed(2);
-            updateBalance();
-        }
-
-        function updateBalance() {
-            const cash = parseFloat(document.getElementById('cashInput').value) || 0;
-            const total = parseFloat(document.getElementById('totalAmount').textContent) || 0;
-            const balance = cash - total;
+            // Form elements
+            const saleForm = document.getElementById('saleForm');
+            const customerSelect = document.getElementById('customerSelect');
+            const customerId = document.getElementById('customerId');
+            const customerAddress = document.getElementById('customerAddress');
+            const customerContact = document.getElementById('customerContact');
+            const barcodeInput = document.getElementById('barcodeInput');
+            const productSelect = document.getElementById('productSelect');
+            const qtyInput = document.getElementById('qty');
+            const addProductBtn = document.getElementById('addProduct');
+            const productsTableBody = document.querySelector('#productsTable tbody');
+            const totalItemsEl = document.getElementById('totalItems');
+            const totalAmountEl = document.getElementById('totalAmount');
+            const totalItemInput = document.getElementById('totalItemInput');
+            const totalPriceInput = document.getElementById('totalPriceInput');
+            const cashInput = document.getElementById('cashInput');
             const balanceInput = document.getElementById('balanceInput');
-            balanceInput.value = balance.toFixed(2);
-            balanceInput.classList.toggle('text-danger', balance < 0);
-            balanceInput.classList.toggle('text-success', balance >= 0);
-        }
-
-        document.getElementById('cashInput').addEventListener('input', updateBalance);
-
-        // Cancel button logic
-        document.addEventListener('DOMContentLoaded', function() {
             const cancelBtn = document.getElementById('cancelButton');
-            if (!cancelBtn) return;
+            const findDraftsBtn = document.getElementById("findDraftsBtn");
+            const draftModalEl = document.getElementById("draftModal");
+            const draftListBody = document.getElementById("draftListBody");
+
+            let currentDraftId = null; // store loaded draft ID
+
+            // ------------------------------
+            // Customer selection
+            // ------------------------------
+            customerSelect.addEventListener('change', function() {
+                const selected = this.options[this.selectedIndex];
+                customerId.value = selected.value;
+                customerAddress.value = selected.getAttribute('data-address') || '';
+                customerContact.value = selected.getAttribute('data-contact') || '';
+            });
+
+            customerContact.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const contact = this.value.trim();
+                    const customer = customers.find(c => c.phone == contact);
+                    if (customer) {
+                        customerId.value = customer.id;
+                        customerAddress.value = customer.address;
+                        customerSelect.value = customer.id;
+                    } else {
+                        customerId.value = '';
+                        customerAddress.value = '';
+                        customerSelect.value = '';
+                    }
+                }
+            });
+
+            // ------------------------------
+            // Barcode and product select
+            // ------------------------------
+            barcodeInput.addEventListener('input', function() {
+                const code = this.value.trim();
+                if (!code) return;
+                const product = products.find(p => String(p.code) === String(code));
+                if (product) {
+                    productSelect.value = product.id;
+                    qtyInput.value = 1;
+                }
+            });
+
+            productSelect.addEventListener('change', function() {
+                const productId = this.value;
+                if (!productId) return barcodeInput.value = '';
+                const product = products.find(p => String(p.id) === String(productId));
+                if (product) barcodeInput.value = product.code || '';
+            });
+
+            // ------------------------------
+            // Add product row
+            // ------------------------------
+            addProductBtn.addEventListener('click', function() {
+                const selected = productSelect.options[productSelect.selectedIndex];
+                const productIdVal = selected.value;
+                const productName = selected.text;
+                const sellPrice = parseFloat(selected.getAttribute('data-sell_price')) || 0;
+                const discount = parseFloat(selected.getAttribute('data-discount')) || 0;
+                const qty = parseInt(qtyInput.value) || 1;
+                if (!productIdVal) return alert('Please select a product.');
+
+                const subtotal = (sellPrice - discount) * qty;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+            <td>${productIdVal}<input type="hidden" name="products[${productIdVal}][id]" value="${productIdVal}"></td>
+            <td>${productName}</td>
+            <td>${sellPrice.toFixed(2)}<input type="hidden" name="products[${productIdVal}][sale_price]" value="${sellPrice.toFixed(2)}"></td>
+            <td>${qty}<input type="hidden" name="products[${productIdVal}][amount]" value="${qty}"></td>
+            <td><input type="number" class="form-control discountInput" value="${discount}" min="0" style="width:80px"
+                name="products[${productIdVal}][discount]"></td>
+            <td class="subtotal">${subtotal.toFixed(2)}<input type="hidden" name="products[${productIdVal}][sub_total]" value="${subtotal.toFixed(2)}"></td>
+            <td><button type="button" class="btn btn-sm btn-danger removeRow">X</button></td>`;
+                productsTableBody.appendChild(row);
+
+                // Reset input
+                qtyInput.value = 1;
+                productSelect.value = '';
+                barcodeInput.value = '';
+                updateTotals();
+            });
+
+            // ------------------------------
+            // Remove product row
+            // ------------------------------
+            productsTableBody.addEventListener('click', function(e) {
+                if (e.target.classList.contains('removeRow')) {
+                    e.target.closest('tr').remove();
+                    updateTotals();
+                }
+            });
+
+            // ------------------------------
+            // Discount change
+            // ------------------------------
+            productsTableBody.addEventListener('input', function(e) {
+                if (e.target.classList.contains('discountInput')) {
+                    const row = e.target.closest('tr');
+                    const price = parseFloat(row.querySelector('td:nth-child(3)').textContent) || 0;
+                    const qty = parseInt(row.querySelector('td:nth-child(4)').textContent) || 0;
+                    const discount = parseFloat(e.target.value) || 0;
+                    const subtotal = (price - discount) * qty;
+                    row.querySelector('.subtotal').textContent = subtotal.toFixed(2);
+                    row.querySelector('input[name$="[sub_total]"]').value = subtotal.toFixed(2);
+                    updateTotals();
+                }
+            });
+
+            // ------------------------------
+            // Update totals & balance
+            // ------------------------------
+            function updateTotals() {
+                let totalAmount = 0,
+                    totalItems = 0;
+                productsTableBody.querySelectorAll('tr').forEach(row => {
+                    const subtotal = parseFloat(row.querySelector('.subtotal').textContent) || 0;
+                    const qty = parseInt(row.querySelector('td:nth-child(4)').textContent) || 0;
+                    totalAmount += subtotal;
+                    totalItems += qty;
+                });
+                totalItemsEl.textContent = totalItems;
+                totalAmountEl.textContent = totalAmount.toFixed(2);
+                totalItemInput.value = totalItems;
+                totalPriceInput.value = totalAmount.toFixed(2);
+                updateBalance();
+            }
+
+            function updateBalance() {
+                const cash = parseFloat(cashInput.value) || 0;
+                const total = parseFloat(totalAmountEl.textContent) || 0;
+                const balance = cash - total;
+                balanceInput.value = balance.toFixed(2);
+                balanceInput.classList.toggle('text-danger', balance < 0);
+                balanceInput.classList.toggle('text-success', balance >= 0);
+            }
+
+            cashInput.addEventListener('input', updateBalance);
+
+            // ------------------------------
+            // Draft modal: Find Drafts
+            // ------------------------------
+            findDraftsBtn.addEventListener("click", function() {
+                const modal = new bootstrap.Modal(draftModalEl);
+                modal.show();
+
+                draftListBody.innerHTML = `<tr>
+            <td colspan="6" class="text-center text-muted py-3">
+                <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
+                <span class="ms-2">Loading drafts...</span>
+            </td>
+        </tr>`;
+
+                fetch("{{ route('cashier.drafts') }}")
+                    .then(res => res.ok ? res.json() : Promise.reject(res))
+                    .then(data => {
+                        draftListBody.innerHTML = "";
+                        if (!data.length) {
+                            draftListBody.innerHTML =
+                                `<tr><td colspan="6" class="text-center text-muted py-3">No draft sales found.</td></tr>`;
+                            return;
+                        }
+
+                        data.forEach(draft => {
+                            const row = document.createElement("tr");
+                            row.innerHTML =
+                                `
+                        <td>${draft.id}</td>
+                        <td>${draft.member ? draft.member.name : '-'}</td>
+                        <td>${draft.total_item}</td>
+                        <td>${parseFloat(draft.total_price).toFixed(2)}</td>
+                        <td>${new Date(draft.created_at).toLocaleDateString()}</td>
+                        <td><button class="btn btn-sm btn-primary loadDraftBtn" data-id="${draft.id}">Load</button></td>`;
+                            draftListBody.appendChild(row);
+                        });
+                    })
+                    .catch(err => {
+                        console.error("Error fetching drafts:", err);
+                        draftListBody.innerHTML =
+                            `<tr><td colspan="6" class="text-center text-danger py-3">⚠️ Failed to load drafts.</td></tr>`;
+                    });
+            });
+
+            // ------------------------------
+            // Load Draft
+            // ------------------------------
+            document.addEventListener("click", function(e) {
+                if (!e.target.classList.contains("loadDraftBtn")) return;
+
+                const draftId = e.target.dataset.id;
+
+                fetch(`{{ url('/cashier/drafts') }}/${draftId}`)
+                    .then(res => res.ok ? res.json() : Promise.reject(res))
+                    .then(draft => {
+                        currentDraftId = draft.id;
+
+                        // Reset form
+                        saleForm.reset();
+                        productsTableBody.innerHTML = '';
+                        totalItemsEl.textContent = 0;
+                        totalAmountEl.textContent = '0.00';
+                        totalItemInput.value = 0;
+                        totalPriceInput.value = 0;
+                        balanceInput.value = '0.00';
+                        balanceInput.classList.remove('text-success', 'text-danger');
+
+                        // Populate customer
+                        if (draft.member) {
+                            customerSelect.value = draft.member.id;
+                            customerId.value = draft.member.id;
+                            customerAddress.value = draft.member.address;
+                            customerContact.value = draft.member.phone;
+                        }
+
+                        // Populate products
+                        draft.products.forEach(prod => {
+                            const subtotal = (prod.sale_price - prod.discount) * prod.amount;
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                        <td>${prod.id}<input type="hidden" name="products[${prod.id}][id]" value="${prod.id}"></td>
+                        <td>${prod.name}</td>
+                        <td>${parseFloat(prod.sale_price).toFixed(2)}<input type="hidden" name="products[${prod.id}][sale_price]" value="${parseFloat(prod.sale_price).toFixed(2)}"></td>
+                        <td>${prod.amount}<input type="hidden" name="products[${prod.id}][amount]" value="${prod.amount}"></td>
+                        <td><input type="number" class="form-control discountInput" value="${prod.discount}" min="0" style="width:80px" name="products[${prod.id}][discount]"></td>
+                        <td class="subtotal">${subtotal.toFixed(2)}<input type="hidden" name="products[${prod.id}][sub_total]" value="${subtotal.toFixed(2)}"></td>
+                        <td><button type="button" class="btn btn-sm btn-danger removeRow">X</button></td>`;
+                            productsTableBody.appendChild(row);
+                        });
+
+                        updateTotals();
+
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(draftModalEl);
+                        modal.hide();
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Failed to load draft.");
+                    });
+            });
+
+            // ------------------------------
+            // Add draft_id before submitting
+            // ------------------------------
+            saleForm.addEventListener('submit', function() {
+                if (currentDraftId) {
+                    let input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'draft_id';
+                    input.value = currentDraftId;
+                    saleForm.appendChild(input);
+                }
+            });
+
+            // ------------------------------
+            // Cancel button
+            // ------------------------------
             cancelBtn.addEventListener('click', function() {
-                const form = document.getElementById('saleForm');
-                form.querySelectorAll('input[type="hidden"][name="action"]').forEach(el => el.remove());
-                form.reset();
-                document.querySelector('#productsTable tbody').innerHTML = '';
-                document.getElementById('totalItems').textContent = 0;
-                document.getElementById('totalAmount').textContent = '0.00';
-                document.getElementById('totalItemInput').value = 0;
-                document.getElementById('totalPriceInput').value = 0;
-                const balanceInput = document.getElementById('balanceInput');
+                saleForm.reset();
+                productsTableBody.innerHTML = '';
+                totalItemsEl.textContent = 0;
+                totalAmountEl.textContent = '0.00';
+                totalItemInput.value = 0;
+                totalPriceInput.value = 0;
                 balanceInput.value = '0.00';
                 balanceInput.classList.remove('text-success', 'text-danger');
-                document.getElementById('customerSelect').value = '';
-                document.getElementById('customerId').value = '';
-                document.getElementById('customerAddress').value = '';
-                document.getElementById('customerContact').value = '';
-                document.getElementById('productSelect').value = '';
-                document.getElementById('qty').value = 1;
-                document.getElementById('barcodeInput').value = '';
-                document.getElementById('invoiceNumber').textContent = 'IN00000502';
+                customerSelect.value = '';
+                customerId.value = '';
+                customerAddress.value = '';
+                customerContact.value = '';
+                productSelect.value = '';
+                qtyInput.value = 1;
+                barcodeInput.value = '';
+                currentDraftId = null;
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const findReturnsBtn = document.getElementById("findReturnsBtn");
+            const returnModalEl = document.getElementById("returnModal");
+            const returnCustomerSelect = document.getElementById("returnCustomerSelect");
+            const returnProductsTableBody = document.querySelector("#returnProductsTable tbody");
+            const addReturnProductsBtn = document.getElementById("addReturnProductsBtn");
+
+            const productsTableBody = document.querySelector("#productsTable tbody");
+            const totalItemsEl = document.getElementById('totalItems');
+            const totalAmountEl = document.getElementById('totalAmount');
+            const totalItemInput = document.getElementById('totalItemInput');
+            const totalPriceInput = document.getElementById('totalPriceInput');
+            const balanceInput = document.getElementById('balanceInput');
+
+            let currentCustomerId = null;
+
+            // ------------------------------
+            // Open Return Modal
+            // ------------------------------
+            findReturnsBtn.addEventListener("click", function() {
+                const modal = new bootstrap.Modal(returnModalEl);
+                modal.show();
+                returnProductsTableBody.innerHTML =
+                    `<tr><td colspan="3" class="text-center text-muted py-3">Select a customer to see returnable products.</td></tr>`;
+            });
+
+            // ------------------------------
+            // Load returnable products on customer select
+            // ------------------------------
+            returnCustomerSelect.addEventListener("change", function() {
+                const customerId = this.value;
+                if (!customerId) return;
+
+                currentCustomerId = customerId;
+                returnProductsTableBody.innerHTML =
+                    `<tr><td colspan="3" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div> Loading...</td></tr>`;
+
+                fetch(`/cashier/returns/${customerId}`)
+                    .then(res => res.ok ? res.json() : Promise.reject(res))
+                    .then(data => {
+                        returnProductsTableBody.innerHTML = '';
+                        if (!data.length) {
+                            returnProductsTableBody.innerHTML =
+                                `<tr><td colspan="3" class="text-center text-muted py-3">No returnable products found.</td></tr>`;
+                            return;
+                        }
+
+                        data.forEach(prod => {
+                            const row = document.createElement("tr");
+                            row.innerHTML = `
+                        <td>${prod.product_name}<input type="hidden" class="productIdInput" value="${prod.product_id}"></td>
+                        <td>${prod.returnable_qty}</td>
+                        <td><input type="number" class="form-control returnQtyInput" min="0" max="${prod.returnable_qty}" value="0" data-price="${prod.sale_price}"></td>
+                    `;
+                            returnProductsTableBody.appendChild(row);
+                        });
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        returnProductsTableBody.innerHTML =
+                            `<tr><td colspan="3" class="text-center text-danger py-3">Failed to load products.</td></tr>`;
+                    });
+            });
+
+            // ------------------------------
+            // Add return products to main table
+            // ------------------------------
+            addReturnProductsBtn.addEventListener("click", function() {
+                const rows = returnProductsTableBody.querySelectorAll("tr");
+                let added = false;
+
+                rows.forEach(row => {
+                    const qty = parseInt(row.querySelector(".returnQtyInput").value) || 0;
+                    const productId = row.querySelector(".productIdInput").value;
+                    const price = parseFloat(row.querySelector(".returnQtyInput").dataset.price);
+
+                    if (qty > 0) {
+                        added = true;
+
+                        // Check if product already exists in main table
+                        let existingRow = Array.from(productsTableBody.querySelectorAll("tr")).find(
+                            r => r.querySelector("td input[name^='products'][name$='[id]']")
+                            .value == productId);
+
+                        if (existingRow) {
+                            // Increase qty
+                            let qtyCell = existingRow.querySelector("td:nth-child(4)");
+                            let hiddenQty = existingRow.querySelector("input[name$='[amount]']");
+                            let newQty = parseInt(qtyCell.textContent) + qty;
+                            qtyCell.textContent = newQty;
+                            hiddenQty.value = newQty;
+
+                            // Update subtotal
+                            let priceCell = parseFloat(existingRow.querySelector("td:nth-child(3)")
+                                .textContent);
+                            let discount = parseFloat(existingRow.querySelector(
+                                "input.discountInput").value) || 0;
+                            let subtotal = (priceCell - discount) * newQty;
+                            existingRow.querySelector('.subtotal').textContent = subtotal.toFixed(
+                            2);
+                            existingRow.querySelector("input[name$='[sub_total]']").value = subtotal
+                                .toFixed(2);
+                        } else {
+                            // Add new row
+                            const rowEl = document.createElement("tr");
+                            const subtotal = price * qty;
+                            rowEl.innerHTML = `
+                        <td>${productId}<input type="hidden" name="products[${productId}][id]" value="${productId}"></td>
+                        <td>Return</td>
+                        <td>${price.toFixed(2)}<input type="hidden" name="products[${productId}][sale_price]" value="${price.toFixed(2)}"></td>
+                        <td>${qty}<input type="hidden" name="products[${productId}][amount]" value="${qty}"></td>
+                        <td><input type="number" class="form-control discountInput" value="0" min="0" style="width:80px" name="products[${productId}][discount]"></td>
+                        <td class="subtotal">${subtotal.toFixed(2)}<input type="hidden" name="products[${productId}][sub_total]" value="${subtotal.toFixed(2)}"></td>
+                        <td><button type="button" class="btn btn-sm btn-danger removeRow">X</button></td>
+                    `;
+                            productsTableBody.appendChild(rowEl);
+                        }
+                    }
+                });
+
+                if (!added) {
+                    alert("Please enter quantity to return.");
+                    return;
+                }
+
+                // Update totals and balance
+                function updateTotals() {
+                    let totalAmount = 0,
+                        totalItems = 0;
+                    productsTableBody.querySelectorAll('tr').forEach(row => {
+                        const subtotal = parseFloat(row.querySelector('.subtotal').textContent) ||
+                        0;
+                        const qty = parseInt(row.querySelector('td:nth-child(4)').textContent) || 0;
+                        totalAmount += subtotal;
+                        totalItems += qty;
+                    });
+                    totalItemsEl.textContent = totalItems;
+                    totalAmountEl.textContent = totalAmount.toFixed(2);
+                    totalItemInput.value = totalItems;
+                    totalPriceInput.value = totalAmount.toFixed(2);
+                    const cash = parseFloat(document.getElementById('cashInput').value) || 0;
+                    const balance = cash - totalAmount;
+                    balanceInput.value = balance.toFixed(2);
+                    balanceInput.classList.toggle('text-danger', balance < 0);
+                    balanceInput.classList.toggle('text-success', balance >= 0);
+                }
+
+                updateTotals();
+
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(returnModalEl);
+                modal.hide();
             });
         });
     </script>
