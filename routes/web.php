@@ -62,7 +62,7 @@ Route::middleware([
         Route::get('/supplier/data', [SupplierController::class, "data"])->name("supplier.data");
         Route::resource('/supplier', SupplierController::class);
         Route::get('/suppliers/all', [SupplierController::class, 'getAll'])->name('suppliers.all');
-        //Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
+        Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
 
 
         // PO

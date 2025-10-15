@@ -1,27 +1,35 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
-use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Http\Request;
+
 
 class SupplierController extends Controller
 {
     // Show supplier list page
     public function index(){
-        $menu = "Supplier";
-        return view("supplier.index", compact("menu","categories"));
+        $menu = 'Supplier';
+        $suppliers = Supplier::all();
+        $categories = Category::all();
+
+        return view('supplier.index', compact('menu','suppliers','categories'));
     }
 
-    // For DataTables server-side
-    public function data(){
-        $suppliers = Supplier::latest();
+
+
+    public function data()
+    {
+        $suppliers = Supplier::with('category')->latest(); // keep the relationship + ordering
 
         return datatables()
             ->of($suppliers)
             ->addIndexColumn()
-            ->addColumn("action", function ($supplier) {
+            ->addColumn('category_name', function ($supplier) {
+                return $supplier->category ? $supplier->category->category_name : '-';
+            })
+            ->addColumn('action', function ($supplier) {
                 return "
                     <div class='btn-group'>
                         <button class='btn btn-xs btn-warning mr-3' onclick='editSupplier(`" . route("supplier.update", $supplier->id) . "`)'>
@@ -33,9 +41,10 @@ class SupplierController extends Controller
                     </div>
                 ";
             })
-            ->rawColumns(["action"])
+            ->rawColumns(['action'])
             ->make(true);
     }
+
 
     // Store new supplier
     public function store(Request $request)

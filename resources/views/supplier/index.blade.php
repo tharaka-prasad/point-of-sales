@@ -83,7 +83,7 @@
                             data: "company_name"
                         },
                         {
-                            data: "name"
+                            data: "category_id"
                         },
                         {
                             data: "phone"
@@ -146,7 +146,7 @@
                     // Populate fields
                     $("#modalForm [name=supplier_name]").val(response.name || response.supplier_name || '');
                     $("#modalForm [name=company_name]").val(response.company || response.company_name || '');
-                    $("#modalForm [name=category]").val(response.name || response.category || '');
+                    $("#modalForm [name=category_id]").val(response.category || response.category_id || '');
                     $("#modalForm [name=phone]").val(response.phone || '');
                     $("#modalForm [name=address]").val(response.address || '');
 

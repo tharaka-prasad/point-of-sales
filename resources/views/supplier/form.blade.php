@@ -23,19 +23,8 @@
                             placeholder="Enter Company Name" required>
                     </div>
 
-
-                    <div class="form-group row">
-                        <select id="category_id" name="category_id" class="form-control">
-                            <option value="">-- Select Category --</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-
-                    <div class="form-group row">
-                        <input type="text" name="name" id="name" class="form-control"
+                     <div class="form-group row">
+                        <input type="text" name="category_name" id="category_name" class="form-control"
                             placeholder="Enter Category" required>
                     </div>
 
