@@ -120,26 +120,23 @@
 
         // Function: Add Supplier
         function addSupplier(url) {
-            $("#modalForm").modal("show");
-            $("#modalForm .modal-title").text("Add Supplier");
+            $("#modalForm").modal("show"); // Show modal
+            $("#modalForm .modal-title").text("Add Supplier"); //add supplier
 
             $("#modalForm form")[0].reset();
             $("#modalForm form").attr("action", url);
-            $("#modalForm [name=_method]").val("POST");
+            $("#modalForm [name=_method]").val("POST"); // this is an create data
         }
 
         // Function: Edit Supplier
-        // Function: Edit Supplier
         function editSupplier(url) {
-            // Show modal
-            $("#modalForm").modal("show");
-            $("#modalForm .modal-title").text("Edit Supplier");
+            $("#modalForm").modal("show"); // Show modal
+            $("#modalForm .modal-title").text("Edit Supplier"); //edit supplier
 
-            // Reset form and set action + method
-            const form = $("#modalForm form")[0];
-            form.reset();
+            const form = $("#modalForm form")[0]; // Reset form and set action + method
+            form.reset(); //reset form
             $(form).attr("action", url);
-            $("#modalForm [name=_method]").val("PUT");
+            $("#modalForm [name=_method]").val("PUT"); //this is an update
 
             // Fetch supplier data
             $.get(url)
@@ -149,6 +146,7 @@
                     // Populate fields
                     $("#modalForm [name=supplier_name]").val(response.name || response.supplier_name || '');
                     $("#modalForm [name=company_name]").val(response.company || response.company_name || '');
+                    $("#modalForm [name=category]").val(response.name || response.category || '');
                     $("#modalForm [name=phone]").val(response.phone || '');
                     $("#modalForm [name=address]").val(response.address || '');
 
@@ -160,24 +158,6 @@
                     alert("Failed to load supplier data!");
                 });
         }
-
-        // Function to load categories into dropdown
-        function loadCategories(selectedId = null) {
-            $.get('/categories') // Make sure this route returns all categories as JSON
-                .done(function(categories) {
-                    let options = '<option value="">-- Select Category --</option>';
-                    categories.forEach(function(category) {
-                        options +=
-                            `<option value="${category.id}" ${selectedId == category.id ? 'selected' : ''}>${category.name}</option>`;
-                    });
-                    $("#category_id").html(options);
-                })
-                .fail(function() {
-                    alert('Failed to load categories!');
-                });
-        }
-
-
 
         // Function: Delete Supplier
         function deleteSupplier(url) {
@@ -198,21 +178,6 @@
                         return;
                     });
             }
-        }
-
-        function loadSuppliers(selectedId = null) {
-            $.get('/suppliers/all')
-                .done(function(response) {
-                    let options = '<option value="">-- Select Supplier --</option>';
-                    response.forEach(function(sup) {
-                        options +=
-                            `<option value="${sup.id}" ${selectedId == sup.id ? 'selected' : ''}>${sup.supplier_name}</option>`;
-                    });
-                    $("#supplier_id").html(options);
-                })
-                .fail(function() {
-                    alert("Failed to load suppliers!");
-                });
         }
 
         function editProduct(url) {
@@ -237,20 +202,21 @@
                 .fail(() => alert("Failed to load product data!"));
         }
 
-        function loadSuppliers(selectedId = null) {
-            $.get('/suppliers/all')
-                .done(function(response) {
-                    let options = '<option value="">-- Select Supplier --</option>';
-                    response.forEach(function(sup) {
-                        options +=
-                            `<option value="${sup.id}" ${selectedId == sup.id ? 'selected' : ''}>${sup.supplier_name}</option>`;
-                    });
-                    $("#supplier_id").html(options);
-                })
-                .fail(function() {
-                    alert("Failed to load suppliers!");
-                });
-        }
+        function editSupplier(url) {
+            $.get(url, function(data) {
+                // other input fields
+                $('#supplier_id').val(data.id);
+                $('#name').val(data.name);
+                $('#phone').val(data.phone);
+                $('#email').val(data.email);
 
+                // ✅ Category fix
+                if (data.category_id) {
+                    $('#category_id').val(data.category_id).trigger('change');
+                } else if (data.category && data.category.id) {
+                    $('#category_id').val(data.category.id).trigger('change');
+                }
+            });
+        }
     </script>
 @endpush

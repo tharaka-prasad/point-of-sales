@@ -4,19 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use App\Models\Category;
 
 class SupplierController extends Controller
 {
     // Show supplier list page
-    public function index()
-    {
+    public function index(){
         $menu = "Supplier";
-        return view("supplier.index", compact("menu"));
+        return view("supplier.index", compact("menu","categories"));
     }
 
     // For DataTables server-side
-    public function data()
-    {
+    public function data(){
         $suppliers = Supplier::latest();
 
         return datatables()
@@ -65,7 +64,7 @@ class SupplierController extends Controller
         $supplier->update([
             'supplier_name' => $request->supplier_name,
             'company_name'  => $request->company_name,
-            'category' =>$request->category,
+            'category'      => $request->name,
             'phone'         => $request->phone,
             'address'       => $request->address,
         ]);
@@ -82,10 +81,13 @@ class SupplierController extends Controller
         return response()->json("Supplier deleted successfully.");
     }
 
-    // ✅ Return all suppliers for AJAX dropdowns
-    public function getAll()
-    {
-        $suppliers = Supplier::select('id', 'supplier_name')->get();
-        return response()->json($suppliers);
+    public function edit($id){
+        $supplier = Supplier::with('category')->findOrFail($id);
+        return response()->json($supplier);
+    }
+
+    public function create(){
+        $categories = Category::all();
+        return view('supplier.form', compact('categories'));
     }
 }

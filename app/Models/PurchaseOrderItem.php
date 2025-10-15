@@ -11,7 +11,7 @@ class PurchaseOrderItem  extends Model
 
     // ✅ Make sure this table name matches your actual DB table for items
     protected $table = 'po_items';
-    protected $primaryKey = 'grn_item_id';
+    protected $primaryKey = 'purchase_order_id';
 
     protected $fillable = [
         'id',

@@ -23,16 +23,20 @@
                             placeholder="Enter Company Name" required>
                     </div>
 
-                    <!-- Dropdown for supplier (loaded dynamically via AJAX) -->
+
                     <div class="form-group row">
-                        <input type="text" name="name" id="category" class="form-control"
+                        <select id="category_id" name="category_id" class="form-control">
+                            <option value="">-- Select Category --</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+
+                    <div class="form-group row">
+                        <input type="text" name="name" id="name" class="form-control"
                             placeholder="Enter Category" required>
-{{--
-                        <label for="supplier_id">Supplier Name</label>
-                        <select name="supplier_id" id="supplier_id" class="form-control" required>
-                            <option value="">-- Select Supplier --</option>
-                            <!-- Options loaded dynamically -->
-                        </select> --}}
                     </div>
 
                     <div class="form-group row">
@@ -41,8 +45,8 @@
                     </div>
 
                     <div class="form-group row">
-                        <textarea name="address" id="address" class="form-control" cols="30" rows="5"
-                            placeholder="Enter Address" required></textarea>
+                        <textarea name="address" id="address" class="form-control" cols="30" rows="5" placeholder="Enter Address"
+                            required></textarea>
                     </div>
                 </div>
 
