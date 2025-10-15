@@ -127,7 +127,7 @@
                 <!--BOX_8-->
                 <div class="small-box bg-warning shadow-sm" style="border-radius:10px;overflow:hidden;">
                     <div class="inner">
-                        <h3>{{ $total_supplier }}</h3>
+                        <h3>LKR {{ $total_expense }}.00</h3>
                         <h4>Today Total Expense</h4>
                     </div>
                     <div class="icon">

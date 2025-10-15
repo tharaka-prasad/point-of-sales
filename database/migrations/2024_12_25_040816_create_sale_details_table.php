@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer("amount");
             $table->tinyInteger("discount")->default(0);
             $table->integer("sub_total");
+            $table->integer('return_qty')->default(0);
             $table->timestamps();
         });
     }

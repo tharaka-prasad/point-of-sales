@@ -16,10 +16,17 @@ use App\Http\Controllers\SaleDetailController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // Login
 Route::get("/", fn() => redirect()->route("login"));
+
+//Logout
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('/login');
+})->name('logout');
 
 Route::middleware([
     'auth:sanctum',
@@ -54,15 +61,16 @@ Route::middleware([
         // Supplier
         Route::get('/supplier/data', [SupplierController::class, "data"])->name("supplier.data");
         Route::resource('/supplier', SupplierController::class);
-        Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
+        //Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
 
         // PO
-        Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');
         Route::resource('po', PurchaseOrderController::class);
+        Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');
         Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');
-        Route::get('/po/{id}', [PurchaseOrderController::class, 'show'])->name('po.show');
+        Route::delete('/po/{po}', [PurchaseOrderController::class, 'destroy'])->name('po.destroy');
+        Route::get('/po/next-number', [PurchaseOrderController::class, 'getNextPoNumber']);
 
-        //GRN
+        // GRN
         Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');
         Route::get('/grn/create', [GrnController::class, 'create'])->name('grn.create');
         Route::post('/grn', [GrnController::class, 'store'])->name('grn.store');
@@ -95,6 +103,10 @@ Route::middleware([
         Route::get('/cashier', [CashierController::class, "index"])->name("cashier.index");
         Route::post('/cashier', [CashierController::class, "store"])->name("cashier.store");
         Route::get('/cashier/print/{sale}', [CashierController::class, 'print'])->name('cashier.print');
+        Route::get('/cashier/drafts', [CashierController::class, 'getDraftSales'])->name('cashier.drafts');
+        Route::get('/cashier/drafts/{id}', [CashierController::class, 'getDraftSale']);
+        Route::get('/sales/customer/{id}', [SaleController::class, 'getCustomerSales'])->name('sales.customer');
+        Route::post('/sales/return', [SaleController::class, 'storeReturn'])->name('sales.return');
 
         // Cashier Shift
         Route::prefix('cashier_shifts')->name('cashierShifts.')->group(function () {
@@ -103,6 +115,7 @@ Route::middleware([
             Route::post('/', [CashierShiftController::class, 'store'])->name('store');
             Route::post('/{id}/close', [CashierShiftController::class, 'close'])->name('close');
             Route::delete('/{id}', [CashierShiftController::class, 'destroy'])->name('destroy');
+
         });
     });
 

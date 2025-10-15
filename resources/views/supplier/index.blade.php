@@ -51,7 +51,6 @@
         </div>
         <!--end::Container-->
     </div>
-
     @includeIf('supplier.form')
 @endsection
 
@@ -141,10 +140,11 @@
             // Get Data
             $.get(url)
                 .done(response => {
-                    // Make sure field names match your form input names
-                    $("#modalForm [name=supplier_name]").val(response.supplier_name);
-                    $("#modalForm [name=company_name]").val(response.company_name);
-                    $("#modalForm [name=name]").val(response.name); // if you really have a 'name' field
+                    // Success
+                    suplier_name
+                    $("#modalForm [name=supplier_name]").val(response.name);
+                    $("#modalForm [name=company_name]").val(response.name);
+                    $("#modalForm [name=name]").val(response.name);
                     $("#modalForm [name=phone]").val(response.phone);
                     $("#modalForm [name=address]").val(response.address);
                 })

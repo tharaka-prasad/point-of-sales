@@ -55,7 +55,7 @@ class SupplierController extends Controller
         $supplier = Supplier::findOrFail($id);
 
         if ($supplier) {
-            $supplier->suplier_name = $request->name;
+            $supplier->supplier_name = $request->name;
             $supplier->company_name = $request->name;
             $supplier->name = $request->name;
             $supplier->phone = $request->phone;

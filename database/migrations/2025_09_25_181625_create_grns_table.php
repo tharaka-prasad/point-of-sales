@@ -20,6 +20,8 @@ return new class extends Migration
             $table->date('date')->nullable();
             $table->string('invoice_no')->nullable();
             $table->text('general_remarks')->nullable();
+            $table->double('grn_total')->default(0)->nullable();
+            $table->enum('status', ['draft', 'complete', 'pending', 'reject'])->default('draft');
             $table->timestamps();
         });
     }
