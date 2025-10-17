@@ -16,8 +16,11 @@ use App\Http\Controllers\SaleDetailController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReportsController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+
 
 // Login
 Route::get("/", fn() => redirect()->route("login"));
@@ -62,7 +65,7 @@ Route::middleware([
         Route::get('/supplier/data', [SupplierController::class, "data"])->name("supplier.data");
         Route::resource('/supplier', SupplierController::class);
         Route::get('/suppliers/all', [SupplierController::class, 'getAll'])->name('suppliers.all');
-        Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
+        //Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
 
 
         // PO
@@ -94,6 +97,9 @@ Route::middleware([
         Route::get('/report/data/{first_date}/{last_date}', [ReportController::class, "data"])->name("report.data");
         Route::resource('/report', ReportController::class)->except("create", "store", "edit", "update", "destroy");
         Route::get('/report/pdf/{first_date}/{last_date}', [ReportController::class, "exportPdf"])->name("report.exportPdf");
+
+        // Reports
+        Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
 
         // User
         Route::get('/user/data', [UserController::class, "data"])->name("user.data");

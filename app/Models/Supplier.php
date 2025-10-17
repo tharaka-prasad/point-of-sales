@@ -1,9 +1,12 @@
 <?php
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Supplier extends Model{
+class Supplier extends Model
+{
+    use HasFactory;
 
     protected $fillable = [
         'supplier_name',
@@ -13,8 +16,13 @@ class Supplier extends Model{
         'phone',
     ];
 
+    // ✅ Correct relationship: Supplier belongs to Category
     public function category(){
-        // assuming 'category_id' column exists in suppliers table
-        return $this->belongsTo(Category::class, 'category_id');
+        return $this->belongsTo(Category::class, 'category_id', 'id', 'name');
+    }
+
+    // ✅ Accessor for category name
+    public function getCategoryNameAttribute(){
+        return $this->category ? $this->category->name : '-';
     }
 }

@@ -119,9 +119,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
+                        <a href="{{ route('reports.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
-                            <p>Daily Sales Summary</p>
+                            <p>Reports</p>
                         </a>
                     </li>
 

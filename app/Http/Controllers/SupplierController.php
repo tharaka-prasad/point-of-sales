@@ -12,8 +12,8 @@ class SupplierController extends Controller
     public function index(){
         $menu = 'Supplier';
         $suppliers = Supplier::all();
-        $categories = Category::all();
-
+$categories = Category::select("id", "name")->get();
+// dd($categories);
         return view('supplier.index', compact('menu','suppliers','categories'));
     }
 
@@ -22,12 +22,11 @@ class SupplierController extends Controller
     public function data()
     {
         $suppliers = Supplier::with('category')->latest(); // keep the relationship + ordering
-
         return datatables()
             ->of($suppliers)
             ->addIndexColumn()
-            ->addColumn('category_name', function ($supplier) {
-                return $supplier->category ? $supplier->category->category_name : '-';
+           ->addColumn('category', function ($supplier) {
+                return $supplier->category ? $supplier->category->name : '';
             })
             ->addColumn('action', function ($supplier) {
                 return "
@@ -43,6 +42,7 @@ class SupplierController extends Controller
             })
             ->rawColumns(['action'])
             ->make(true);
+
     }
 
 
@@ -73,7 +73,7 @@ class SupplierController extends Controller
         $supplier->update([
             'supplier_name' => $request->supplier_name,
             'company_name'  => $request->company_name,
-            'category'      => $request->name,
+            'category'      => $request->category_id,
             'phone'         => $request->phone,
             'address'       => $request->address,
         ]);
@@ -93,6 +93,7 @@ class SupplierController extends Controller
     public function edit($id){
         $supplier = Supplier::with('category')->findOrFail($id);
         return response()->json($supplier);
+
     }
 
     public function create(){
