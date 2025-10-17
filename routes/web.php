@@ -100,6 +100,10 @@ Route::middleware([
 
         // Reports
         Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
+            // Existing report route
+            Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
+            // New route to handle report generation
+            Route::get('/reports/generate', [ReportsController::class, 'generate'])->name('reports.generate');
 
         // User
         Route::get('/user/data', [UserController::class, "data"])->name("user.data");

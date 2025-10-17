@@ -109,13 +109,19 @@
                     <li class="nav-item">
                         <a href="{{ route('report.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
-                            <p>Report</p>
+                            <p>Report-remove</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="https://quickbooks.intuit.com/" target="_blank" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
-                            <p>QuickBooks</p>
+                            <p>QuickBooks-remove</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('reports.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Sales Report</p>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -124,7 +130,7 @@
                             <p>Reports</p>
                         </a>
                     </li>
-
+                    
                     <li class="nav-header">USER MANAGEMENT</li>
                     <li class="nav-item">
                         <a href="{{ route('user.index') }}" class="nav-link">
