@@ -84,18 +84,20 @@ class CashierController extends Controller
         // ✅ Save details + reduce stock only if complete
         if ($status === 'complete' && $request->products) {
             foreach ($request->products as $product) {
+                $amount = $product['amount'] ?? 1; // default to 1 if missing
+
                 SaleDetail::create([
                     'sale_id'    => $sale->id,
                     'product_id' => $product['id'],
                     'sale_price' => $product['sale_price'],
-                    'amount'     => $product['amount'],
+                    'amount'     => $amount,
                     'discount'   => $product['discount'] ?? 0,
-                    'sub_total'  => $product['sub_total'],
+                    'sub_total'  => $product['sub_total'] ?? ($amount * ($product['sale_price'] ?? 0)),
                 ]);
 
                 // Reduce stock safely
                 $productModel = Product::findOrFail($product['id']);
-                $productModel->stock -= $product['amount'];
+                $productModel->stock -= $amount;
                 $productModel->save();
             }
         }
@@ -187,36 +189,44 @@ class CashierController extends Controller
 
         return response()->json($draftData);
     }
- public function getCustomerSales($customerId)
+    // Step 1: Get all completed sales for a customer
+    public function getCustomerSales($customerId)
     {
-        $sales = SaleDetail::with(['product', 'sale'])
-            ->whereHas('sale', function ($q) use ($customerId) {
-                $q->where('member_id', $customerId);
-            })
-            ->whereColumn('amount', '>', 'return_qty') // only products that can be returned
+        $customer = Member::with('sales')->find($customerId);
+
+        if (! $customer) {
+            return response()->json(['message' => 'Customer not found'], 404);
+        }
+
+        return response()->json($customer->sales);
+    }
+
+    // Step 2: Get all returnable products in a selected sale
+    public function getSaleProducts($saleId)
+    {
+        $details = SaleDetail::with('product:id,name,code')
+            ->where('sale_id', $saleId)
+            ->whereColumn('amount', '>', 'return_qty') // can still be returned
             ->get()
-            ->map(function ($d) {
+            ->map(function ($item) {
                 return [
-                    'sale_id'        => $d->sale_id,
-                    'product_id'     => $d->product_id,
-                    'product_name'   => $d->product->name ?? '-',
-                    'qty_purchased'  => $d->amount,
-                    'returnable_qty' => $d->amount - ($d->return_qty ?? 0),
-                    'sale_price'     => $d->sale_price,
-                    'discount'       => $d->discount ?? 0,
-                    'sub_total'      => $d->sub_total,
+                    'product_id'     => $item->product_id,
+                    'product_name'   => $item->product->name,
+                    'sale_price'     => $item->sale_price,
+                    'sold_qty'       => $item->amount,
+                    'returnable_qty' => $item->amount - $item->return_qty,
                 ];
             });
 
-        return response()->json($sales);
+        return response()->json($details);
     }
 
     // ✅ Save return data
     public function storeReturn(Request $request)
     {
         $request->validate([
-            'customer_id' => 'required|exists:members,id',
-            'products'    => 'required|array|min:1',
+            'customer_id'           => 'required|exists:members,id',
+            'products'              => 'required|array|min:1',
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.qty'        => 'required|numeric|min:1',
             'products.*.price'      => 'required|numeric|min:0',
@@ -225,8 +235,8 @@ class CashierController extends Controller
         DB::transaction(function () use ($request) {
             foreach ($request->products as $item) {
                 $detail = SaleDetail::whereHas('sale', function ($q) use ($request) {
-                        $q->where('member_id', $request->customer_id);
-                    })
+                    $q->where('member_id', $request->customer_id);
+                })
                     ->where('product_id', $item['product_id'])
                     ->first();
 
@@ -239,14 +249,14 @@ class CashierController extends Controller
 
             // optional: record in Sale table for reference
             Sale::create([
-                'member_id' => $request->customer_id,
-                'total_item' => count($request->products),
-                'total_price' => collect($request->products)->sum(fn($p) => $p['price'] * $p['qty']),
-                'discount' => 0,
-                'pay' => 0,
-                'accepted' => 0,
-                'user_id' => auth()->id(),
-                'status' => 'return',
+                'member_id'       => $request->customer_id,
+                'total_item'      => count($request->products),
+                'total_price'     => collect($request->products)->sum(fn($p) => $p['price'] * $p['qty']),
+                'discount'        => 0,
+                'pay'             => 0,
+                'accepted'        => 0,
+                'user_id'         => auth()->id(),
+                'status'          => 'return',
                 'return_products' => $request->products,
             ]);
         });

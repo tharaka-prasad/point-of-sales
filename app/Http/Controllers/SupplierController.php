@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 
@@ -16,10 +17,12 @@ class SupplierController extends Controller
     public function data()
     {
         $suppliers = Supplier::latest();
+        $categories = Category::all();
 
         return datatables()
             ->of($suppliers)
             ->addIndexColumn()
+            
             ->addColumn("action", function ($supplier) {
                 return "
                 <div class='btn-group'>
@@ -28,18 +31,34 @@ class SupplierController extends Controller
                 </div>
                 ";
             })
+            ->addColumn("category", function ($supplier) {
+                return $supplier->category->name;
+            })
             ->rawColumns(["action"])
             ->make(true);
     }
 
-    public function store(Request $request)
-    {
-        $supplier = Supplier::create($request->all());
+public function store(Request $request)
+{
+    $request->validate([
+        'supplier_name' => 'required|string',
+        'company_name'  => 'required|string',
+        'phone'         => 'required|string',
+        'address'       => 'required|string',
+        'category_id'   => 'required|exists:categories,id', // ensure category exists
+    ]);
 
-        if ($supplier) {
-            return response()->json("Add supplier successfully.", 201);
-        }
-    }
+    $supplier = Supplier::create($request->only([
+        'supplier_name',
+        'company_name',
+        'phone',
+        'address',
+        'category_id',
+    ]));
+
+    return response()->json("Add supplier successfully.", 201);
+}
+
 
     public function show(string $id)
     {

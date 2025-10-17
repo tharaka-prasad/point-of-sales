@@ -105,7 +105,9 @@ Route::middleware([
         Route::get('/cashier/print/{sale}', [CashierController::class, 'print'])->name('cashier.print');
         Route::get('/cashier/drafts', [CashierController::class, 'getDraftSales'])->name('cashier.drafts');
         Route::get('/cashier/drafts/{id}', [CashierController::class, 'getDraftSale']);
-        Route::get('/sales/customer/{id}', [SaleController::class, 'getCustomerSales'])->name('sales.customer');
+// routes/web.php
+        Route::get('/cashier/returns/{customerId}/sales', [CashierController::class, 'getCustomerSales']);
+        Route::get('/cashier/returns/sale/{saleId}', [CashierController::class, 'getSaleProducts']);
         Route::post('/sales/return', [SaleController::class, 'storeReturn'])->name('sales.return');
 
         // Cashier Shift

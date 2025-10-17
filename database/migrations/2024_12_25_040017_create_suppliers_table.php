@@ -15,14 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string("supplier_name");
             $table->string("company_name");
-            $table->string("name");
+            $table->integer("category_id");
             $table->text("address")->nullable();
             $table->string("phone");
             $table->timestamps();
         });
     }
 
-    /**
+    /** 
      * Reverse the migrations.
      */
     public function down(): void

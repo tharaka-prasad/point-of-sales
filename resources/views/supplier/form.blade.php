@@ -24,7 +24,7 @@
                     </div>
 
                     <div class="form-group row">
-                        <input type="text" name="name" id="name" class="form-control"
+                        <input type="number" name="category_id" id="category_id" class="form-control"
                             placeholder="Enter Category Name" required>
                     </div>
 

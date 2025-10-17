@@ -83,7 +83,7 @@
                             data: "company_name"
                         },
                         {
-                            data: "name"
+                            data: "category_name"
                         },
                         {
                             data: "phone"
@@ -144,7 +144,7 @@
                     suplier_name
                     $("#modalForm [name=supplier_name]").val(response.name);
                     $("#modalForm [name=company_name]").val(response.name);
-                    $("#modalForm [name=name]").val(response.name);
+                    $("#modalForm [name=category_id]").val(response.name);
                     $("#modalForm [name=phone]").val(response.phone);
                     $("#modalForm [name=address]").val(response.address);
                 })
