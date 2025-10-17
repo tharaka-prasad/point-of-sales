@@ -5,8 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class GrnItems extends Model
-{
+class GrnItems extends Model{
    use HasFactory;
 
     protected $primaryKey = 'grn_item_id';
@@ -28,20 +27,17 @@ class GrnItems extends Model
     ];
 
     // Relationship: GRN Item belongs to GRN
-    public function grn()
-    {
+    public function grn(){
         return $this->belongsTo(Grn::class, 'grn_id');
     }
 
     // Relationship: GRN Item belongs to Product
-    public function product()
-    {
+    public function product(){
         return $this->belongsTo(Product::class);
     }
 
     // Optional: automatically calculate total when unit_price or qty_received changes
-    protected static function booted()
-    {
+    protected static function booted(){
         static::saving(function ($item) {
             if ($item->unit_price && $item->qty_received) {
                 $item->total = $item->unit_price * $item->qty_received;

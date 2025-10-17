@@ -5,3 +5,124 @@
 [x-cloak] {
     display: none;
 }
+
+/* 🌊 Blue Gradient Collection */
+.bg-gradient-blue1 {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: #fff !important;
+}
+
+.bg-gradient-blue2 {
+  background: linear-gradient(135deg, #2193b0, #6dd5ed);
+  color: #fff !important;
+}
+
+.bg-gradient-blue3 {
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: #fff !important;
+}
+
+.bg-gradient-blue4 {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: #fff !important;
+}
+
+.bg-gradient-blue5 {
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff !important;
+}
+
+/* Optional: make text and icons pop */
+.small-box .inner h3,
+.small-box .inner h4 {
+  color: #fff;
+}
+
+.small-box-footer {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* 🌈 Universal Gradient Styles for Dashboard Cards */
+.bg-gradient-blue {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: #fff !important;
+}
+
+.bg-gradient-green {
+  background: linear-gradient(135deg, #56ab2f, #a8e063);
+  color: #fff !important;
+}
+
+.bg-gradient-red {
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: #fff !important;
+}
+
+.bg-gradient-yellow {
+  background: linear-gradient(135deg, #f7971e, #ffd200);
+  color: #fff !important;
+}
+
+.bg-gradient-purple {
+  background: linear-gradient(135deg, #7f00ff, #e100ff);
+  color: #fff !important;
+}
+
+.bg-gradient-orange {
+  background: linear-gradient(135deg, #ff8008, #ffc837);
+  color: #fff !important;
+}
+
+.bg-gradient-pink {
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  color: #fff !important;
+}
+
+.bg-gradient-teal {
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  color: #fff !important;
+}
+
+.bg-gradient-gray {
+  background: linear-gradient(135deg, #757f9a, #d7dde8);
+  color: #fff !important;
+}
+
+.bg-gradient-black {
+  background: linear-gradient(135deg, #232526, #414345);
+  color: #fff !important;
+}
+
+/* Make text & links readable on gradients */
+.small-box .inner h3,
+.small-box .inner h4,
+.small-box-footer {
+  color: #fff !important;
+}
+
+.small-box-footer {
+  background: rgba(255, 255, 255, 0.15);
+  display: block;
+  padding: 5px 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.bg-gradient-ash {
+  background: linear-gradient(135deg, #bdc3c7, #2c3e50);
+  color: #fff !important;
+}
+.bg-gradient-ash-light {
+  background: linear-gradient(135deg, #e0eafc, #cfdef3);
+  color: #333 !important;
+}
+.bg-gradient-brown {
+  background: linear-gradient(135deg, #603813, #b29f94);
+  color: #fff !important;
+}
+.bg-gradient-brown-light {
+  background: linear-gradient(135deg, #d1913c, #ffd194);
+  color: #fff !important;
+}
+
+

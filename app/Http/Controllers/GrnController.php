@@ -11,11 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class GrnController extends Controller
 {
-    /**
-     * Display a listing of GRNs.
-     */
-    public function index()
-    {
+    // Display a listing of GRNs.
+    public function index(){
         $menu      = 'GRN';
         $suppliers = Supplier::all();
         $products  = Product::all();

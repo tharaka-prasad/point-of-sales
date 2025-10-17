@@ -3,9 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\{
+    CashierShift,
+    Category,
     Expense,
-    Purchase,
+    Grn,
+    GrnItems,
+    Member,
+    Product,
+    PurchaseOrder,
+    PurchaseOrderItem,
     Sale,
+    SaleDetail,
+    Supplier,
 };
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;

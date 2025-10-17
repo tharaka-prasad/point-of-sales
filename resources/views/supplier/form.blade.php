@@ -11,36 +11,45 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
 
+                <div class="modal-body">
                     <div class="form-group row">
                         <input type="text" name="supplier_name" id="supplier_name" class="form-control"
                             placeholder="Enter Supplier Name" required>
                     </div>
 
-                     <div class="form-group row">
+                    <div class="form-group row">
                         <input type="text" name="company_name" id="company_name" class="form-control"
                             placeholder="Enter Company Name" required>
                     </div>
 
                     <div class="form-group row">
-                        <input type="number" name="category_id" id="category_id" class="form-control"
-                            placeholder="Enter Category Name" required>
+                        <select name="category_id" id="category_id" class="form-control" required>
+                            <option value="">-- Select Category --</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name  }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="form-group row">
                         <input type="number" name="phone" id="phone" class="form-control"
                             placeholder="Enter Phone" required>
                     </div>
+
                     <div class="form-group row">
-                        <textarea name="address" id="address" class="form-control" cols="30" rows="10"
-                            placeholder="Enter Address" required></textarea>
+                        <textarea name="address" id="address" class="form-control" cols="30" rows="5" placeholder="Enter Address"
+                            required></textarea>
                     </div>
                 </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i
-                            class="fas fa-times-circle"></i> Close</button>
-                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        <i class="fas fa-times-circle"></i> Close
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Save
+                    </button>
                 </div>
             </div>
         </form>

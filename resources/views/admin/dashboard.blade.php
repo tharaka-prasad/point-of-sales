@@ -11,12 +11,12 @@
 
 @section('content')
     <div class="container-fluid">
-
      <!-- 1_ROW-->
         <div class="row">
             <div class="col-lg-3 col-6">
                 <!--BOX_1-->
-                <div class="small-box bg-warning shadow-sm" style="border-radius:10px;overflow:hidden;">
+                <div class="small-box bg-gradient-green shadow-sm" style="border-radius:10px;overflow:hidden;">
+                    {{-- <div class="small-box bg-warning shadow-sm" style="border-radius:10px;overflow:hidden;"> --}}
                     <div class="inner">
                         <h4>Total Catogeries</h4>
                         <h3>{{ $total_category }}</h3>
@@ -28,11 +28,11 @@
                             class="fas fa-arrow-circle-right"></i></a>
                 </div>
             </div>
-
             <div class="col-lg-3 col-6">
                 <!--BOX_2-->
 
-                <div class="small-box bg-warning shadow-sm" style="border-radius:10px;overflow:hidden;">
+                <div class="small-box bg-gradient-blue shadow-sm" style="border-radius:10px;overflow:hidden;">
+
                     <div class="inner">
                         <h4>Total Suppliers</h4>
                         <h3>{{ $total_supplier }}</h3>
@@ -47,7 +47,7 @@
 
             <div class="col-lg-3 col-6">
                 <!--BOX_3-->
-                <div class="small-box bg-warning shadow-sm" style="border-radius:10px;overflow:hidden;">
+                <div class="small-box bg-gradient-red shadow-sm" style="border-radius:10px;overflow:hidden;">
                     <div class="inner">
                         <h4>Total Customers</h4>
                         <h3>{{ $total_member }}</h3>
@@ -62,7 +62,7 @@
 
             <div class="col-lg-3 col-6">
                 <!--BOX_4-->
-                <div class="small-box bg-warning shadow-sm" style="border-radius:10px;overflow:hidden;">
+                <div class="small-box bg-gradient-teal shadow-sm" style="border-radius:10px;overflow:hidden;">
                     <div class="inner">
                         <h4>Total Products</h4>
                         <h3>{{ $total_product }}</h3>
@@ -80,9 +80,9 @@
         <div class="row">
             <div class="col-lg-3 col-6">
                 <!--BOX_5-->
-                <div class="small-box bg-warning shadow-sm" style="border-radius:10px;overflow:hidden;">
+                <div class="small-box bg-gradient-purple shadow-sm" style="border-radius:10px;overflow:hidden;">
                     <div class="inner">
-                        <h3>{{ $total_category }}</h3>
+                        <h3>LKR {{ $total_category }}.00</h3>
                         <h4>Today Total Sales</h4>
                     </div>
                     <div class="icon">
@@ -95,9 +95,9 @@
 
             <div class="col-lg-3 col-6">
                 <!--BOX_6-->
-                <div class="small-box bg-warning shadow-sm" style="border-radius:10px;overflow:hidden;">
+                <div class="small-box bg-gradient-orange shadow-sm" style="border-radius:10px;overflow:hidden;">
                     <div class="inner">
-                        <h3>{{ $total_product }}</h3>
+                        <h3>LKR {{ $total_product }}.00</h3>
                         <h4>Today Total Returns</h4>
                     </div>
                     <div class="icon">
@@ -112,20 +112,20 @@
                 <!--BOX_7-->
                 <div class="small-box bg-warning shadow-sm" style="border-radius:10px;overflow:hidden;">
                     <div class="inner">
-                        <h3>{{ $total_member }}</h3>
+                        <h3>LKR {{ $today_total_purchases }}.00</h3>
                         <h4>Today Total Purchases</h4>
                     </div>
                     <div class="icon">
                         <i class="fas fa-id-card"></i>
                     </div>
-                    <a href="{{ route('member.index') }}" class="small-box-footer">More info <i
+                    <a href="{{ route('grn.index') }}" class="small-box-footer">More info <i
                             class="fas fa-arrow-circle-right"></i></a>
                 </div>
             </div>
 
             <div class="col-lg-3 col-6">
                 <!--BOX_8-->
-                <div class="small-box bg-warning shadow-sm" style="border-radius:10px;overflow:hidden;">
+                <div class="small-box bg-gradient-purple shadow-sm" style="border-radius:10px;overflow:hidden;">
                     <div class="inner">
                         <h3>LKR {{ $total_expense }}.00</h3>
                         <h4>Today Total Expense</h4>
@@ -133,7 +133,7 @@
                     <div class="icon">
                         <i class="fas fa-chart-line"></i>
                     </div>
-                    <a href="{{ route('supplier.index') }}" class="small-box-footer">More info <i
+                    <a href="{{ route('expense.index') }}" class="small-box-footer">More info <i
                             class="fas fa-arrow-circle-right"></i></a>
                 </div>
             </div>

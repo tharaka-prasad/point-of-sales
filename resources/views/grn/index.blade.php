@@ -25,7 +25,7 @@
                             <th>Invoice No</th>
                             <th>Prepared By</th>
                             <th>Total(Rs)</th>
-                            <th width="160">Actions</th>
+                            <th width="200">Actions</th>
                         </tr>
                     </thead>
                     <tbody>

@@ -55,11 +55,11 @@
 @endsection
 
 @push('scripts')
-    <script>
-        let supplier_table;
+<script>
+let supplier_table;
 
-        $(function() {
-            $("body").addClass("sidebar-collapse");
+$(function() {
+    $("body").addClass("sidebar-collapse");
 
             supplier_table = $("#supplier_table")
                 .DataTable({
@@ -83,7 +83,7 @@
                             data: "company_name"
                         },
                         {
-                            data: "category_name"
+                            data: "name"
                         },
                         {
                             data: "phone"
@@ -99,39 +99,67 @@
                     ]
                 });
 
-            $("#modalForm").on("submit", function(e) {
-                if (!e.preventDefault()) {
-                    $.post($("#modalForm form").attr("action"), $("#modalForm form").serialize())
-                        .done((response) => {
-                            // Success
-                            $("#modalForm").modal("hide");
+    // Handle Add/Edit form submission via AJAX
+    $("#modalForm form").on("submit", function(e) {
+        e.preventDefault();
 
-                            supplier_table.ajax.reload();
-                        })
-                        .fail((errors) => {
-                            // Failed
-                            alert("Failed to save data!");
+        let form = $(this);
+        let url = form.attr("action");
+        let method = $("#modalForm [name=_method]").val() || 'POST';
 
-                            return;
-                        });
-                }
-            });
+        $.ajax({
+            url: url,
+            method: method === 'POST' ? 'POST' : 'PUT',
+            data: form.serialize(),
+            success: function(res) {
+                $("#modalForm").modal("hide");
+                supplier_table.ajax.reload();
+            },
+            error: function(err) {
+                console.error(err);
+                alert("Failed to save data!");
+            }
         });
+    });
+});
 
-        // Function: Add Supplier
-        function addSupplier(url) {
-            $("#modalForm").modal("show");
-            $("#modalForm .modal-title").text("Add Supplier");
+// Function to load categories dynamically and set selected
+function loadCategories(selectedId = null) {
+    $.get('/category/list', function(categories) {
+        let options = '<option value="">-- Select Category --</option>';
+        $.each(categories, function(i, cat) {
+            let selected = cat.id == selectedId ? 'selected' : '';
+            options += `<option value="${cat.id}" ${selected}>${cat.name}</option>`;
+        });
+        $('#category_id').html(options);
+    });
+}
 
-            $("#modalForm form")[0].reset();
-            $("#modalForm form").attr("action", url);
-            $("#modalForm [name=_method]").val("POST");
-        }
+// Open Add Supplier modal
+function addSupplier(url) {
+    $("#modalForm").modal("show");
+    $("#modalForm .modal-title").text("Add Supplier");
 
-        // Function: Edit Supplier
-        function editSupplier(url) {
-            $("#modalForm").modal("show");
-            $("#modalForm .modal-title").text("Edit Supplier");
+    // Clear form
+    let form = $("#modalForm form")[0];
+    form.reset();
+
+    // Set form action/method
+    $("#modalForm form").attr("action", url);
+    $("#modalForm [name=_method]").val("POST");
+
+    // Load categories (none selected)
+    loadCategories();
+}
+
+// Open Edit Supplier modal
+function editSupplier(url) {
+    $.get(url.replace('/update',''), function(supplier) {
+        // Fill form fields
+        $('#supplier_name').val(supplier.supplier_name);
+        $('#company_name').val(supplier.company_name);
+        $('#phone').val(supplier.phone);
+        $('#address').val(supplier.address);
 
             $("#modalForm form")[0].reset();
             $("#modalForm form").attr("action", url);
@@ -144,7 +172,7 @@
                     suplier_name
                     $("#modalForm [name=supplier_name]").val(response.name);
                     $("#modalForm [name=company_name]").val(response.name);
-                    $("#modalForm [name=category_id]").val(response.name);
+                    $("#modalForm [name=name]").val(response.name);
                     $("#modalForm [name=phone]").val(response.phone);
                     $("#modalForm [name=address]").val(response.address);
                 })
@@ -153,25 +181,17 @@
                 });
         }
 
-        // Function: Delete Supplier
-        function deleteSupplier(url) {
-            if (confirm("Are you sure delete this supplier?")) {
-                // Delete Data
-                $.post(url, {
-                        "_token": $("[name=csrf-token]").attr("content"),
-                        "_method": "DELETE"
-                    })
-                    .done(response => {
-                        // Success
-                        supplier_table.ajax.reload();
-                    })
-                    .fail(errors => {
-                        // Failed
-                        alert("Failed to delete data!");
-
-                        return;
-                    });
-            }
-        }
-    </script>
+// Delete Supplier
+function deleteSupplier(url) {
+    if (confirm("Are you sure delete this supplier?")) {
+        $.post(url, {
+            "_token": $("[name=csrf-token]").attr("content"),
+            "_method": "DELETE"
+        })
+        .done(() => supplier_table.ajax.reload())
+        .fail(() => alert("Failed to delete supplier!"));
+    }
+}
+</script>
 @endpush
+

@@ -10,8 +10,11 @@ class Category extends Model
         'name',
     ];
 
-    public function products()
-    {
+    public function products(){
         return $this->hasMany(Product::class);
+    }
+
+    public function suppliers(){
+        return $this->hasMany(Supplier::class, 'category_id');
     }
 }
