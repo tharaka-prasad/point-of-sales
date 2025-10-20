@@ -9,7 +9,7 @@ class Category extends Model
     protected $fillable = [
         'name',
     ];
-
+#these are for creatre relations between tables
     public function products(){
         return $this->hasMany(Product::class);
     }

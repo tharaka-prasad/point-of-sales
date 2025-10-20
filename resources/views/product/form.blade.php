@@ -34,7 +34,7 @@
 
                     <div class="form-group row">
                         <input type="text" name="brand" id="brand" class="form-control"
-                            placeholder="Enter Product Brand" required>
+                            placeholder="Enter Product Brand" nullable>
                     </div>
 
                     <div class="form-group row">
@@ -63,6 +63,11 @@
                         <input type="date" class="form-control" id="expiry_date" name="expiry_date" required>
                     </div>
 
+                    <div class="form-group row">
+                        <label for="text" class="form-label">Batch No </label>
+                        <input type="text" name="batch_no" id="batch_no" class="form-control"
+                            placeholder="Enter Batch No" nullable>
+                    </div>
 
                 </div>
 

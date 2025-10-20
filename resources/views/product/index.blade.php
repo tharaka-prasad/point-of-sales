@@ -50,6 +50,7 @@
                                             <th>Discount</th>
                                             <th>Stock</th>
                                             <th>Exp-Date</th>
+                                            <th>Batch-No</th>
                                             <th>
                                                 <i class="fas fa-cog"></i>
                                             </th>
@@ -125,6 +126,9 @@
                     {
                         data: "expiry_date"
                     },
+                     {
+                        data: "batch_no"
+                    },
                     {
                         data: "action",
                         searchable: false,
@@ -179,6 +183,7 @@
                 $.get(url)
                     .done((response) => {
                         // Success
+                        $("#modalForm [name=code]").val(response.code);
                         $("#modalForm [name=name]").val(response.name);
                         $("#modalForm [name=category_id]").val(response.category_id);
                         $("#modalForm [name=brand]").val(response.brand);
@@ -187,6 +192,8 @@
                         $("#modalForm [name=discount]").val(response.discount);
                         $("#modalForm [name=stock]").val(response.stock);
                         $("#modalForm [name=expiry_date]").val(response.expiry_date);
+                        $("#modalForm [name=batch_no]").val(response.batch_no);
+
                     })
                     .fail((errors) => {
                         // Failed

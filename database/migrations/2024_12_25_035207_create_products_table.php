@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer("sell_price")->nullable();
             $table->integer("stock")->nullable();
             $table->date("expiry_date")->nullable();
+            $table->string("batch_no")->nullable();
             $table->timestamps();
         });
     }

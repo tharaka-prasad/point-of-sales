@@ -82,7 +82,7 @@
                 <!--BOX_5-->
                 <div class="small-box bg-gradient-purple shadow-sm" style="border-radius:10px;overflow:hidden;">
                     <div class="inner">
-                        <h3>LKR {{ $total_category }}.00</h3>
+                        <h3>LKR {{ $today_total_sales }}.00</h3>
                         <h4>Today Total Sales</h4>
                     </div>
                     <div class="icon">
@@ -97,7 +97,7 @@
                 <!--BOX_6-->
                 <div class="small-box bg-gradient-orange shadow-sm" style="border-radius:10px;overflow:hidden;">
                     <div class="inner">
-                        <h3>LKR {{ $total_product }}.00</h3>
+                        <h3>LKR {{ $today_total_return }}.00</h3>
                         <h4>Today Total Returns</h4>
                     </div>
                     <div class="icon">

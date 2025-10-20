@@ -6,7 +6,6 @@ use App\Models\{
     Category,
     Expense,
     Product,
-    Purchase,
     Sale,
     Supplier,
     Member,
@@ -27,8 +26,8 @@ class DashboardController extends Controller
             $total_supplier = Supplier::count();
             $total_member = Member::count();
             $today_total_sales = Grn::count();
-            //$today_total_return = Grn::count();
-            //$today_total_purchases = Grn::count();
+            $today_total_return = Sale::count();
+            $today_total_purchases = Grn::count();
             $today_total_expens = Expense::count();
 
             $first_date = date("Y-m-01");   # From day 1
@@ -40,10 +39,12 @@ class DashboardController extends Controller
             while (strtotime($first_date) <= strtotime($last_date)) {
                 $data_date[] = (int) substr($first_date, 8, 2);
 
-                //$total_sale = Sale::whereDate('created_at', $first_date)->sum('pay');
                 $today_total_purchases = Grn::whereDate('created_at', $first_date)->sum('grn_total');
                 $total_expense = Expense::whereDate('created_at', $first_date)->sum('amount');
+                $today_total_sales = Sale::whereDate('created_at', $first_date)->sum('total_price');
+                $today_total_return = Sale::whereDate('created_at', $first_date)->sum('return_products');
 
+                //HERE YOU CAN DO THE CALCULATIONS LIKE THIS,
                 // $income = $total_sale - $total_purchase - $total_expense;
                 // $data_income[] = $income;
 
@@ -60,6 +61,8 @@ class DashboardController extends Controller
                 "data_income",
                 "total_expense",
                 "today_total_purchases",
+                "today_total_sales",
+                "today_total_return"
 
             ));
         } else {

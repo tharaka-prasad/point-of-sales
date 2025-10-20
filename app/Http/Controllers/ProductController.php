@@ -8,10 +8,8 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
-    {
+    public function index(){
         $menu = "Product";
-
         $categories = Category::select("id", "name")->get();
 
         return view("product.index", compact("menu", "categories"));
@@ -35,12 +33,13 @@ class ProductController extends Controller
             'code'        => 'nullable|string|max:50|unique:products,code',
             'name'        => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'brand'       => 'required|string|max:255',
+            'brand'       => 'nullable|string|max:255',
             'price'       => 'required|numeric|min:1',
             'sell_price'  => 'required|numeric|min:1|gte:price',
             'discount'    => 'nullable|numeric|min:0',
             'stock'       => 'required|integer|min:1',
             'expiry_date' => 'required|date',
+            'batch_no'    => 'nullable|string|max:255',
         ], [
             // ✅ Custom messages (optional)
             'name.required'        => 'Product name is required.',
@@ -124,12 +123,13 @@ class ProductController extends Controller
             'code'        => 'nullable|string|max:50|unique:products,code,' . $product->id,
             'name'        => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'brand'       => 'required|string|max:255',
+            'brand'       => 'nullable|string|max:255',
             'price'       => 'required|numeric|min:1',
             'sell_price'  => 'required|numeric|min:1|gte:price',
             'discount'    => 'nullable|numeric|min:0',
             'stock'       => 'required|integer|min:1',
             'expiry_date' => 'required|date',
+            'batch_no'    => 'nullable|string|max:255'
         ], [
             // ✅ Custom messages (optional)
             'name.required'        => 'Product name is required.',

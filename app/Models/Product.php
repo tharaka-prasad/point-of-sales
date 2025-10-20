@@ -15,7 +15,8 @@ class Product extends Model
         'discount',
         'sell_price',
         'stock',
-        'expiry_date'
+        'expiry_date',
+        'batch_no'
     ];
 
     public function category()

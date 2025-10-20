@@ -2,6 +2,10 @@
 
 @section('title')
     <h3>{{ $menu }}</h3>
+    <h3>{{ $test }}</h3>
+    <div>
+        <img src="" alt="" srcset="">
+    </div>
 @endsection
 
 @section('breadcumb')
