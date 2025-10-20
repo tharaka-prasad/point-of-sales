@@ -90,8 +90,9 @@ Route::middleware([
         Route::resource('/expense', ExpenseController::class);
 
         // Sale
-        //Route::get('/sale/data', [SaleController::class, "data"])->name("sale.data");
-        Route::resource('/sale', SaleController::class)->except("edit", "update");
+        Route::get('/sale/data', [SaleController::class, "data"])->name("sale.data");
+        Route::post('/sale/store', [SaleController::class, 'store'])->name('sale.store');
+        //Route::resource('/sale', SaleController::class)->except("edit", "update");
 
         // Report
         Route::get('/report/data/{first_date}/{last_date}', [ReportController::class, "data"])->name("report.data");
