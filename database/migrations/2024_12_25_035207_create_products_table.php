@@ -21,6 +21,7 @@ return new class extends Migration
             $table->integer("discount")->default(0)->nullable();
             $table->integer("sell_price")->nullable();
             $table->integer("stock")->nullable();
+            $table->date("expiry_date")->nullable();
             $table->timestamps();
         });
     }

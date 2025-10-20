@@ -41,7 +41,7 @@ class GrnController extends Controller
         $validated = $request->validate([
             'date'             => 'required|date',
             'supplier'         => 'required|exists:suppliers,id',
-            'po_no'            => 'required|string',
+            'po_no'            => 'nullable|string',
             'invoice_no'       => 'required|string',
             'general_remarks'  => 'nullable|string',
             'grn_total'        => 'required|numeric',

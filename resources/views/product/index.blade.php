@@ -49,6 +49,7 @@
                                             <th>Sell Price (Rs)</th>
                                             <th>Discount</th>
                                             <th>Stock</th>
+                                            <th>Exp-Date</th>
                                             <th>
                                                 <i class="fas fa-cog"></i>
                                             </th>
@@ -122,6 +123,9 @@
                         data: "stock"
                     },
                     {
+                        data: "expiry_date"
+                    },
+                    {
                         data: "action",
                         searchable: false,
                         sortable: false
@@ -182,6 +186,7 @@
                         $("#modalForm [name=sell_price]").val(response.sell_price);
                         $("#modalForm [name=discount]").val(response.discount);
                         $("#modalForm [name=stock]").val(response.stock);
+                        $("#modalForm [name=expiry_date]").val(response.expiry_date);
                     })
                     .fail((errors) => {
                         // Failed

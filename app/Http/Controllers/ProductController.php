@@ -40,6 +40,7 @@ class ProductController extends Controller
             'sell_price'  => 'required|numeric|min:1|gte:price',
             'discount'    => 'nullable|numeric|min:0',
             'stock'       => 'required|integer|min:1',
+            'expiry_date' => 'required|date',
         ], [
             // ✅ Custom messages (optional)
             'name.required'        => 'Product name is required.',
@@ -128,6 +129,7 @@ class ProductController extends Controller
             'sell_price'  => 'required|numeric|min:1|gte:price',
             'discount'    => 'nullable|numeric|min:0',
             'stock'       => 'required|integer|min:1',
+            'expiry_date' => 'required|date',
         ], [
             // ✅ Custom messages (optional)
             'name.required'        => 'Product name is required.',
