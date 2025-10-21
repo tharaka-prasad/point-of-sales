@@ -11,13 +11,11 @@ return new class extends Migration
         Schema::create('pos', function (Blueprint $table) {
             $table->id();
             $table->string('po_number')->unique();
-            $table->string('purchase_company')->nullable(); // company name
-            $table->text('supplier_name')->nullable();
+            $table->integer('supplier_id')->nullable();
             $table->text('description')->nullable();
-            $table->text('contact_no')->nullable();
-            $table->integer('quantity')->nullable();
             $table->decimal('rate', 10, 2)->nullable(); // Rs
             $table->enum('status', ['draft', 'complete', 'pending', 'reject'])->default('draft');
+            $table->decimal('grand_total', 15, 2)->nullable();
             $table->timestamps();
         });
     }

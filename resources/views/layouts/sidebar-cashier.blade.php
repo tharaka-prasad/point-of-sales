@@ -81,12 +81,12 @@
                             <p>Expense</p>
                         </a>
                     </li>
-                    {{-- <li class="nav-item">
+                    <li class="nav-item">
                         <a href="{{ route('sale.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-th"></i>
                             <p>Sale</p>
                         </a>
-                    </li> --}}
+                    </li>
 
                     <!-- CASHIER Section -->
                     <li class="nav-header">CASHIER</li>
@@ -109,20 +109,19 @@
                     <li class="nav-item">
                         <a href="{{ route('report.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
-                            <p>Report-remove</p>
+                            <p>Report</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="https://quickbooks.intuit.com/" target="_blank" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
-                            <p>QuickBooks-remove</p>
+                            <p>QuickBooks</p>
                         </a>
                     </li>
-
                     <li class="nav-item">
-                        <a href="{{ route('reports.index') }}" class="nav-link">
+                        <a href="{{ route('report.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
-                            <p>Reports</p>
+                            <p>Daily Sales Summary</p>
                         </a>
                     </li>
 

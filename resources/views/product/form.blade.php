@@ -34,7 +34,7 @@
 
                     <div class="form-group row">
                         <input type="text" name="brand" id="brand" class="form-control"
-                            placeholder="Enter Product Brand" required>
+                            placeholder="Enter Product Brand" nullable>
                     </div>
 
                     <div class="form-group row">
@@ -57,6 +57,18 @@
                             placeholder="Enter Stock" min="1" value="1" required>
                         <small class="ml-1">Min. 1</small>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="expiry_date" class="form-label">Expiry Date</label>
+                        <input type="date" class="form-control" id="expiry_date" name="expiry_date" required>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="text" class="form-label">Batch No </label>
+                        <input type="text" name="batch_no" id="batch_no" class="form-control"
+                            placeholder="Enter Batch No" nullable>
+                    </div>
+
                 </div>
 
                 <div class="modal-footer">
@@ -71,18 +83,18 @@
 
 <!-- Auto-fill barcode JS -->
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const codeInput = document.getElementById('code');
+    document.addEventListener('DOMContentLoaded', function() {
+        const codeInput = document.getElementById('code');
 
-    // Auto-fill code when modal opens
-    $('#modalForm').on('shown.bs.modal', function () {
-        if (!codeInput.value) {
-            fetch("{{ route('product.autocode') }}")
-                .then(res => res.json())
-                .then(data => {
-                    codeInput.value = data.code;
-                });
-        }
+        // Auto-fill code when modal opens
+        $('#modalForm').on('shown.bs.modal', function() {
+            if (!codeInput.value) {
+                fetch("{{ route('product.autocode') }}")
+                    .then(res => res.json())
+                    .then(data => {
+                        codeInput.value = data.code;
+                    });
+            }
+        });
     });
-});
 </script>

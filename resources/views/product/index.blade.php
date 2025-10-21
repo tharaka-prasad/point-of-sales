@@ -45,10 +45,12 @@
                                             <th>Product Name</th>
                                             <th>Category</th>
                                             <th>Brand</th>
-                                            <th>Purchase Price (Rp)</th>
-                                            <th>Sell Price (Rp)</th>
+                                            <th>Purchase Price (Rs)</th>
+                                            <th>Sell Price (Rs)</th>
                                             <th>Discount</th>
                                             <th>Stock</th>
+                                            <th>Exp-Date</th>
+                                            <th>Batch-No</th>
                                             <th>
                                                 <i class="fas fa-cog"></i>
                                             </th>
@@ -77,7 +79,7 @@
 
         $(function() {
             $("body").addClass("sidebar-collapse");
-            
+
             product_table = $("#product_table").DataTable({
                 responsive: true,
                 lengthChange: false,
@@ -120,6 +122,12 @@
                     },
                     {
                         data: "stock"
+                    },
+                    {
+                        data: "expiry_date"
+                    },
+                     {
+                        data: "batch_no"
                     },
                     {
                         data: "action",
@@ -175,6 +183,7 @@
                 $.get(url)
                     .done((response) => {
                         // Success
+                        $("#modalForm [name=code]").val(response.code);
                         $("#modalForm [name=name]").val(response.name);
                         $("#modalForm [name=category_id]").val(response.category_id);
                         $("#modalForm [name=brand]").val(response.brand);
@@ -182,6 +191,9 @@
                         $("#modalForm [name=sell_price]").val(response.sell_price);
                         $("#modalForm [name=discount]").val(response.discount);
                         $("#modalForm [name=stock]").val(response.stock);
+                        $("#modalForm [name=expiry_date]").val(response.expiry_date);
+                        $("#modalForm [name=batch_no]").val(response.batch_no);
+
                     })
                     .fail((errors) => {
                         // Failed

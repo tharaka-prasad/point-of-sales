@@ -2,78 +2,102 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
+use App\Models\Category;
 use Illuminate\Http\Request;
+
 
 class SupplierController extends Controller
 {
-    public function index()
-    {
-        $menu = "Supplier";
-
-        return view("supplier.index", compact("menu"));
+    // Show supplier list page
+    public function index(){
+        $menu = 'Supplier';
+        $suppliers = Supplier::all();
+$categories = Category::select("id", "name")->get();
+// dd($categories);
+        return view('supplier.index', compact('menu','suppliers','categories'));
     }
+
+
 
     public function data()
     {
-        $suppliers = Supplier::latest();
-
+        $suppliers = Supplier::with('category')->latest(); // keep the relationship + ordering
         return datatables()
             ->of($suppliers)
             ->addIndexColumn()
-            ->addColumn("action", function ($supplier) {
+           ->addColumn('category', function ($supplier) {
+                return $supplier->category ? $supplier->category->name : '';
+            })
+            ->addColumn('action', function ($supplier) {
                 return "
-                <div class='btn-group'>
-                    <button class='btn btn-xs btn-warning mr-3' onclick='editSupplier(`". route("supplier.update", $supplier->id) ."`)'><i class='fa fa-pencil-alt'></i></button>
-                    <button class='btn btn-xs btn-danger' onclick='deleteSupplier(`". route("supplier.destroy", $supplier->id) ."`)'><i class='fa fa-trash-alt'></i></button>
-                </div>
+                    <div class='btn-group'>
+                        <button class='btn btn-xs btn-warning mr-3' onclick='editSupplier(`" . route("supplier.update", $supplier->id) . "`)'>
+                            <i class='fa fa-pencil-alt'></i>
+                        </button>
+                        <button class='btn btn-xs btn-danger' onclick='deleteSupplier(`" . route("supplier.destroy", $supplier->id) . "`)'>
+                            <i class='fa fa-trash-alt'></i>
+                        </button>
+                    </div>
                 ";
             })
-            ->rawColumns(["action"])
+            ->rawColumns(['action'])
             ->make(true);
+
     }
 
+
+    // Store new supplier
     public function store(Request $request)
     {
         $supplier = Supplier::create($request->all());
 
         if ($supplier) {
-            return response()->json("Add supplier successfully.", 201);
+            return response()->json("Supplier added successfully.", 201);
         }
+
+        return response()->json("Failed to add supplier.", 500);
     }
 
+    // Show single supplier for edit
     public function show(string $id)
     {
         $supplier = Supplier::findOrFail($id);
-
-        if ($supplier) {
-            return response()->json($supplier);
-        }
+        return response()->json($supplier);
     }
 
+    // Update supplier
     public function update(Request $request, string $id)
     {
         $supplier = Supplier::findOrFail($id);
 
-        if ($supplier) {
-            $supplier->suplier_name = $request->name;
-            $supplier->company_name = $request->name;
-            $supplier->name = $request->name;
-            $supplier->phone = $request->phone;
-            $supplier->address = $request->address;
-            $supplier->update();
+        $supplier->update([
+            'supplier_name' => $request->supplier_name,
+            'company_name'  => $request->company_name,
+            'category'      => $request->category_id,
+            'phone'         => $request->phone,
+            'address'       => $request->address,
+        ]);
 
-            return response()->json("Update purchase order successfully.");
-        }
+        return response()->json("Supplier updated successfully.");
     }
 
+    // Delete supplier
     public function destroy(string $id)
     {
         $supplier = Supplier::findOrFail($id);
+        $supplier->delete();
 
-        if ($supplier) {
-            $supplier->delete();
+        return response()->json("Supplier deleted successfully.");
+    }
 
-            return response()->json("Delete supplier successfully.");
-        }
+    public function edit($id){
+        $supplier = Supplier::with('category')->findOrFail($id);
+        return response()->json($supplier);
+
+    }
+
+    public function create(){
+        $categories = Category::all();
+        return view('supplier.form', compact('categories'));
     }
 }
