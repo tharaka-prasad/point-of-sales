@@ -16,10 +16,12 @@
                         <input type="text" name="name" id="name" class="form-control"
                             placeholder="Enter Name" required>
                     </div>
+
                     <div class="form-group row">
                         <input type="email" name="email" id="email" class="form-control"
                             placeholder="Enter Email" required>
                     </div>
+
                     <div class="form-group row">
                         <input type="password" name="password" id="password" class="form-control"
                             placeholder="Enter Password" minlength="8" required>

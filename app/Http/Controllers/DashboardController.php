@@ -10,6 +10,7 @@ use App\Models\{
     Supplier,
     Member,
     Grn,
+    Cus
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

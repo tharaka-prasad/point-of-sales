@@ -9,16 +9,14 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-   public function index()
-{
+   public function index(){
     $users = User::all(); // remove ->get()
     $menu = "User";
 
     return view('user.index', compact('menu', 'users')); // also fix compact syntax
 }
 
-    public function data()
-    {
+    public function data(){
         $users = User::isNotAdmin()->get();
 
         return datatables()

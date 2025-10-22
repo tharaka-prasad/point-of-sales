@@ -21,5 +21,6 @@ class AuthCheckMiddleware
         }
 
         return redirect()->route("dashboard.index");
+        //return redirect()->route("cashier.index");
     }
 }
