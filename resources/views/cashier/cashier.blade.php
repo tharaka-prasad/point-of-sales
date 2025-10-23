@@ -113,7 +113,7 @@
 
                             <div class="d-flex justify-content-between mt-2">
                                 <div>Total Items: <strong id="totalItems">0</strong></div>
-                                <div>Total Amount: <strong id="totalAmount">0.00</strong></div>
+                                <div>Total Amount: <strong id="totalAmount" step="0.01" min="0">0.00</strong></div>
                             </div>
                         </div>
                     </div>
@@ -127,11 +127,11 @@
                             </div>
                             <div class="mb-2">
                                 <label>Cash</label>
-                                <input type="text" id="cashInput" class="form-control" value="0.00" name="pay">
+                                <input type="text" id="cashInput" step="0.01" min="0" class="form-control" value="0.00" name="pay">
                             </div>
                             <div class="mb-2">
                                 <label>Balance</label>
-                                <input type="text" id="balanceInput" class="form-control text-danger" value="0.00"
+                                <input type="text" id="balanceInput" step="0.01" min="0" class="form-control text-danger" value="0.00"
                                     readonly>
                             </div>
                             <div class="d-grid gap-2">

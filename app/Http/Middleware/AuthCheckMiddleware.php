@@ -19,8 +19,6 @@ class AuthCheckMiddleware
         if (Auth::user() && $level == Auth::user()->current_team_id) {
             return $next($request);
         }
-
-        return redirect()->route("dashboard.index");
-        //return redirect()->route("cashier.index");
+            return redirect()->route("dashboard.index");
     }
 }

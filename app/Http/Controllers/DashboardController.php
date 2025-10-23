@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{
+use App\Models\ {
     Category,
     Expense,
     Product,
@@ -11,17 +11,18 @@ use App\Models\{
     Member,
     Grn,
     Cus
-};
+}
+;
+
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class DashboardController extends Controller
-{
-    public function index()
-    {
-        $menu = "Dashboard";
+class DashboardController extends Controller {
+    public function index() {
+        $menu = 'Dashboard';
 
-        if (Auth::user()->current_team_id == 1) {
+        if ( Auth::user()->current_team_id == 1 ) {
             $total_category = Category::count();
             $total_product = Product::count();
             $total_supplier = Supplier::count();
@@ -31,43 +32,67 @@ class DashboardController extends Controller
             $today_total_purchases = Grn::count();
             $today_total_expens = Expense::count();
 
-            $first_date = date("Y-m-01");   # From day 1
-            $last_date = date("Y-m-d");     # To day now
+            $first_date = date( 'Y-m-01' );
+            # From day 1
+            $last_date = date( 'Y-m-d' );
+            # To day now
 
             $data_date = [];
             $data_income = [];
 
-            while (strtotime($first_date) <= strtotime($last_date)) {
-                $data_date[] = (int) substr($first_date, 8, 2);
+            // Blade variables for charts
+            $data_date = Sale::select( DB::raw( 'DATE(created_at) as date' ) )
+            ->groupBy( 'date' )->pluck( 'date' );
+            $data_income = Sale::select( DB::raw( 'SUM(total_price) as total_income' ) )
+            ->groupBy( DB::raw( 'DATE(created_at)' ) )->pluck( 'total_income' );
 
-                $today_total_purchases = Grn::whereDate('created_at', $first_date)->sum('grn_total');
-                $total_expense = Expense::whereDate('created_at', $first_date)->sum('amount');
-                $today_total_sales = Sale::whereDate('created_at', $first_date)->sum('total_price');
-                $today_total_return = Sale::whereDate('created_at', $first_date)->sum('return_products');
+            // New: Daily Sales by Cashier
+            $dailySalesByCashier = DB::table( 'sales' )
+            ->join( 'users', 'sales.id', '=', 'users.id' )
+            ->select( 'users.name as cashier', DB::raw( 'SUM(total_price) as total_sales' ) )
+            ->whereDate( 'sales.created_at', today() )
+            ->groupBy( 'users.name' )
+            ->orderBy( 'total_sales', 'desc' )
+            ->get();
+
+            // Blade variables for charts
+            $data_date = Sale::select( DB::raw( 'DATE(created_at) as date' ) )
+            ->groupBy( 'date' )->pluck( 'date' );
+            $data_income = Sale::select( DB::raw( 'SUM(total_price) as total_income' ) )
+            ->groupBy( DB::raw( 'DATE(created_at)' ) )->pluck( 'total_income' );
+
+            while ( strtotime( $first_date ) <= strtotime( $last_date ) ) {
+                $data_date[] = ( int ) substr( $first_date, 8, 2 );
+
+                $today_total_purchases = Grn::whereDate( 'created_at', $first_date )->sum( 'grn_total' );
+                $total_expense = Expense::whereDate( 'created_at', $first_date )->sum( 'amount' );
+                $today_total_sales = Sale::whereDate( 'created_at', $first_date )->sum( 'total_price' );
+                $today_total_return = Sale::whereDate( 'created_at', $first_date )->sum( 'return_products' );
 
                 //HERE YOU CAN DO THE CALCULATIONS LIKE THIS,
                 // $income = $total_sale - $total_purchase - $total_expense;
                 // $data_income[] = $income;
 
-                $first_date = date("Y-m-d", strtotime("+1 day", strtotime($first_date)));
+                $first_date = date( 'Y-m-d', strtotime( '+1 day', strtotime( $first_date ) ) );
             }
 
-            return view("admin.dashboard", compact(
-                "menu",
-                "total_category",
-                "total_product",
-                "total_supplier",
-                "total_member",
-                "data_date",
-                "data_income",
-                "total_expense",
-                "today_total_purchases",
-                "today_total_sales",
-                "today_total_return"
+            return view( 'admin.dashboard', compact(
+                'menu',
+                'total_category',
+                'total_product',
+                'total_supplier',
+                'total_member',
+                'data_date',
+                'data_income',
+                'total_expense',
+                'today_total_purchases',
+                'today_total_sales',
+                'today_total_return',
+                'dailySalesByCashier'
 
-            ));
+            ) );
         } else {
-            return view("cashier.dashboard", compact("menu"));
+            return view( 'cashier.dashboard', compact( 'menu' ) );
         }
     }
 }

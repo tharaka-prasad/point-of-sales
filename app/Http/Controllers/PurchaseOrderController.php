@@ -56,7 +56,7 @@ class PurchaseOrderController extends Controller{
             'items.*.category' => 'nullable|string',
             'items.*.uom'      => 'nullable|string',
             'items.*.qty'      => 'required|numeric|min:1',
-            'items.*.rate'     => 'required|numeric|min:0',
+            'items.*.rate'     => 'required|numeric|min:0.01',
             'items.*.remarks'  => 'nullable|string',
         ]);
 
@@ -107,7 +107,7 @@ class PurchaseOrderController extends Controller{
         }
 
         $poNumber = $purchaseOrder->po_number;
-        
+
         return view('po.show', compact('menu', 'po', 'suppliers', 'poNumber'));
     }
 

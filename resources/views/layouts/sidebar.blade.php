@@ -148,7 +148,7 @@
                     <li class="nav-item">
                         <a href="{{ route('member.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-id-card"></i>
-                            <p>Member</p>
+                            <p>Add New Member</p>
                         </a>
                     </li>
                 @endif

@@ -103,6 +103,12 @@ Route::middleware([
             Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
             // New route to handle report generation
             Route::get('/reports/generate', [ReportsController::class, 'generate'])->name('reports.generate');
+            // Admin dashboard charts
+            Route::get('/reports/income-chart', function () {
+                return view('reports.income_chart');
+            })->name('reports.income-chart');
+            Route::get('/reports/income-chart-data', [ReportsController::class, 'incomeChartData'])->name('reports.income-chart-data');
+
 
         // User
         Route::get('/user/data', [UserController::class, "data"])->name("user.data");
@@ -129,6 +135,20 @@ Route::middleware([
         Route::delete('/{id}', [CashierShiftController::class, 'destroy'])->name('destroy');
         });
 
+    });
+
+    Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+    ])->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, "index"])->name("dashboard.index");
+
+        //Quick-Books
+        Route::get('/qbo/connect', [QuickBooksController::class, 'connect']);
+        Route::get('/qbo/callback', [QuickBooksController::class, 'callback']);
+
     Route::middleware(['level:2'])->group(function () {
         // Cashier
         Route::get('/cashier', [CashierController::class, "index"])->name("cashier.index");
@@ -145,8 +165,8 @@ Route::middleware([
         Route::post('/member/delete-selected', [MemberController::class, "deleteSelected"])->name("member.deleteSelected");
         Route::post('/member/print-member', [MemberController::class, "printMember"])->name("member.printMember");
         });
-
     });
+
 
     // Transaction
     Route::get('/transaction/new', [SaleController::class, "create"])->name("transaction.new");

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer("member_id")->nullable();
             $table->integer("total_item")->nullable();
-            $table->integer("total_price")->nullable();
+            $table->decimal("total_price", 10, 2)->nullable();
             $table->integer("discount")->default(0)->nullable();
             $table->integer("pay")->default(0)->nullable();
             $table->integer("accepted")->default(0)->nullable();

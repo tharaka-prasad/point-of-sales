@@ -38,12 +38,12 @@
                     </div>
 
                     <div class="form-group row">
-                        <input type="number" name="price" id="price" class="form-control"
+                        <input type="number" name="price" id="price" step="0.01" min="0" class="form-control"
                             placeholder="Enter Purchase Price" min="1" required>
                     </div>
 
                     <div class="form-group row">
-                        <input type="number" name="sell_price" id="sell_price" class="form-control"
+                        <input type="number" name="sell_price" id="sell_price" step="0.01" min="0" class="form-control"
                             placeholder="Enter Sell Price" min="1" required>
                     </div>
 

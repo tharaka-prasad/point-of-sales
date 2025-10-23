@@ -219,7 +219,7 @@ class CashierController extends Controller
             'products'    => 'required|array|min:1',
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.qty'        => 'required|numeric|min:1',
-            'products.*.price'      => 'required|numeric|min:0',
+            'products.*.price'      => 'required|numeric|min:0.01',
         ]);
 
         DB::transaction(function () use ($request) {

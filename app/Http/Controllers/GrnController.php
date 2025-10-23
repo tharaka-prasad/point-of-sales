@@ -172,7 +172,7 @@ class GrnController extends Controller
             'items.*.ordered'  => 'nullable|numeric',
             'items.*.received' => 'nullable|numeric',
             'items.*.accepted' => 'nullable|numeric',
-            'items.*.price'    => 'nullable|numeric',
+            'items.*.price'    => 'nullable|numeric|min:0.01'
         ]);
 
         DB::transaction(function () use ($validated, $grn) {

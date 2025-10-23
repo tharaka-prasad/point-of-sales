@@ -17,7 +17,7 @@
                             placeholder="Enter Description" required></textarea>
                     </div>
                     <div class="form-group row">
-                        <input type="number" name="amount" id="amount" class="form-control"
+                        <input type="number" name="amount" id="amount" step="0.01" min="0" class="form-control"
                             placeholder="Enter Amount" min="1" required>
                         <small class="ml-1">Min. 1</small>
                     </div>
