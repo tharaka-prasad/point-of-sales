@@ -41,7 +41,7 @@ class GrnController extends Controller
         $validated = $request->validate([
             'date'             => 'required|date',
             'supplier'         => 'required|exists:suppliers,id',
-            'po_no'            => 'required|string',
+            'po_no'            => 'nullable|string',
             'invoice_no'       => 'required|string',
             'general_remarks'  => 'nullable|string',
             'grn_total'        => 'required|numeric',
@@ -172,7 +172,7 @@ class GrnController extends Controller
             'items.*.ordered'  => 'nullable|numeric',
             'items.*.received' => 'nullable|numeric',
             'items.*.accepted' => 'nullable|numeric',
-            'items.*.price'    => 'nullable|numeric',
+            'items.*.price'    => 'nullable|numeric|min:0.01'
         ]);
 
         DB::transaction(function () use ($validated, $grn) {

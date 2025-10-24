@@ -57,7 +57,7 @@ class ReportController extends Controller
             $current_date->addDay();
 
             $total_sale = Sale::whereDate('created_at', $date)->sum('pay');
-            $total_purchase = Purchase::whereDate('created_at', $date)->sum('pay');
+            $total_purchase = 0;#Purchase::whereDate('created_at', $date)->sum('pay');
             $total_expense = Expense::whereDate('created_at', $date)->sum('amount');
 
             $income = $total_sale - $total_purchase - $total_expense;

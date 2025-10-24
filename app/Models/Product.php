@@ -15,11 +15,13 @@ class Product extends Model
         'discount',
         'sell_price',
         'stock',
+        'expiry_date',
+        'batch_no'
     ];
 
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
-    
+
 }

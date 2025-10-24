@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('qty')->nullable();
             $table->decimal('rate', 10, 2)->nullable(); // Rs
             $table->string('remarks')->nullable();
-            $table->decimal('total', 15, 2)->nullable();
+            $table->decimal('total', 10, 2)->nullable();
             $table->timestamps();
         });
     }

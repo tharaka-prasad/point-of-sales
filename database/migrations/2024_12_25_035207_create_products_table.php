@@ -17,10 +17,12 @@ return new class extends Migration
             $table->string("name")->nullable();
             $table->integer("category_id")->nullable();
             $table->string("brand")->nullable();
-            $table->integer("price")->nullable();
+            $table->decimal("price", 10, 2)->nullable();
             $table->integer("discount")->default(0)->nullable();
             $table->integer("sell_price")->nullable();
             $table->integer("stock")->nullable();
+            $table->date("expiry_date")->nullable();
+            $table->string("batch_no")->nullable();
             $table->timestamps();
         });
     }

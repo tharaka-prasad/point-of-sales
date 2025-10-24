@@ -21,8 +21,8 @@ return new class extends Migration
             $table->integer('qty_received')->nullable();
             $table->integer('qty_accepted')->nullable();
             $table->integer('qty_rejected')->nullable();
-            $table->decimal('unit_price', 12, 2)->nullable();
-            $table->decimal('total', 12, 2)->nullable();
+            $table->decimal('unit_price', 10, 2)->nullable();
+            $table->decimal('total', 10, 2)->nullable();
             $table->string('remarks')->nullable();
             $table->integer('created_by')->nullable();
             $table->timestamps();

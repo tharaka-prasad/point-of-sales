@@ -26,7 +26,7 @@
 
                         <div class="form-group">
                             <label>Start Balance</label>
-                            <input type="number" name="start_balance" class="form-control start-balance" required>
+                            <input type="number" name="start_balance" step="0.01" min="0" class="form-control start-balance" required>
                         </div>
 
                         <div class="form-group">
@@ -44,7 +44,7 @@
                         </div>
                         <div class="form-group">
                             <label>Start Balance</label>
-                            <input type="number" class="form-control end-start-balance" readonly>
+                            <input type="number" step="0.01" min="0" class="form-control end-start-balance" readonly>
                         </div>
                         <div class="form-group">
                             <label>Start Time</label>

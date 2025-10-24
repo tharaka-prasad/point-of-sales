@@ -49,7 +49,7 @@ class CashierShiftController extends Controller
     {
         $request->validate([
             'cashier_id'    => 'required|exists:users,id',
-            'start_balance' => 'required|numeric',
+            'start_balance' => 'required|numeric|min:0.01',
             'start_time'    => 'required|date',
         ]);
 

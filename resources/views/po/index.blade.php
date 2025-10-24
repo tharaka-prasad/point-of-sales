@@ -39,7 +39,7 @@
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $po->po_number }}</td>
                                 <td>{{ $po->supplier->company_name  ?? 'N/A'  }}</td>
-                                <td>{{ $po->supplier->name ?? 'N/A' }}</td>
+                                <td>{{ $po->supplier->supplier_name ?? 'N/A' }}</td>
                                 <td>{{ $po->description ?? 'N/A'  }}</td>
                                 <td>{{ $po->supplier->phone ?? 'N/A'  }}</td>
                                 <td>{{ $po->status ?? 'N/A'  }}</td>
