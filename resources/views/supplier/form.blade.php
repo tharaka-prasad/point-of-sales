@@ -26,8 +26,8 @@
                     <div class="form-group row">
                         <select name="category_id" id="category_id" class="form-control" required>
                             <option value="">-- Select Category --</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name  }}</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
                             @endforeach
                         </select>
                     </div>

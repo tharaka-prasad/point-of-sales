@@ -463,111 +463,169 @@
             });
         });
 
-        // ------------------------------
-        // Returns
-        // ------------------------------
+document.addEventListener("DOMContentLoaded", function() {
+    const returnCustomerSelect = document.getElementById("returnCustomerSelect");
+    const returnSaleSelect = document.getElementById("returnSaleSelect");
+    const returnProductsTableBody = document.querySelector("#returnProductsTable tbody");
+    const returnCustomerBalanceEl = document.getElementById("returnCustomerBalance");
+    const returnTotalAmountEl = document.getElementById("returnTotalAmount");
+    const updatedBalanceEl = document.getElementById("updatedBalance");
+    const confirmReturnBtn = document.getElementById("confirmReturnBtn");
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const findReturnsBtn = document.getElementById("findReturnsBtn");
-            const returnModalEl = document.getElementById("returnModal");
-            const returnCustomerSelect = document.getElementById("returnCustomerSelect");
-            const returnSaleSelect = document.getElementById("returnSaleSelect");
-            const returnProductsTableBody = document.querySelector("#returnProductsTable tbody");
-            const addReturnProductsBtn = document.getElementById("addReturnProductsBtn");
+    // ------------------------------
+    // Load customer balance & sales
+    // ------------------------------
+    returnCustomerSelect.addEventListener("change", function() {
+        const customerId = this.value;
+        if (!customerId) return;
 
-            const productsTableBody = document.querySelector("#productsTable tbody");
-            const totalItemsEl = document.getElementById('totalItems');
-            const totalAmountEl = document.getElementById('totalAmount');
-            const totalItemInput = document.getElementById('totalItemInput');
-            const totalPriceInput = document.getElementById('totalPriceInput');
-            const balanceInput = document.getElementById('balanceInput');
+        returnSaleSelect.disabled = true;
+        returnSaleSelect.innerHTML = `<option>Loading...</option>`;
+        returnCustomerBalanceEl.textContent = "0.00";
+        updatedBalanceEl.textContent = "0.00";
 
-            let currentCustomerId = null;
+        // Load balance
+        fetch(`/cashier/customer/${customerId}/balance`)
+            .then(res => res.ok ? res.json() : Promise.reject(res))
+            .then(data => {
+                const balance = parseFloat(data.balance) || 0;
+                returnCustomerBalanceEl.textContent = balance.toFixed(2);
+                updatedBalanceEl.textContent = balance.toFixed(2);
+            })
+            .catch(() => {
+                returnCustomerBalanceEl.textContent = "Error";
+            });
 
-            // ------------------------------
-            // Open modal
-            // ------------------------------
-            findReturnsBtn.addEventListener("click", function() {
-                const modal = new bootstrap.Modal(returnModalEl);
-                modal.show();
-
-                returnProductsTableBody.innerHTML =
-                    `<tr><td colspan="3" class="text-center text-muted py-3">Select a customer to see sales.</td></tr>`;
+        // Load sales
+        fetch(`/cashier/returns/${customerId}/sales`)
+            .then(res => res.ok ? res.json() : Promise.reject(res))
+            .then(data => {
+                if (!data.length) {
+                    returnSaleSelect.innerHTML = `<option>No completed sales</option>`;
+                    return;
+                }
                 returnSaleSelect.innerHTML = `<option value="">-- Select Sale --</option>`;
-                returnSaleSelect.disabled = true;
+                data.forEach(sale => {
+                    const option = document.createElement("option");
+                    option.value = sale.id;
+                    option.textContent = `#${sale.id} - ${new Date(sale.created_at).toLocaleDateString()} (${sale.total_item} items)`;
+                    returnSaleSelect.appendChild(option);
+                });
+                returnSaleSelect.disabled = false;
+            })
+            .catch(() => {
+                returnSaleSelect.innerHTML = `<option>Failed to load sales</option>`;
             });
+    });
 
-            // ------------------------------
-            // Load customer sales
-            // ------------------------------
-            returnCustomerSelect.addEventListener("change", function() {
-                const customerId = this.value;
-                if (!customerId) return;
+    // ------------------------------
+    // Load returnable products
+    // ------------------------------
+    returnSaleSelect.addEventListener("change", function() {
+        const saleId = this.value;
+        if (!saleId) return;
 
-                currentCustomerId = customerId;
-                returnSaleSelect.disabled = true;
-                returnSaleSelect.innerHTML =
-                    `<option value="">Loading...</option>`;
+        returnProductsTableBody.innerHTML = `<tr><td colspan="4" class="text-center py-3">Loading...</td></tr>`;
 
-                fetch(`/cashier/returns/${customerId}/sales`)
-                    .then(res => res.ok ? res.json() : Promise.reject(res))
-                    .then(data => {
-                        if (!data.length) {
-                            returnSaleSelect.innerHTML = `<option value="">No completed sales</option>`;
-                            return;
-                        }
+        fetch(`/cashier/returns/sale/${saleId}`)
+            .then(res => res.ok ? res.json() : Promise.reject(res))
+            .then(products => {
+                returnProductsTableBody.innerHTML = '';
+                if (!products.length) {
+                    returnProductsTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">No returnable products found.</td></tr>`;
+                    return;
+                }
 
-                        returnSaleSelect.innerHTML = `<option value="">-- Select Sale --</option>`;
-                        data.forEach(sale => {
-                            const option = document.createElement("option");
-                            option.value = sale.id;
-                            option.textContent =
-                                `#${sale.id} - ${new Date(sale.created_at).toLocaleDateString()} (${sale.total_item} items)`;
-                            returnSaleSelect.appendChild(option);
-                        });
-
-                        returnSaleSelect.disabled = false;
-                    })
-                    .catch(() => {
-                        returnSaleSelect.innerHTML = `<option value="">Failed to load sales</option>`;
-                    });
-            });
-
-            // ------------------------------
-            // Load products for selected sale
-            // ------------------------------
-            returnSaleSelect.addEventListener("change", function() {
-                const saleId = this.value;
-                if (!saleId) return;
-
-                returnProductsTableBody.innerHTML =
-                    `<tr><td colspan="3" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div> Loading...</td></tr>`;
-
-                fetch(`/cashier/returns/sale/${saleId}`)
-                    .then(res => res.ok ? res.json() : Promise.reject(res))
-                    .then(data => {
-                        returnProductsTableBody.innerHTML = '';
-                        if (!data.length) {
-                            returnProductsTableBody.innerHTML =
-                                `<tr><td colspan="3" class="text-center text-muted py-3">No returnable products found.</td></tr>`;
-                            return;
-                        }
-
-                        data.forEach(prod => {
-                            const row = document.createElement("tr");
-                            row.innerHTML = `
-                        <td>${prod.product_name}<input type="hidden" class="productIdInput" value="${prod.product_id}"></td>
+                products.forEach(prod => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${prod.product_name}</td>
                         <td>${prod.returnable_qty}</td>
                         <td><input type="number" class="form-control returnQtyInput" min="0" max="${prod.returnable_qty}" value="0" data-price="${prod.sale_price}"></td>
-                    `;
-                            returnProductsTableBody.appendChild(row);
-                        });
-                    })
-                    .catch(() => {
-                        returnProductsTableBody.innerHTML =
-                            `<tr><td colspan="3" class="text-center text-danger py-3">Failed to load products.</td></tr>`;
-                    });
+                        <td class="returnSubtotal">0.00</td>`;
+                    returnProductsTableBody.appendChild(row);
+                });
+            })
+            .catch(() => {
+                returnProductsTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-3">Failed to load products.</td></tr>`;
             });
+    });
+
+    // ------------------------------
+    // Recalculate totals on input
+    // ------------------------------
+    document.addEventListener("input", function(e) {
+        if (e.target.classList.contains("returnQtyInput")) {
+            let input = e.target;
+            const max = parseFloat(input.max) || 0;
+            if (parseFloat(input.value) > max) input.value = max;
+
+            const price = parseFloat(input.dataset.price) || 0;
+            const subtotal = parseFloat(input.value) * price;
+            input.closest("tr").querySelector(".returnSubtotal").textContent = subtotal.toFixed(2);
+
+            recalcReturnTotals();
+        }
+    });
+
+    function recalcReturnTotals() {
+        let totalReturn = 0;
+        document.querySelectorAll(".returnQtyInput").forEach(input => {
+            const qty = parseFloat(input.value) || 0;
+            const price = parseFloat(input.dataset.price) || 0;
+            totalReturn += qty * price;
         });
+
+        returnTotalAmountEl.textContent = totalReturn.toFixed(2);
+
+        const originalBalance = parseFloat(returnCustomerBalanceEl.textContent) || 0;
+        updatedBalanceEl.textContent = (originalBalance + totalReturn).toFixed(2);
+    }
+
+    // ------------------------------
+    // Confirm return
+    // ------------------------------
+    confirmReturnBtn.addEventListener("click", function() {
+        const customerId = returnCustomerSelect.value;
+        const saleId = returnSaleSelect.value;
+        if (!customerId || !saleId) {
+            alert("Please select customer and sale.");
+            return;
+        }
+
+        const products = [];
+        document.querySelectorAll(".returnQtyInput").forEach(input => {
+            const qty = parseFloat(input.value);
+            const price = parseFloat(input.dataset.price);
+            const productName = input.closest("tr").children[0].textContent.trim();
+            if (qty > 0) products.push({ name: productName, qty, price });
+        });
+
+        if (!products.length) {
+            alert("No products selected for return.");
+            return;
+        }
+
+        fetch(`/cashier/returns/process`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ customer_id: customerId, sale_id: saleId, products })
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert("Return processed successfully!");
+            location.reload();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Error processing return.");
+        });
+    });
+});
+
+
     </script>
 @endpush

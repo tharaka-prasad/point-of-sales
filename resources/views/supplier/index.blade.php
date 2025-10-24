@@ -10,94 +10,65 @@
 @endsection
 
 @section('content')
-    <div class="app-content">
-        <!--begin::Container-->
-        <div class="container-fluid">
-            <!--begin::Row-->
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <button class="btn btn-primary xs" onclick="addSupplier('{{ route('supplier.store') }}')">
-                                <i class="fas fa-plus"></i> Add
-                            </button>
-                        </div>
-                        <!-- /.card-header -->
-
-                        <div class="card-body">
-                            <table id="supplier_table" class="table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Supplier Name</th>
-                                        <th>Company Name</th>
-                                        <th>Category</th>
-                                        <th>Phone</th>
-                                        <th>Address</th>
-                                        <th>
-                                            <i class="fas fa-cog"></i>
-                                        </th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
-                        <!-- ./card-body -->
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <button class="btn btn-primary xs" onclick="addSupplier('{{ route('supplier.store') }}')">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
                     </div>
-                    <!-- /.card -->
+                    <div class="card-body">
+                        <table id="supplier_table" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Supplier Name</th>
+                                    <th>Company Name</th>
+                                    <th>Category</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th><i class="fas fa-cog"></i></th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
                 </div>
-                <!-- /.col -->
             </div>
-            <!-- /.row (main row) -->
         </div>
-        <!--end::Container-->
     </div>
-    @includeIf('supplier.form')
+</div>
+
+@includeIf('supplier.form')
 @endsection
 
 @push('scripts')
 <script>
-let supplier_table;
-
-$(function() {
+$(document).ready(function() {
     $("body").addClass("sidebar-collapse");
 
-            supplier_table = $("#supplier_table")
-                .DataTable({
-                    responsive: true,
-                    lengthChange: false,
-                    autoWidth: false,
-                    serverSide: true,
-                    processing: true,
-                    ajax: {
-                        url: "{{ route('supplier.data') }}",
-                    },
-                    columns: [{
-                            data: "DT_RowIndex",
-                            searchable: false,
-                            sortable: false
-                        },
-                        {
-                            data: "supplier_name"
-                        },
-                        {
-                            data: "company_name"
-                        },
-                        {
-                            data: "name"
-                        },
-                        {
-                            data: "phone"
-                        },
-                        {
-                            data: "address"
-                        },
-                        {
-                            data: "action",
-                            searchable: false,
-                            sortable: false
-                        }
-                    ]
-                });
+    // Initialize DataTable
+    let supplier_table = $("#supplier_table").DataTable({
+        responsive: true,
+        lengthChange: false,
+        autoWidth: false,
+        serverSide: true,
+        processing: true,
+        ajax: {
+            url: "{{ route('supplier.data') }}",
+        },
+        columns: [
+            { data: "DT_RowIndex", searchable: false, sortable: false },
+            { data: "supplier_name" },
+            { data: "company_name" },
+            { data: "category" }, // category name
+            { data: "phone" },
+            { data: "address" },
+            { data: "action", searchable: false, sortable: false }
+        ]
+    });
 
     // Handle Add/Edit form submission via AJAX
     $("#modalForm form").on("submit", function(e) {
@@ -123,8 +94,8 @@ $(function() {
     });
 });
 
-// Function to load categories dynamically and set selected
-function loadCategories(selectedId = null) {
+// Make functions globally accessible
+window.loadCategories = function(selectedId = null) {
     $.get('/category/list', function(categories) {
         let options = '<option value="">-- Select Category --</option>';
         $.each(categories, function(i, cat) {
@@ -135,63 +106,51 @@ function loadCategories(selectedId = null) {
     });
 }
 
-// Open Add Supplier modal
-function addSupplier(url) {
+window.addSupplier = function(url) {
     $("#modalForm").modal("show");
     $("#modalForm .modal-title").text("Add Supplier");
 
-    // Clear form
     let form = $("#modalForm form")[0];
     form.reset();
 
-    // Set form action/method
     $("#modalForm form").attr("action", url);
     $("#modalForm [name=_method]").val("POST");
 
-    // Load categories (none selected)
     loadCategories();
 }
 
-// Open Edit Supplier modal
-function editSupplier(url) {
+window.editSupplier = function(url) {
     $.get(url.replace('/update',''), function(supplier) {
+        $("#modalForm").modal("show");
+        $("#modalForm .modal-title").text("Edit Supplier");
+
+        let form = $("#modalForm form")[0];
+        form.reset();
+
+        $("#modalForm form").attr("action", url);
+        $("#modalForm [name=_method]").val("PUT");
+
         // Fill form fields
         $('#supplier_name').val(supplier.supplier_name);
         $('#company_name').val(supplier.company_name);
         $('#phone').val(supplier.phone);
         $('#address').val(supplier.address);
 
-            $("#modalForm form")[0].reset();
-            $("#modalForm form").attr("action", url);
-            $("#modalForm [name=_method]").val("PUT");
+        loadCategories(supplier.category_id);
+    }).fail(function() {
+        alert("Failed to fetch supplier data!");
+    });
+}
 
-            // Get Data
-            $.get(url)
-                .done(response => {
-                    // Success
-                    suplier_name
-                    $("#modalForm [name=supplier_name]").val(response.name);
-                    $("#modalForm [name=company_name]").val(response.name);
-                    $("#modalForm [name=name]").val(response.name);
-                    $("#modalForm [name=phone]").val(response.phone);
-                    $("#modalForm [name=address]").val(response.address);
-                })
-                .fail(errors => {
-                    alert("Failed to display data!");
-                });
-        }
-
-// Delete Supplier
-function deleteSupplier(url) {
+window.deleteSupplier = function(url) {
     if (confirm("Are you sure delete this supplier?")) {
         $.post(url, {
             "_token": $("[name=csrf-token]").attr("content"),
             "_method": "DELETE"
         })
-        .done(() => supplier_table.ajax.reload())
+        .done(() => $("#supplier_table").DataTable().ajax.reload())
         .fail(() => alert("Failed to delete supplier!"));
     }
 }
 </script>
 @endpush
-

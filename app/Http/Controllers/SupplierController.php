@@ -5,19 +5,17 @@ use App\Models\Category;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 
-
 class SupplierController extends Controller
 {
     // Show supplier list page
-    public function index(){
-        $menu = 'Supplier';
-        $suppliers = Supplier::all();
-$categories = Category::select("id", "name")->get();
+    public function index()
+    {
+        $menu       = 'Supplier';
+        $suppliers  = Supplier::all();
+        $categories = Category::select("id", "name")->get();
 // dd($categories);
-        return view('supplier.index', compact('menu','suppliers','categories'));
+        return view('supplier.index', compact('menu', 'suppliers', 'categories'));
     }
-
-
 
     public function data()
     {
@@ -25,7 +23,7 @@ $categories = Category::select("id", "name")->get();
         return datatables()
             ->of($suppliers)
             ->addIndexColumn()
-           ->addColumn('category', function ($supplier) {
+            ->addColumn('category', function ($supplier) {
                 return $supplier->category ? $supplier->category->name : '';
             })
             ->addColumn('action', function ($supplier) {
@@ -44,7 +42,6 @@ $categories = Category::select("id", "name")->get();
             ->make(true);
 
     }
-
 
     // Store new supplier
     public function store(Request $request)
@@ -90,13 +87,15 @@ $categories = Category::select("id", "name")->get();
         return response()->json("Supplier deleted successfully.");
     }
 
-    public function edit($id){
+    public function edit($id)
+    {
         $supplier = Supplier::with('category')->findOrFail($id);
         return response()->json($supplier);
 
     }
 
-    public function create(){
+    public function create()
+    {
         $categories = Category::all();
         return view('supplier.form', compact('categories'));
     }
