@@ -12,12 +12,10 @@ class SupplierController extends Controller
     public function index(){
         $menu = 'Supplier';
         $suppliers = Supplier::all();
-$categories = Category::select("id", "name")->get();
-// dd($categories);
+        $categories = Category::select("id", "name")->get();
+    // dd($categories);
         return view('supplier.index', compact('menu','suppliers','categories'));
     }
-
-
 
     public function data()
     {
@@ -44,7 +42,6 @@ $categories = Category::select("id", "name")->get();
             ->make(true);
 
     }
-
 
     // Store new supplier
     public function store(Request $request)

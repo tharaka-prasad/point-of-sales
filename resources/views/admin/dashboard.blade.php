@@ -245,117 +245,158 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
 
-    //---------------------------
-    // 1️⃣ INCOME RECAP CHART
-    //---------------------------
-    var incomeRecapChartCanvas = document.getElementById('incomeRecapChart').getContext('2d');
+            //---------------------------
+            // 1️⃣ INCOME RECAP CHART
+            //---------------------------
+            var incomeRecapChartCanvas = document.getElementById('incomeRecapChart').getContext('2d');
 
-    var incomeRecapChartData = {
-        labels: {!! json_encode($data_date) !!},
-        datasets: [{
-            label: 'Income',
-            data: {!! json_encode($data_income) !!},
-            borderColor: 'rgba(60,141,188,0.8)',
-            backgroundColor: 'rgba(60,141,188,0.2)',
-            fill: true,
-            tension: 0.3
-        }]
-    };
+            var incomeRecapChartData = {
+                labels: {!! json_encode($data_date) !!},
+                datasets: [{
+                    label: 'Income',
+                    data: {!! json_encode($data_income) !!},
+                    borderColor: 'rgba(60,141,188,0.8)',
+                    backgroundColor: 'rgba(60,141,188,0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            };
 
-    new Chart(incomeRecapChartCanvas, {
-        type: 'line',
-        data: incomeRecapChartData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: true } },
-            scales: {
-                x: { grid: { display: true } },
-                y: { beginAtZero: true, grid: { display: true } }
-            }
-        }
-    });
-
-    //---------------------------
-    // 2️⃣ SALES / EXPENSES / INCOME CHART
-    //---------------------------
-    fetch("{{ route('reports.income-chart-data') }}")
-        .then(response => response.json())
-        .then(data => {
-            const ctx = document.getElementById('incomeChart').getContext('2d');
-
-            new Chart(ctx, {
+            new Chart(incomeRecapChartCanvas, {
                 type: 'line',
-                data: {
-                    labels: data.labels,
-                    datasets: [
-                        {
-                            label: 'Sales (LKR)',
-                            data: data.sales,
-                            borderColor: '#00bcd4',
-                            backgroundColor: 'rgba(0, 188, 212, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Expenses (LKR)',
-                            data: data.expenses,
-                            borderColor: '#f44336',
-                            backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Net Income (LKR)',
-                            data: data.income,
-                            borderColor: '#4caf50',
-                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                            fill: true,
-                            tension: 0.3
+                data: incomeRecapChartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
                         }
-                    ]
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: true
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                display: true
+                            }
+                        }
+                    }
+                }
+            });
+
+            //---------------------------
+            // 2️⃣ SALES / EXPENSES / INCOME CHART
+            //---------------------------
+            fetch("{{ route('reports.income-chart-data') }}")
+                .then(response => response.json())
+                .then(data => {
+                    const ctx = document.getElementById('incomeChart').getContext('2d');
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                    label: 'Sales (LKR)',
+                                    data: data.sales,
+                                    borderColor: '#00bcd4',
+                                    backgroundColor: 'rgba(0, 188, 212, 0.1)',
+                                    fill: true,
+                                    tension: 0.3
+                                },
+                                {
+                                    label: 'Expenses (LKR)',
+                                    data: data.expenses,
+                                    borderColor: '#f44336',
+                                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                                    fill: true,
+                                    tension: 0.3
+                                },
+                                {
+                                    label: 'Net Income (LKR)',
+                                    data: data.income,
+                                    borderColor: '#4caf50',
+                                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                                    fill: true,
+                                    tension: 0.3
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true
+                                }
+                            },
+                            scales: {
+                                x: {},
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                });
+
+            //---------------------------
+            // 3️⃣ DAILY SALES BY CASHIER CHART
+            //---------------------------
+            var salesByCashierLabels = {!! json_encode($dailySalesByCashier->pluck('id')) !!};
+            var salesByCashierData = {!! json_encode($dailySalesByCashier->pluck('total_price')) !!};
+
+            var salesByCashierCtx = document.getElementById('salesByCashierChart').getContext('2d');
+
+            new Chart(salesByCashierCtx, {
+                type: 'bar',
+                data: {
+                    labels: salesByCashierLabels,
+                    datasets: [{
+                        label: 'Sales (LKR)',
+                        data: salesByCashierData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: true } },
-                    scales: { x: {}, y: { beginAtZero: true } }
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        },
+                        x: {
+                            grid: {
+                                display: true
+                            }
+                        }
+                    }
                 }
             });
+
         });
 
-    //---------------------------
-    // 3️⃣ DAILY SALES BY CASHIER CHART
-    //---------------------------
-    var salesByCashierLabels = {!! json_encode($dailySalesByCashier->pluck('id')) !!};
-    var salesByCashierData = {!! json_encode($dailySalesByCashier->pluck('total_price')) !!};
 
-    var salesByCashierCtx = document.getElementById('salesByCashierChart').getContext('2d');
 
-    new Chart(salesByCashierCtx, {
-        type: 'bar',
-        data: {
-            labels: salesByCashierLabels,
-            datasets: [{
-                label: 'Sales (LKR)',
-                data: salesByCashierData,
-                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true }, x: { grid: { display: true } } }
-        }
-    });
-
-});
-</script>
+        //Side bar animation
+        $(function() {
+            $("body").toggleClass("sidebar-collapse");
+        });
+    </script>
 @endpush

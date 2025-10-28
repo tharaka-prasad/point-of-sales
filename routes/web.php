@@ -108,7 +108,12 @@ Route::middleware([
                 return view('reports.income_chart');
             })->name('reports.income-chart');
             Route::get('/reports/income-chart-data', [ReportsController::class, 'incomeChartData'])->name('reports.income-chart-data');
-
+            //supplier_report
+            Route::get('/reports/supplier_report', [ReportsController::class, 'supplier_report'])->name('reports.supplier_report');
+            //product_report
+            Route::get('/reports/product_report', [ReportsController::class, 'product_report'])->name('reports.product_report');
+            //customer_report
+            Route::get('/reports/customer_report', [ReportsController::class, 'customer_report'])->name('reports.customer_report');
 
         // User
         Route::get('/user/data', [UserController::class, "data"])->name("user.data");
