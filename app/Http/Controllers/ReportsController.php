@@ -20,6 +20,7 @@ use App\Models\ {
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportsController extends Controller {
     public function index() {
@@ -76,7 +77,6 @@ class ReportsController extends Controller {
     }
 
     //supplier
-
     public function supplier_report() {
         $menu = 'Supplier';
         $suppliers = Supplier::all();
@@ -84,6 +84,22 @@ class ReportsController extends Controller {
         // dd( $categories );
         return view( 'reports.supplier_report', compact( 'menu', 'suppliers', 'categories' ));
     }
+
+    public function supplier_report_pdf($first_date = null, $last_date = null){
+        // Defaults: last month → today
+        $first_date = $first_date ?? now()->subMonth()->format('Y-m-d');
+        $last_date  = $last_date ?? now()->format('Y-m-d');
+
+        // Fetch suppliers for the date range
+        $data = Supplier::orderBy('created_at', 'desc')->get();
+
+        // Generate PDF
+        $pdf = Pdf::loadView("reports.supplier_pdf", compact("data", "first_date", "last_date"));
+        $pdf->setPaper("a4", "portrait");
+
+        return $pdf->stream("SupplierReport-$first_date-to-$last_date.pdf");
+    }
+
         //product
         public function product_report() {
             return view( 'reports.product_report' );

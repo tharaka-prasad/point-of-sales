@@ -110,6 +110,12 @@ Route::middleware([
             Route::get('/reports/income-chart-data', [ReportsController::class, 'incomeChartData'])->name('reports.income-chart-data');
             //supplier_report
             Route::get('/reports/supplier_report', [ReportsController::class, 'supplier_report'])->name('reports.supplier_report');
+
+            Route::get('reports/supplier_exportPdf/{first_date?}/{last_date?}',
+    [ReportsController::class, 'supplier_report_pdf'])
+    ->name('reports.supplier_exportPdf');
+
+
             //product_report
             Route::get('/reports/product_report', [ReportsController::class, 'product_report'])->name('reports.product_report');
             //customer_report

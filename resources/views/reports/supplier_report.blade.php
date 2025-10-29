@@ -21,6 +21,11 @@
                             <button class="btn btn-primary xs" onclick="addSupplier('{{ route('supplier.store') }}')">
                                 <i class="fas fa-plus"></i> Add
                             </button>
+
+                            <a href="{{ route('reports.supplier_exportPdf') }}" target="_blank" class="btn btn-danger xs">
+                                <i class="fas fa-file-pdf"></i> Export PDF
+                            </a>
+
                         </div>
                         <!-- /.card-header -->
 
