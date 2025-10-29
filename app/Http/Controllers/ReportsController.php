@@ -99,15 +99,22 @@ class ReportsController extends Controller {
 
         return $pdf->stream("SupplierReport-$first_date-to-$last_date.pdf");
     }
+    // Product Report Page
+    public function product_report(){
+        $menu = "Product";
+        $categories = Category::select("id", "name")->get();
 
-        //product
-        public function product_report() {
-            return view( 'reports.product_report' );
-        }
-
-        //product
-        public function customer_report() {
-            return view( 'reports.customer_report' );
-        }
-
+        return view("reports.product_report", compact("menu", "categories"));
     }
+
+    // Product Report PDF Export
+    public function product_exportPdf(){
+        $data = Product::with('category')->get();
+        $today = now()->format('Y-m-d H:i:s');
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.product_pdf', compact('data', 'today'));
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->stream("Product_Report_" . now()->format('Ymd_His') . ".pdf");
+    }
+}

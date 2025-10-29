@@ -108,18 +108,20 @@ Route::middleware([
                 return view('reports.income_chart');
             })->name('reports.income-chart');
             Route::get('/reports/income-chart-data', [ReportsController::class, 'incomeChartData'])->name('reports.income-chart-data');
+
             //supplier_report
             Route::get('/reports/supplier_report', [ReportsController::class, 'supplier_report'])->name('reports.supplier_report');
-
-            Route::get('reports/supplier_exportPdf/{first_date?}/{last_date?}',
-    [ReportsController::class, 'supplier_report_pdf'])
-    ->name('reports.supplier_exportPdf');
-
+            //supplier_pdf
+            Route::get('reports/supplier_exportPdf/{first_date?}/{last_date?}',[ReportsController::class, 'supplier_report_pdf'])->name('reports.supplier_exportPdf');
 
             //product_report
             Route::get('/reports/product_report', [ReportsController::class, 'product_report'])->name('reports.product_report');
+            //[product_pdf
+            Route::get('reports/product_exportPdf', [ReportsController::class, 'product_exportPdf'])->name('reports.product_exportPdf');
+
             //customer_report
             Route::get('/reports/customer_report', [ReportsController::class, 'customer_report'])->name('reports.customer_report');
+
 
         // User
         Route::get('/user/data', [UserController::class, "data"])->name("user.data");
