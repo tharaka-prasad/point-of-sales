@@ -30,9 +30,9 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Code</th>
                                     <th>Product Name</th>
                                     <th>Category</th>
-                                    <th>Code</th>
                                     <th>Cost</th>
                                     <th>Price</th>
                                     <th>Curent Stock</th>
@@ -62,9 +62,9 @@ $(function() {
         ajax: "{{ route('product.data') }}",
         columns: [
             {data: "DT_RowIndex", searchable: false, sortable: false},
+            {data: "code"},
             {data: "name"},
             {data: "category", defaultContent: "-"},
-            {data: "code"},
             {data: "price"},
             {data: "sell_price"},
             {data: "stock"},

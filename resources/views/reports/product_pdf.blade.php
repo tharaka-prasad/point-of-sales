@@ -81,9 +81,9 @@
         <thead>
             <tr>
                 <th width="5%">No.</th>
+                <th>Code</th>
                 <th>Product Name</th>
                 <th>Category</th>
-                <th>Code</th>
                 <th>Cost</th>
                 <th>Price</th>
                 <th>Stock</th>
@@ -94,9 +94,9 @@
             @foreach ($data as $index => $product)
                 <tr>
                     <td>{{ $index + 1 }}</td>
+                    <td>{{ $product->code }}</td>
                     <td>{{ $product->name }}</td>
                     <td>{{ $product->category->name ?? '-' }}</td>
-                    <td>{{ $product->code }}</td>
                     <td>{{ number_format($product->price, 2) }}</td>
                     <td>{{ number_format($product->sell_price, 2) }}</td>
                     <td>{{ $product->stock }}</td>
