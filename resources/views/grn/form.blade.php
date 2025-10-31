@@ -289,6 +289,8 @@
                                     <th>Product Name</th>
                                     <th>Category</th>
                                     <th>UOM</th>
+                                    <th>Batch No</th>
+                                    <th>Expiry date</th>
                                     <th>Qty Ordered</th>
                                     <th>Qty Received</th>
                                     <th>Qty Accepted</th>
@@ -373,6 +375,8 @@
             <td><input name="items[${rowIndex}][code]" class="code" value="${data.code || ''}"></td>
             <td><input name="items[${rowIndex}][desc]" class="desc" value="${data.desc || ''}"></td>
             <td><input name="items[${rowIndex}][remarks]" class="remarks" value="${data.remarks || ''}"></td>
+            <td><input name="items[${rowIndex}][batch_no]" class="batch_no" value="${data.batch_no || ''}"></td>
+            <td><input name="items[${rowIndex}][expiry_date]" class="expiry_date" value="${data.expiry_date || ''}"></td>
             <td><input name="items[${rowIndex}][uom]" class="uom" value="${data.uom || ''}"></td>
             <td><input name="items[${rowIndex}][ordered]" class="ordered" type="number" value="${data.ordered || 0}"></td>
             <td><input name="items[${rowIndex}][received]" class="received" type="number" value="${data.received || 0}"></td>
@@ -442,6 +446,10 @@
                 document.getElementById("grnDate").value = new Date().toISOString().split("T")[0];
                 addRow();
             };
+
+            $(function() {
+                $("body").toggleClass("sidebar-collapse");
+            });
         </script>
     </body>
 

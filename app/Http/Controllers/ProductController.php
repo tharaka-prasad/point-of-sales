@@ -11,7 +11,6 @@ class ProductController extends Controller
     public function index(){
         $menu = "Product";
         $categories = Category::select("id", "name")->get();
-
         return view("product.index", compact("menu", "categories"));
     }
 

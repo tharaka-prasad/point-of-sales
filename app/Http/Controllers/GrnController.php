@@ -109,17 +109,19 @@ class GrnController extends Controller
                     // 2d. Save GRN Item
                     GrnItems::create([
                         'grn_id'       => $grn->id,
-                        'product_id'   => $product->id,
                         'description'  => $item['desc'] ?? null,
                         'uom'          => $item['uom'] ?? null,
                         'qty_ordered'  => $item['ordered'] ?? 0,
                         'qty_received' => $item['received'] ?? 0,
                         'qty_accepted' => $acceptedQty,
                         'qty_rejected' => ($item['received'] ?? 0) - $acceptedQty,
-                        'unit_price'   => $product->price,
                         'total'        => $acceptedQty * $product->price,
                         'remarks'      => $category->name,
                         'created_by'   => auth()->id(),
+                        'product_id'   => $product->id,
+                        'unit_price'   => $product->price,
+                        'expiry_date'  => $product->expiry_date,
+                        'batch_no '    => $product->batch_no,
                     ]);
                 }
             }
@@ -236,7 +238,6 @@ class GrnController extends Controller
 
                     GrnItems::create([
                         'grn_id'       => $grn->id,
-                        'product_id'   => $product->id,
                         'description'  => $item['desc'] ?? null,
                         'uom'          => $item['uom'] ?? null,
                         'qty_ordered'  => $item['ordered'] ?? 0,
@@ -247,6 +248,9 @@ class GrnController extends Controller
                         'total'        => $lineTotal,
                         'remarks'      => $category->name,
                         'created_by'   => auth()->id(),
+                        'product_id'   => $product->id,
+                        'expiry_date'  => $product->expiry_date,
+                        'batch_no '    => $product->batch_no,
                     ]);
                 }
             }
