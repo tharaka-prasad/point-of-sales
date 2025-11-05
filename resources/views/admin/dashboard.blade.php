@@ -144,7 +144,7 @@
             <div class="col-lg-6">
                 <div class="card shadow-sm" style="border-radius: 10px; overflow: hidden;">
                     <div class="card-body">
-                        <h4>Daily Income (Blade Data)</h4>
+                        <h4>Daily Income </h4>
                         <div class="chart-container" style="height: 300px;">
                             <canvas id="incomeRecapChart"></canvas>
                         </div>
@@ -183,64 +183,21 @@
 
 
         {{-- CHART 2 new pie chart Top selling products --}}
-        <div class="col">
+        <div class="row mt-4">
             {{-- CHART 2 new pie chart Top selling products --}}
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Income Distribution</h3>
-                </div>
-                <div class="card-body">
-                    <canvas id="incomePieChart"
-                        style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                </div>
-            </div>
-        </div>
-
-        {{-- ROW 2 --}}
-        <div class="row">
-            <div class="col">
-                {{-- CHART-3 new pie chart Top selling products-2 --}}
-
-                <div class="card" style="border-radius: 15px; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
-                    <div class="card-header" style="background: #f39c12; border-radius: 15px 15px 0 0;">
-                        <h3 class="card-title" style="color: #fff; font-weight: bold;">
-                            <i class="fas fa-chart-pie"></i> Top Selling Products
-                        </h3>
+            <div class="col-lg-12">
+                <div class="card shadow-sm" style="border-radius:10px; overflow:hidden;">
+                    <div class="card-header">
+                        <h3 class="card-title">Income Distribution</h3>
                     </div>
                     <div class="card-body">
-                        <canvas id="topProductPieChart"
-                            style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;">
-                        </canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col">
-                {{-- CHART 4 new pie chart Top selling products-2 --}}
-                <div class="card" style="border-radius: 15px; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
-                    <div class="card-header" style="background: #f39c12; border-radius: 15px 15px 0 0;">
-                        <h3 class="card-title" style="color: #fff; font-weight: bold;">
-                            <i class="fas fa-chart-pie"></i> Top Selling Products
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="topProductPieChart"
-                            style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;">
-                        </canvas>
+                        <canvas id="incomePieChart"
+                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-
-        {{-- ROW 5 --}}
-        <div class="row">
-
-        </div>
-        {{-- ROW 6 --}}
-        <div class="row">
-
-        </div>
-
+    </div>
     </div>
 @endsection
 
@@ -391,8 +348,6 @@
             });
 
         });
-
-
 
         //Side bar animation
         $(function() {

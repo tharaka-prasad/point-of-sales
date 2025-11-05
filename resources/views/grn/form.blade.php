@@ -18,13 +18,15 @@
             /* --- Existing styles --- */
             body {
                 font-family: Arial, sans-serif;
-                margin: 20px;
+                margin: 1px;
                 background: #f9f9f9;
             }
 
             .container {
-                max-width: 1200px;
-                margin: auto;
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                padding: 0 20px;
             }
 
             .card {
@@ -32,6 +34,7 @@
                 padding: 20px;
                 border-radius: 8px;
                 box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+                width: 100%;
             }
 
             header {
@@ -249,7 +252,8 @@
                             <div class="meta">
                                 <div class="field">
                                     <label>Date</label>
-                                    <input id="grnDate" type="date" name="date" required />
+                                    <input id="grnDate" type="date" name="date" value="{{ date('Y-m-d') }}"
+                                        required />
                                 </div>
                                 <div class="field">
                                     <label>Supplier Name</label>
@@ -285,9 +289,10 @@
                         <table id="itemsTable">
                             <thead>
                                 <tr>
-                                    <th>Item Code</th>
+                                    <th>Product Code</th>
                                     <th>Product Name</th>
                                     <th>Category</th>
+                                    <th>Brand</th>
                                     <th>UOM</th>
                                     <th>Batch No</th>
                                     <th>Expiry date</th>
@@ -303,7 +308,7 @@
                             <tbody id="tbody"></tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="9" style="text-align:right; font-weight:bold;">Grand Total</td>
+                                    <td colspan="12" style="text-align:right; font-weight:bold;">Grand Total</td>
                                     <td id="grandTotal">0.00</td>
                                     <td colspan="2"></td>
                                 </tr>
@@ -376,8 +381,9 @@
             <td><input name="items[${rowIndex}][desc]" class="desc" value="${data.desc || ''}"></td>
             <td><input name="items[${rowIndex}][remarks]" class="remarks" value="${data.remarks || ''}"></td>
             <td><input name="items[${rowIndex}][batch_no]" class="batch_no" value="${data.batch_no || ''}"></td>
-            <td><input name="items[${rowIndex}][expiry_date]" class="expiry_date" value="${data.expiry_date || ''}"></td>
+            <td><input name="items[${rowIndex}][brand]" class="brand" value="${data.brand || ''}"></td>
             <td><input name="items[${rowIndex}][uom]" class="uom" value="${data.uom || ''}"></td>
+            <td><input name="items[${rowIndex}][expiry_date]" class="expiry_date" type="date" value="${data.expiry_date || ''}"></td>
             <td><input name="items[${rowIndex}][ordered]" class="ordered" type="number" value="${data.ordered || 0}"></td>
             <td><input name="items[${rowIndex}][received]" class="received" type="number" value="${data.received || 0}"></td>
             <td><input name="items[${rowIndex}][accepted]" class="accepted" type="number" value="${data.accepted || 0}"></td>
