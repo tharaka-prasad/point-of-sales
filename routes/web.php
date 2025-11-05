@@ -20,7 +20,6 @@ use App\Http\Controllers\ReportsController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-
 // Login
 Route::get("/", fn() => redirect()->route("login"));
 
@@ -162,7 +161,7 @@ Route::middleware([
         Route::get('/qbo/connect', [QuickBooksController::class, 'connect']);
         Route::get('/qbo/callback', [QuickBooksController::class, 'callback']);
 
-    Route::middleware(['level:2'])->group(function () {
+    Route::middleware(['level:1,2'])->group(function () {
         // Cashier
         Route::get('/cashier', [CashierController::class, "index"])->name("cashier.index");
         Route::post('/cashier', [CashierController::class, "store"])->name("cashier.store");
