@@ -616,5 +616,13 @@
                 modal.hide();
             });
         });
+
+        {{-- Side bar animation --}}
+        $(function() {
+            $("body").toggleClass("sidebar-collapse");
+        });
     </script>
 @endpush
+
+
+
