@@ -102,7 +102,7 @@
                     <li class="nav-item">
                         <a href="{{ route('report.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
-                            <p>Report-remove</p>
+                            <p>Income report</p>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -115,6 +115,27 @@
                         <a href="{{ route('reports.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-chart-line"></i>
                             <p>Reports</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('reports.supplier_report') }}" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Supplier report</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('reports.product_report') }}" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Product report</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('reports.customer_report') }}" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Customer report</p>
                         </a>
                     </li>
 

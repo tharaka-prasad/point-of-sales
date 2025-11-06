@@ -8,13 +8,12 @@ use Illuminate\Http\Request;
 class SupplierController extends Controller
 {
     // Show supplier list page
-    public function index()
-    {
-        $menu       = 'Supplier';
-        $suppliers  = Supplier::all();
+    public function index(){
+        $menu = 'Supplier';
+        $suppliers = Supplier::all();
         $categories = Category::select("id", "name")->get();
-// dd($categories);
-        return view('supplier.index', compact('menu', 'suppliers', 'categories'));
+    // dd($categories);
+        return view('supplier.index', compact('menu','suppliers','categories'));
     }
 
     public function data()

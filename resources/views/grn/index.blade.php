@@ -71,3 +71,12 @@
         </div>
     </div>
 @endsection
+
+{{-- Side bar animation --}}
+@push('scripts')
+    <script>
+        $(function() {
+            $("body").toggleClass("sidebar-collapse");
+        });
+    </script>
+@endpush

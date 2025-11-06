@@ -29,10 +29,11 @@
     </div>
 @endsection
 
+{{-- Side bar animation --}}
 @push('scripts')
     <script>
         $(function() {
-            $("body").addClass("sidebar-collapse");
+            $("body").toggleClass("sidebar-collapse");
         });
     </script>
 @endpush

@@ -29,31 +29,34 @@ class GrnController extends Controller
      * Show the form for creating a new GRN.
      */
 
-    public function create()
-    {
+    public function create(){
         $menu      = 'Create GRN';
         $suppliers = Supplier::all();
+
         return view('grn.form', compact('menu', 'suppliers'));
     }
     // Store new GRN
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'date'             => 'required|date',
-            'supplier'         => 'required|exists:suppliers,id',
-            'po_no'            => 'nullable|string',
-            'invoice_no'       => 'required|string',
-            'general_remarks'  => 'nullable|string',
-            'grn_total'        => 'required|numeric',
-            'items'            => 'nullable|array',
-            'items.*.code'     => 'nullable|string', // barcode / product reference
-            'items.*.desc'     => 'nullable|string',
-            'items.*.uom'      => 'nullable|string',
-            'items.*.remarks'  => 'nullable|string', // category name
-            'items.*.ordered'  => 'nullable|numeric',
-            'items.*.received' => 'nullable|numeric',
-            'items.*.accepted' => 'nullable|numeric',
-            'items.*.price'    => 'nullable|numeric',
+            'date'                => 'required|date',
+            'supplier'            => 'required|exists:suppliers,id',
+            'po_no'               => 'nullable|string',
+            'invoice_no'          => 'required|string',
+            'general_remarks'     => 'nullable|string',
+            'grn_total'           => 'required|numeric',
+            'items'               => 'nullable|array',
+            'items.*.code'        => 'nullable|string', // barcode / product reference
+            'items.*.desc'        => 'nullable|string',
+            'items.*.uom'         => 'nullable|string',
+            'items.*.remarks'     => 'nullable|string', // category name
+            'items.*.ordered'     => 'nullable|numeric',
+            'items.*.received'    => 'nullable|numeric',
+            'items.*.accepted'    => 'nullable|numeric',
+            'items.*.price'       => 'nullable|numeric',
+            'items.*.brand'       => 'nullable|string',
+            'items.*.batch_no'    => 'nullable|string',
+            'items.*.expiry_date' => 'nullable|date',
         ]);
 
         DB::transaction(function () use ($validated) {
@@ -95,6 +98,9 @@ class GrnController extends Controller
                             'code'        => $uniqueCode,
                             'name'        => $item['desc'] ?? 'Unnamed Product',
                             'category_id' => $category->id,
+                            'brand'       => $item['brand'] ?? null,         // ✅ brand
+                            'batch_no'    => $item['batch_no'] ?? null,      // ✅ batch number
+                            'expiry_date' => $item['expiry_date'] ?? null,   // ✅ expiry date
                             'price'       => $item['price'] ?? 0,
                             'sell_price'  => $item['price'] ?? 0,
                             'stock'       => 0,
@@ -109,17 +115,19 @@ class GrnController extends Controller
                     // 2d. Save GRN Item
                     GrnItems::create([
                         'grn_id'       => $grn->id,
-                        'product_id'   => $product->id,
                         'description'  => $item['desc'] ?? null,
                         'uom'          => $item['uom'] ?? null,
                         'qty_ordered'  => $item['ordered'] ?? 0,
                         'qty_received' => $item['received'] ?? 0,
                         'qty_accepted' => $acceptedQty,
                         'qty_rejected' => ($item['received'] ?? 0) - $acceptedQty,
-                        'unit_price'   => $product->price,
                         'total'        => $acceptedQty * $product->price,
                         'remarks'      => $category->name,
                         'created_by'   => auth()->id(),
+                        'product_id'   => $product->id,
+                        'unit_price'   => $product->price,
+                        'expiry_date'  => $product->expiry_date,
+                        'batch_no '    => $product->batch_no,
                     ]);
                 }
             }
@@ -172,7 +180,10 @@ class GrnController extends Controller
             'items.*.ordered'  => 'nullable|numeric',
             'items.*.received' => 'nullable|numeric',
             'items.*.accepted' => 'nullable|numeric',
-            'items.*.price'    => 'nullable|numeric|min:0.01'
+            'items.*.price'    => 'nullable|numeric|min:0.01',
+            'items.*.brand'       => 'nullable|string',
+            'items.*.batch_no'    => 'nullable|string',
+            'items.*.expiry_date' => 'nullable|date',
         ]);
 
         DB::transaction(function () use ($validated, $grn) {
@@ -219,6 +230,9 @@ class GrnController extends Controller
                             'code'        => $uniqueCode,
                             'name'        => $item['desc'] ?? 'Unnamed Product',
                             'category_id' => $category->id,
+                            'brand'       => $item['brand'] ?? null,
+                            'batch_no'    => $item['batch_no'] ?? null,
+                            'expiry_date' => $item['expiry_date'] ?? null,
                             'price'       => $item['price'] ?? 0,
                             'sell_price'  => $item['price'] ?? 0,
                             'stock'       => 0,
@@ -236,7 +250,6 @@ class GrnController extends Controller
 
                     GrnItems::create([
                         'grn_id'       => $grn->id,
-                        'product_id'   => $product->id,
                         'description'  => $item['desc'] ?? null,
                         'uom'          => $item['uom'] ?? null,
                         'qty_ordered'  => $item['ordered'] ?? 0,
@@ -247,6 +260,9 @@ class GrnController extends Controller
                         'total'        => $lineTotal,
                         'remarks'      => $category->name,
                         'created_by'   => auth()->id(),
+                        'product_id'   => $product->id,
+                        'expiry_date'  => $product->expiry_date,
+                        'batch_no '    => $product->batch_no,
                     ]);
                 }
             }
@@ -257,6 +273,8 @@ class GrnController extends Controller
 
         return redirect()->route('grn.index')->with('success', 'GRN updated successfully!');
     }
+
+    //-----
 
     /**
      * Remove the specified GRN from storage.

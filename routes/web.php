@@ -104,7 +104,19 @@ Route::middleware([
         Route::get('/reports/generate', [ReportsController::class, 'generate'])->name('reports.generate');
         // Admin dashboard charts
 
-        Route::get('/reports/income-chart-data', [ReportsController::class, 'incomeChartData'])->name('reports.income-chart-data');
+            //supplier_report
+            Route::get('/reports/supplier_report', [ReportsController::class, 'supplier_report'])->name('reports.supplier_report');
+            //supplier_pdf
+            Route::get('reports/supplier_exportPdf/{first_date?}/{last_date?}',[ReportsController::class, 'supplier_report_pdf'])->name('reports.supplier_exportPdf');
+
+            //product_report
+            Route::get('/reports/product_report', [ReportsController::class, 'product_report'])->name('reports.product_report');
+            //[product_pdf
+            Route::get('reports/product_exportPdf', [ReportsController::class, 'product_exportPdf'])->name('reports.product_exportPdf');
+
+            //customer_report
+            Route::get('/reports/customer_report', [ReportsController::class, 'customer_report'])->name('reports.customer_report');
+
 
         // User
         Route::get('/user/data', [UserController::class, "data"])->name("user.data");
@@ -148,24 +160,22 @@ Route::middleware([
         Route::get('/qbo/connect', [QuickBooksController::class, 'connect']);
         Route::get('/qbo/callback', [QuickBooksController::class, 'callback']);
 
-        // Route::middleware(['level:2'])->group(function () {
-        //     // Cashier
-        //     Route::get('/cashier', [CashierController::class, "index"])->name("cashier.index");
-        //     Route::post('/cashier', [CashierController::class, "store"])->name("cashier.store");
-        //     Route::get('/cashier/print/{sale}', [CashierController::class, 'print'])->name('cashier.print');
-        //     Route::get('/cashier/drafts', [CashierController::class, 'getDraftSales'])->name('cashier.drafts');
-        //     Route::get('/cashier/drafts/{id}', [CashierController::class, 'getDraftSale']);
-        //     Route::get('/sales/customer/{id}', [SaleController::class, 'getCustomerSales'])->name('sales.customer');
-        //     Route::post('/sales/return', [SaleController::class, 'storeReturn'])->name('sales.return');
-        //     Route::get('/cashier/returns/{customerId}/sales', [CashierController::class, 'getCustomerSales']);
-        //     Route::get('/cashier/returns/sale/{saleId}', [CashierController::class, 'getSaleProducts']);
-        //     Route::post('/sales/return', [SaleController::class, 'storeReturn'])->name('sales.return');
-        //     // Member
-        //     Route::get('/member/data', [MemberController::class, "data"])->name("member.data");
-        //     Route::resource('/member', MemberController::class);
-        //     Route::post('/member/delete-selected', [MemberController::class, "deleteSelected"])->name("member.deleteSelected");
-        //     Route::post('/member/print-member', [MemberController::class, "printMember"])->name("member.printMember");
-        //     });
+    Route::middleware(['level:1,2'])->group(function () {
+        // Cashier
+        Route::get('/cashier', [CashierController::class, "index"])->name("cashier.index");
+        Route::post('/cashier', [CashierController::class, "store"])->name("cashier.store");
+        Route::get('/cashier/print/{sale}', [CashierController::class, 'print'])->name('cashier.print');
+        Route::get('/cashier/drafts', [CashierController::class, 'getDraftSales'])->name('cashier.drafts');
+        Route::get('/cashier/drafts/{id}', [CashierController::class, 'getDraftSale']);
+        Route::get('/sales/customer/{id}', [SaleController::class, 'getCustomerSales'])->name('sales.customer');
+        Route::post('/sales/return', [SaleController::class, 'storeReturn'])->name('sales.return');
+
+        // Member
+        Route::get('/member/data', [MemberController::class, "data"])->name("member.data");
+        Route::resource('/member', MemberController::class);
+        Route::post('/member/delete-selected', [MemberController::class, "deleteSelected"])->name("member.deleteSelected");
+        Route::post('/member/print-member', [MemberController::class, "printMember"])->name("member.printMember");
+        });
     });
 
     // Transaction
