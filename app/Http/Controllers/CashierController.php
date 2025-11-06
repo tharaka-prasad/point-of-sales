@@ -6,7 +6,6 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleDetail;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
 
@@ -189,7 +188,16 @@ class CashierController extends Controller
 
         return response()->json($draftData);
     }
-    // Step 1: Get all completed sales for a customer
+
+    // Return
+    public function returnPage()
+    {
+        $menu      = 'Return';
+        $customers = Member::all();
+        return view('cashier.return', compact('customers', 'menu'));
+    }
+
+    // Get all sales of a customer
     public function getCustomerSales($customerId)
     {
         $customer = Member::with('sales')->find($customerId);
@@ -198,71 +206,89 @@ class CashierController extends Controller
             return response()->json(['message' => 'Customer not found'], 404);
         }
 
-        return response()->json($customer->sales);
+        $sales = $customer->sales->map(function ($sale) {
+            return [
+                'id'          => $sale->id,
+                'total_price' => $sale->total_price,
+                'created_at'  => $sale->created_at->format('Y-m-d H:i:s'),
+            ];
+        });
+
+        return response()->json([
+            'balance' => $customer->balance ?? 0,
+            'sales'   => $sales,
+        ]);
     }
 
-    // Step 2: Get all returnable products in a selected sale
+    // Get products for a sale
     public function getSaleProducts($saleId)
     {
-        $details = SaleDetail::with('product:id,name,code')
+        $saleDetails = SaleDetail::with('product')
             ->where('sale_id', $saleId)
-            ->whereColumn('amount', '>', 'return_qty') // can still be returned
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'product_id'     => $item->product_id,
-                    'product_name'   => $item->product->name,
-                    'sale_price'     => $item->sale_price,
-                    'sold_qty'       => $item->amount,
-                    'returnable_qty' => $item->amount - $item->return_qty,
-                ];
-            });
+            ->whereColumn('amount', '>', 'return_qty') // only returnable
+            ->get();
 
-        return response()->json($details);
+        $products = $saleDetails->map(function ($detail) {
+            return [
+                'product_id'     => $detail->product_id,
+                'product_name'   => $detail->product->name,
+                'sale_price'     => $detail->sale_price, // <- corrected
+                'returnable_qty' => $detail->amount - $detail->return_qty,
+            ];
+        });
+
+        return response()->json($products);
     }
 
-    // ✅ Save return data
     public function storeReturn(Request $request)
     {
         $request->validate([
-            'customer_id'           => 'required|exists:members,id',
+            'sale_id'               => 'required|exists:sales,id',
             'products'              => 'required|array|min:1',
             'products.*.product_id' => 'required|exists:products,id',
-            'products.*.qty'        => 'required|numeric|min:1',
-            'products.*.price'      => 'required|numeric|min:0.01',
+            'products.*.return_qty' => 'required|numeric|min:1',
         ]);
 
-        DB::transaction(function () use ($request) {
-            foreach ($request->products as $item) {
-                $detail = SaleDetail::whereHas('sale', function ($q) use ($request) {
-                    $q->where('member_id', $request->customer_id);
-                })
-                    ->where('product_id', $item['product_id'])
-                    ->first();
+        $sale        = Sale::findOrFail($request->sale_id);
+        $totalReturn = 0;
 
-                if ($detail) {
-                    // update returned qty
-                    $detail->return_qty = ($detail->return_qty ?? 0) + $item['qty'];
-                    $detail->save();
-                }
+        foreach ($request->products as $prod) {
+            $saleDetail = SaleDetail::where('sale_id', $request->sale_id)
+                ->where('product_id', $prod['product_id'])
+                ->first();
+
+            $product = Product::find($prod['product_id']);
+
+            if ($saleDetail && $product) {
+                // Add returned qty to sale detail
+                $saleDetail->return_qty += $prod['return_qty'];
+                $saleDetail->save();
+
+                // Add returned qty back to stock
+                $product->stock += $prod['return_qty'];
+                $product->save();
+
+                // Calculate total return amount
+                $totalReturn += $prod['return_qty'] * $saleDetail->sale_price;
             }
+        }
 
-            // optional: record in Sale table for reference
-            Sale::create([
-                'member_id'       => $request->customer_id,
-                'total_item'      => count($request->products),
-                'total_price'     => collect($request->products)->sum(fn($p) => $p['price'] * $p['qty']),
-                'discount'        => 0,
-                'pay'             => 0,
-                'accepted'        => 0,
-                'user_id'         => auth()->id(),
-                'status'          => 'return',
-                'return_products' => $request->products,
-            ]);
-        });
+        // Reduce sale total price by total return
+        $sale->total_price -= $totalReturn;
+        $sale->save();
 
-        return response()->json(['message' => 'Return saved successfully.']);
+        // Optional: update sale return_products column
+        $sale->return_products = $sale->return_products ?? [];
+        $sale->return_products = array_merge($sale->return_products, $request->products);
+        $sale->save();
+
+        return response()->json([
+            'success'         => true,
+            'total_return'    => $totalReturn,
+            'updated_balance' => $sale->total_price, // Sale total after return
+        ]);
     }
+
     /**
      * Display the specified resource.
      */

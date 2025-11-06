@@ -113,7 +113,8 @@
 
                             <div class="d-flex justify-content-between mt-2">
                                 <div>Total Items: <strong id="totalItems">0</strong></div>
-                                <div>Total Amount: <strong id="totalAmount" step="0.01" min="0">0.00</strong></div>
+                                <div>Total Amount: <strong id="totalAmount" step="0.01" min="0">0.00</strong>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -127,12 +128,13 @@
                             </div>
                             <div class="mb-2">
                                 <label>Cash</label>
-                                <input type="text" id="cashInput" step="0.01" min="0" class="form-control" value="0.00" name="pay">
+                                <input type="text" id="cashInput" step="0.01" min="0" class="form-control"
+                                    value="0.00" name="pay">
                             </div>
                             <div class="mb-2">
                                 <label>Balance</label>
-                                <input type="text" id="balanceInput" step="0.01" min="0" class="form-control text-danger" value="0.00"
-                                    readonly>
+                                <input type="text" id="balanceInput" step="0.01" min="0"
+                                    class="form-control text-danger" value="0.00" readonly>
                             </div>
                             <div class="d-grid gap-2">
                                 <button class="btn btn-primary" type="submit"
@@ -144,10 +146,10 @@
                                 </button>
                                 @include('cashier.draftModal')
 
-                                <button type="button" class="btn btn-info" id="findReturnsBtn">
+                                <a href="{{ route('cashier.return') }}" class="btn btn-info">
                                     <i class="bi bi-search"></i> Find Returns
-                                </button>
-                                @include('cashier.returnModal')
+                                </a>
+
 
                                 <button type="button" class="btn btn-danger" id="cancelButton">Cancel</button>
                             </div>
@@ -158,7 +160,7 @@
         </div>
     </div>
 
-    @includeIf('member.form')
+@includeIf('member.form')
 @endsection
 @push('scripts')
     <script>
@@ -463,168 +465,9 @@
             });
         });
 
-document.addEventListener("DOMContentLoaded", function() {
-    const returnCustomerSelect = document.getElementById("returnCustomerSelect");
-    const returnSaleSelect = document.getElementById("returnSaleSelect");
-    const returnProductsTableBody = document.querySelector("#returnProductsTable tbody");
-    const returnCustomerBalanceEl = document.getElementById("returnCustomerBalance");
-    const returnTotalAmountEl = document.getElementById("returnTotalAmount");
-    const updatedBalanceEl = document.getElementById("updatedBalance");
-    const confirmReturnBtn = document.getElementById("confirmReturnBtn");
-
-    // ------------------------------
-    // Load customer balance & sales
-    // ------------------------------
-    returnCustomerSelect.addEventListener("change", function() {
-        const customerId = this.value;
-        if (!customerId) return;
-
-        returnSaleSelect.disabled = true;
-        returnSaleSelect.innerHTML = `<option>Loading...</option>`;
-        returnCustomerBalanceEl.textContent = "0.00";
-        updatedBalanceEl.textContent = "0.00";
-
-        // Load balance
-        fetch(`/cashier/customer/${customerId}/balance`)
-            .then(res => res.ok ? res.json() : Promise.reject(res))
-            .then(data => {
-                const balance = parseFloat(data.balance) || 0;
-                returnCustomerBalanceEl.textContent = balance.toFixed(2);
-                updatedBalanceEl.textContent = balance.toFixed(2);
-            })
-            .catch(() => {
-                returnCustomerBalanceEl.textContent = "Error";
-            });
-
-        // Load sales
-        fetch(`/cashier/returns/${customerId}/sales`)
-            .then(res => res.ok ? res.json() : Promise.reject(res))
-            .then(data => {
-                if (!data.length) {
-                    returnSaleSelect.innerHTML = `<option>No completed sales</option>`;
-                    return;
-                }
-                returnSaleSelect.innerHTML = `<option value="">-- Select Sale --</option>`;
-                data.forEach(sale => {
-                    const option = document.createElement("option");
-                    option.value = sale.id;
-                    option.textContent = `#${sale.id} - ${new Date(sale.created_at).toLocaleDateString()} (${sale.total_item} items)`;
-                    returnSaleSelect.appendChild(option);
-                });
-                returnSaleSelect.disabled = false;
-            })
-            .catch(() => {
-                returnSaleSelect.innerHTML = `<option>Failed to load sales</option>`;
-            });
-    });
-
-    // ------------------------------
-    // Load returnable products
-    // ------------------------------
-    returnSaleSelect.addEventListener("change", function() {
-        const saleId = this.value;
-        if (!saleId) return;
-
-        returnProductsTableBody.innerHTML = `<tr><td colspan="4" class="text-center py-3">Loading...</td></tr>`;
-
-        fetch(`/cashier/returns/sale/${saleId}`)
-            .then(res => res.ok ? res.json() : Promise.reject(res))
-            .then(products => {
-                returnProductsTableBody.innerHTML = '';
-                if (!products.length) {
-                    returnProductsTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">No returnable products found.</td></tr>`;
-                    return;
-                }
-
-                products.forEach(prod => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${prod.product_name}</td>
-                        <td>${prod.returnable_qty}</td>
-                        <td><input type="number" class="form-control returnQtyInput" min="0" max="${prod.returnable_qty}" value="0" data-price="${prod.sale_price}"></td>
-                        <td class="returnSubtotal">0.00</td>`;
-                    returnProductsTableBody.appendChild(row);
-                });
-            })
-            .catch(() => {
-                returnProductsTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-3">Failed to load products.</td></tr>`;
-            });
-    });
-
-    // ------------------------------
-    // Recalculate totals on input
-    // ------------------------------
-    document.addEventListener("input", function(e) {
-        if (e.target.classList.contains("returnQtyInput")) {
-            let input = e.target;
-            const max = parseFloat(input.max) || 0;
-            if (parseFloat(input.value) > max) input.value = max;
-
-            const price = parseFloat(input.dataset.price) || 0;
-            const subtotal = parseFloat(input.value) * price;
-            input.closest("tr").querySelector(".returnSubtotal").textContent = subtotal.toFixed(2);
-
-            recalcReturnTotals();
-        }
-    });
-
-    function recalcReturnTotals() {
-        let totalReturn = 0;
-        document.querySelectorAll(".returnQtyInput").forEach(input => {
-            const qty = parseFloat(input.value) || 0;
-            const price = parseFloat(input.dataset.price) || 0;
-            totalReturn += qty * price;
+        document.getElementById('findReturnsBtn').addEventListener('click', function() {
+            window.location.href = "{{ route('cashier.return') }}";
         });
-
-        returnTotalAmountEl.textContent = totalReturn.toFixed(2);
-
-        const originalBalance = parseFloat(returnCustomerBalanceEl.textContent) || 0;
-        updatedBalanceEl.textContent = (originalBalance + totalReturn).toFixed(2);
-    }
-
-    // ------------------------------
-    // Confirm return
-    // ------------------------------
-    confirmReturnBtn.addEventListener("click", function() {
-        const customerId = returnCustomerSelect.value;
-        const saleId = returnSaleSelect.value;
-        if (!customerId || !saleId) {
-            alert("Please select customer and sale.");
-            return;
-        }
-
-        const products = [];
-        document.querySelectorAll(".returnQtyInput").forEach(input => {
-            const qty = parseFloat(input.value);
-            const price = parseFloat(input.dataset.price);
-            const productName = input.closest("tr").children[0].textContent.trim();
-            if (qty > 0) products.push({ name: productName, qty, price });
-        });
-
-        if (!products.length) {
-            alert("No products selected for return.");
-            return;
-        }
-
-        fetch(`/cashier/returns/process`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-            },
-            body: JSON.stringify({ customer_id: customerId, sale_id: saleId, products })
-        })
-        .then(res => res.json())
-        .then(data => {
-            alert("Return processed successfully!");
-            location.reload();
-        })
-        .catch(err => {
-            console.error(err);
-            alert("Error processing return.");
-        });
-    });
-});
 
 
     </script>
