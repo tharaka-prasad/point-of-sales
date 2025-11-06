@@ -469,6 +469,16 @@
             window.location.href = "{{ route('cashier.return') }}";
         });
 
+<<<<<<< HEAD
 
+=======
+        {{-- Side bar animation --}}
+        $(function() {
+            $("body").toggleClass("sidebar-collapse");
+        });
+>>>>>>> e7b47817d8b2a48add4181cd249051ebbb451c0d
     </script>
 @endpush
+
+
+
