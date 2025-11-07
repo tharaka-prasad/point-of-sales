@@ -101,16 +101,16 @@
                     <li class="nav-header">REPORT</li>
                     <li class="nav-item">
                         <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
+                            <i class="nav-icon fas fa-chart-line"></i>
                             <p>Income report</p>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="https://quickbooks.intuit.com/" target="_blank" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
                             <p>QuickBooks-remove</p>
                         </a>
-                    </li>
+                    </li> --}}
                     <li class="nav-item">
                         <a href="{{ route('reports.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-chart-line"></i>

@@ -115,12 +115,13 @@ Route::middleware([
 
             //product_report
             Route::get('/reports/product_report', [ReportsController::class, 'product_report'])->name('reports.product_report');
-            //[product_pdf
+            //product_pdf
             Route::get('reports/product_exportPdf', [ReportsController::class, 'product_exportPdf'])->name('reports.product_exportPdf');
 
             //customer_report
             Route::get('/reports/customer_report', [ReportsController::class, 'customer_report'])->name('reports.customer_report');
-
+             //customer_pdf
+            Route::get('reports/customer_exportPdf/{first_date?}/{last_date?}',[ReportsController::class, 'customer_exportPdf'])->name('reports.customer_exportPdf');
 
         // User
         Route::get('/user/data', [UserController::class, "data"])->name("user.data");
