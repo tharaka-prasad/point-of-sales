@@ -23,15 +23,15 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                 data-accordion="false">
 
-                <!-- Dashboard -->
-                <li class="nav-item">
-                    <a href="{{ route('dashboard.index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
-                        <p>Dashboard</p>
-                    </a>
-                </li>
-
                 @if (Auth::user()->current_team_id == 1)
+                    <!-- Admin Dashboard -->
+                    <li class="nav-item">
+                        <a href="{{ route('dashboard.index') }}" class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+
                     <!-- MASTER Section -->
                     <li class="nav-header">MASTER</li>
                     <li class="nav-item">
@@ -73,7 +73,7 @@
                         </a>
                     </li>
 
-
+                    <!-- TRANSACTION Section -->
                     <li class="nav-header">TRANSACTION</li>
                     <li class="nav-item">
                         <a href="{{ route('expense.index') }}" class="nav-link">
@@ -81,13 +81,7 @@
                             <p>Expense</p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ route('sale.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-th"></i>
-                            <p>Sale</p>
-                        </a>
-                    </li>
-                   
+
                     <!-- CASHIER Section -->
                     <li class="nav-header">CASHIER</li>
                     <li class="nav-item">
@@ -98,33 +92,54 @@
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('cashierShifts.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-cash-register"></i>
+                            <i class="nav-icon fas fa-clock"></i>
                             <p>Cashier Shift</p>
                         </a>
                     </li>
 
                     <!-- REPORT Section -->
                     <li class="nav-header">REPORT</li>
-
                     <li class="nav-item">
                         <a href="{{ route('report.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
-                            <p>Report</p>
+                            <p>Income report</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="https://quickbooks.intuit.com/" target="_blank" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
-                            <p>QuickBooks</p>
+                            <p>QuickBooks-remove</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>Daily Sales Summary</p>
+                        <a href="{{ route('reports.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-chart-line"></i>
+                            <p>Reports</p>
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a href="{{ route('reports.supplier_report') }}" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Supplier report</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('reports.product_report') }}" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Product report</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('reports.customer_report') }}" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Customer report</p>
+                        </a>
+                    </li>
+
+                    <!-- USER MANAGEMENT -->
                     <li class="nav-header">USER MANAGEMENT</li>
                     <li class="nav-item">
                         <a href="{{ route('user.index') }}" class="nav-link">
@@ -141,36 +156,35 @@
                             <p>Settings</p>
                         </a>
                     </li>
+                @endif
+
+                @if (Auth::user()->current_team_id == 2)
+                    <!-- Cashier View -->
                     <li class="nav-item">
-                        <a href="javascript:void(0)" class="nav-link"
-                            onclick="document.getElementById('logout-form').submit()">
-                            <i class="nav-icon fas fa-sign-out-alt"></i>
-                            <p>Logout</p>
-                        </a>
-                    </li>
-                @else
-                    <li class="nav-header">TRANSACTION</li>
-                    {{-- <li class="nav-item">
-                        <a href="{{ route('transaction.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-cart-arrow-down"></i>
-                            <p>Active Transaction</p>
+                        <a href="{{ route('cashier.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-cash-register"></i>
+                            <p>Cashier</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('transaction.new') }}" class="nav-link">
-                            <i class="nav-icon fas fa-cart-plus"></i>
-                            <p>New Transaction</p>
-                        </a>
-                    </li> --}}
-                    <li class="nav-header">SYSTEM</li>
-                    <li class="nav-item">
-                        <a href="javascript:void(0)" class="nav-link"
-                            onclick="document.getElementById('logout-form').submit()">
-                            <i class="nav-icon fas fa-sign-out-alt"></i>
-                            <p>Logout</p>
+                        <a href="{{ route('member.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-id-card"></i>
+                            <p>Add New Member</p>
                         </a>
                     </li>
                 @endif
+
+                <!-- Logout (for all) -->
+                <li class="nav-item">
+                    <a href="javascript:void(0)" class="nav-link"
+                       onclick="document.getElementById('logout-form').submit()">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                        <p>Logout</p>
+                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+                </li>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

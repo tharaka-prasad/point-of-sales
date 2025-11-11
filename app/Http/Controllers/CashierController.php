@@ -63,7 +63,7 @@ class CashierController extends Controller
 
         // Calculate totals
         $totalItem  = $request->total_item ?? count($request->products ?? []);
-        $totalPrice = $request->total_price ?? array_sum(array_map(fn($p) => $p['sub_total'] ?? 0, $request->products ?? []));
+        $totalPrice = $request->total_price ?? array_sum(array_map(fn($p) => $p['sub_total'], $request->products ?? []));
         $productIds = $request->products ? array_column($request->products, 'id') : [];
 
         // Create sale
@@ -83,18 +83,20 @@ class CashierController extends Controller
         // ✅ Save details + reduce stock only if complete
         if ($status === 'complete' && $request->products) {
             foreach ($request->products as $product) {
+                $amount = $product['amount'] ?? 1; // default to 1 if missing
+
                 SaleDetail::create([
                     'sale_id'    => $sale->id,
                     'product_id' => $product['id'],
                     'sale_price' => $product['sale_price'],
-                    'amount'     => $product['amount'],
+                    'amount'     => $amount,
                     'discount'   => $product['discount'] ?? 0,
-                    'sub_total'  => $product['sub_total'],
+                    'sub_total'  => $product['sub_total'] ?? ($amount * ($product['sale_price'] ?? 0)),
                 ]);
 
                 // Reduce stock safely
                 $productModel = Product::findOrFail($product['id']);
-                $productModel->stock -= $product['amount'];
+                $productModel->stock -= $amount;
                 $productModel->save();
             }
         }
@@ -145,6 +147,145 @@ class CashierController extends Controller
             'paid'       => $paid,
             'change'     => $change,
             'menu'       => 'Invoice',
+        ]);
+    }
+
+    public function getDraftSales()
+    {
+        $drafts = Sale::with('member')
+            ->where('status', 'draft')
+            ->where('user_id', auth()->id()) // only show drafts created by current user
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return response()->json($drafts);
+    }
+
+    public function getDraftSale($id)
+    {
+        $draft = Sale::with(['member', 'details.product']) // eager load products from details
+            ->where('id', $id)
+            ->where('user_id', auth()->id()) // only owner can load
+            ->firstOrFail();
+
+        // Transform details to match frontend expected format
+        $draftData = [
+            'id'          => $draft->id,
+            'member'      => $draft->member,
+            'total_item'  => $draft->total_item,
+            'total_price' => $draft->total_price,
+            'pay'         => $draft->pay,
+            'discount'    => $draft->discount,
+            'products'    => $draft->details->map(fn($d) => [
+                'id'         => $d->product_id,
+                'name'       => $d->product->name ?? '',
+                'sale_price' => $d->sale_price,
+                'amount'     => $d->amount,
+                'discount'   => $d->discount,
+                'sub_total'  => $d->sub_total,
+            ]),
+        ];
+
+        return response()->json($draftData);
+    }
+
+    // Return
+    public function returnPage()
+    {
+        $menu      = 'Return';
+        $customers = Member::all();
+        return view('cashier.return', compact('customers', 'menu'));
+    }
+
+    // Get all sales of a customer
+    public function getCustomerSales($customerId)
+    {
+        $customer = Member::with('sales')->find($customerId);
+
+        if (! $customer) {
+            return response()->json(['message' => 'Customer not found'], 404);
+        }
+
+        $sales = $customer->sales->map(function ($sale) {
+            return [
+                'id'          => $sale->id,
+                'total_price' => $sale->total_price,
+                'created_at'  => $sale->created_at->format('Y-m-d H:i:s'),
+            ];
+        });
+
+        return response()->json([
+            'balance' => $customer->balance ?? 0,
+            'sales'   => $sales,
+        ]);
+    }
+
+    // Get products for a sale
+    public function getSaleProducts($saleId)
+    {
+        $saleDetails = SaleDetail::with('product')
+            ->where('sale_id', $saleId)
+            ->whereColumn('amount', '>', 'return_qty') // only returnable
+            ->get();
+
+        $products = $saleDetails->map(function ($detail) {
+            return [
+                'product_id'     => $detail->product_id,
+                'product_name'   => $detail->product->name,
+                'sale_price'     => $detail->sale_price, // <- corrected
+                'returnable_qty' => $detail->amount - $detail->return_qty,
+            ];
+        });
+
+        return response()->json($products);
+    }
+
+    public function storeReturn(Request $request)
+    {
+        $request->validate([
+            'sale_id'               => 'required|exists:sales,id',
+            'products'              => 'required|array|min:1',
+            'products.*.product_id' => 'required|exists:products,id',
+            'products.*.return_qty' => 'required|numeric|min:1',
+        ]);
+
+        $sale        = Sale::findOrFail($request->sale_id);
+        $totalReturn = 0;
+
+        foreach ($request->products as $prod) {
+            $saleDetail = SaleDetail::where('sale_id', $request->sale_id)
+                ->where('product_id', $prod['product_id'])
+                ->first();
+
+            $product = Product::find($prod['product_id']);
+
+            if ($saleDetail && $product) {
+                // Add returned qty to sale detail
+                $saleDetail->return_qty += $prod['return_qty'];
+                $saleDetail->save();
+
+                // Add returned qty back to stock
+                $product->stock += $prod['return_qty'];
+                $product->save();
+
+                // Calculate total return amount
+                $totalReturn += $prod['return_qty'] * $saleDetail->sale_price;
+            }
+        }
+
+        // Reduce sale total price by total return
+        $sale->total_price -= $totalReturn;
+        $sale->save();
+
+        // Optional: update sale return_products column
+        $sale->return_products = $sale->return_products ?? [];
+        $sale->return_products = array_merge($sale->return_products, $request->products);
+        $sale->save();
+
+        return response()->json([
+            'success'         => true,
+            'total_return'    => $totalReturn,
+            'updated_balance' => $sale->total_price, // Sale total after return
         ]);
     }
 

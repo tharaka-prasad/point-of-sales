@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    <div class="container mt-4">
+    <div class="container-fluid">
         <div class="card">
 
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -25,7 +25,7 @@
                             <th>Invoice No</th>
                             <th>Prepared By</th>
                             <th>Total(Rs)</th>
-                            <th width="160">Actions</th>
+                            <th width="200">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,3 +71,12 @@
         </div>
     </div>
 @endsection
+
+{{-- Side bar animation --}}
+@push('scripts')
+    <script>
+        $(function() {
+            $("body").toggleClass("sidebar-collapse");
+        });
+    </script>
+@endpush

@@ -7,6 +7,7 @@ use App\Models\{
     Sale,
     SaleDetail,
     Setting,
+    User,
 };
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;

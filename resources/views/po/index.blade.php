@@ -10,63 +10,88 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid">
-        <div class="card">
+    <div class="app-content">
+        <!--begin::Container-->
+        <div class="container-fluid">
+            <!--begin::Row-->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">Purchase Order (PO)</h4>
+                            <a href="{{ route('po.create') }}" class="btn btn-primary ">+ New PO</a>
+                        </div>
 
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">Purchase Order (PO)</h4>
-                <a href="{{ route('po.create') }}" class="btn btn-primary ">+ New PO</a>
-            </div>
+                        <div class="card-body">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>PO No</th>
+                                        <th>Company</th>
+                                        <th>Supplier</th>
+                                        <th>Description</th>
+                                        <th>Contact</th>
+                                        <th>Status</th>
+                                        <th>Total(Rs)</th>
+                                        <th width="200">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($pos as $index => $po)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ $po->po_number }}</td>
+                                            <td>{{ $po->supplier->company_name ?? 'N/A' }}</td>
+                                            <td>{{ $po->supplier->supplier_name ?? 'N/A' }}</td>
+                                            <td>{{ $po->description ?? 'N/A' }}</td>
+                                            <td>{{ $po->supplier->phone ?? 'N/A' }}</td>
+                                            <td>{{ $po->status ?? 'N/A' }}</td>
+                                            <td>{{ number_format($po->grand_total ?? 0, 2) }}</td>
+                                            <td>
+                                                <a href="{{ route('po.show', $po->id) }}"
+                                                    class="btn btn-sm btn-info">View</a>
+                                                <a href="{{ route('po.edit', $po->id) }}"
+                                                    class="btn btn-sm btn-warning">Edit</a>
 
-            <div class="card-body">
-                <table class="table table-bordered table-hover table-striped">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>PO No</th>
-                            <th>Company</th>
-                            <th>Supplier</th>
-                            <th>Description</th>
-                            <th>Contact</th>
-                            <th>Quantity</th>
-                            <th>Rate(Rs)</th>
-                            <th>Status</th>
-                            <th>Total(Rs)</th>
-                            <th width="160">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($pos as $index => $po)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td>{{ $po->po_number }}</td>
-                                <td>{{ $po->purchase_company }}</td>
-                                <td>{{ $po->supplier_name ?? 'N/A' }}</td>
-                                <td>{{ $po->description }}</td>
-                                <td>{{ $po->contact_no }}</td>
-                                <td>{{ $po->quantity }}</td>
-                                <td>{{ $po->rate }}</td>
-                                <td>{{ $po->status }}</td>
-                                <td>{{ number_format($po->grand_total, 2) }}</td>
-                                <td>
-                                    <a href="{{ route('po.show', $po->id) }}" class="btn btn-sm btn-info">View</a>
-                                {{-- Optional actions: Edit, PDF, Delete --}}
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="11" class="text-center text-muted">No pos found</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                                                <form action="{{ route('po.destroy', $po->id) }}" method="POST"
+                                                    style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn mt-1 btn-sm btn-danger"
+                                                        onclick="return confirm('Are you sure you want to delete this PO?');">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="9" class="text-center text-muted">No Purchase Orders found</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
 
-                    {{-- Pagination --}}
+                            {{-- Pagination --}}
 
-                    <div class="d-flex justify-content-center">
-                        {{ $pos->links() }}
+                            <div class="d-flex justify-content-center">
+                                {{ $pos->links() }}
+                            </div>
+                        </div>
                     </div>
+                </div>
             </div>
         </div>
     </div>
 @endsection
+
+{{-- Side bar animation --}}
+@push('scripts')
+    <script>
+        $(function() {
+            $("body").toggleClass("sidebar-collapse");
+        });
+    </script>
+@endpush
+

@@ -8,12 +8,9 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
-    {
+    public function index(){
         $menu = "Product";
-
         $categories = Category::select("id", "name")->get();
-
         return view("product.index", compact("menu", "categories"));
     }
 
@@ -30,17 +27,40 @@ class ProductController extends Controller
     // Store product
     public function store(Request $request)
     {
-        // If code empty, generate one (extra safety)
-        if (! $request->filled('code')) {
-            $lastProduct     = Product::latest()->first();
-            $lastCode        = $lastProduct ? $lastProduct->code : '';
-            $newNumber       = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
-            $request['code'] = 'P' . code_generator($newNumber, 5);
+        // ✅ Validate input
+        $validated = $request->validate([
+            'code'        => 'nullable|string|max:50|unique:products,code',
+            'name'        => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'brand'       => 'nullable|string|max:255',
+            'price'       => 'required|numeric|min:0.01',
+            'sell_price'  => 'required|numeric|min:0.01|gte:price',
+            'discount'    => 'nullable|numeric|min:0',
+            'stock'       => 'required|integer|min:1',
+            'expiry_date' => 'required|date',
+            'batch_no'    => 'nullable|string|max:255',
+        ], [
+            // ✅ Custom messages (optional)
+            'name.required'        => 'Product name is required.',
+            'category_id.required' => 'Please select a category.',
+            'brand.required'       => 'Product brand is required.',
+            'price.required'       => 'Purchase price is required.',
+            'sell_price.gte'       => 'Sell price must be greater than or equal to purchase price.',
+            'stock.min'            => 'Stock must be at least 1.',
+        ]);
+
+        // ✅ Generate auto code if not provided
+        if (empty($validated['code'])) {
+            $lastProduct       = Product::latest()->first();
+            $lastCode          = $lastProduct ? $lastProduct->code : '';
+            $newNumber         = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
+            $validated['code'] = 'P' . code_generator($newNumber, 5);
         }
 
-        // Save product
-        $product = Product::create($request->all());
+        // ✅ Create product
+        $product = Product::create($validated);
 
+        // ✅ Return JSON success response
         return response()->json([
             'message' => 'Product added successfully.',
             'product' => $product,
@@ -93,35 +113,48 @@ class ProductController extends Controller
         }
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
 
-        $request->validate([
-            'code'        => 'required|unique:products,code,' . $product->id,
-            'name'        => 'required',
-            'category_id' => 'required',
-            'price'       => 'required|numeric',
-            'sell_price'  => 'required|numeric',
-            'stock'       => 'required|integer',
-            // add more validation if needed
+        // ✅ Validate input
+        $validated = $request->validate([
+            'code'        => 'nullable|string|max:50|unique:products,code,' . $product->id,
+            'name'        => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'brand'       => 'nullable|string|max:255',
+            'price'       => 'required|numeric|min:0.01',
+            'sell_price'  => 'required|numeric|min:0.01|gte:price',
+            'discount'    => 'nullable|numeric|min:0',
+            'stock'       => 'required|integer|min:1',
+            'expiry_date' => 'required|date',
+            'batch_no'    => 'nullable|string|max:255'
+        ], [
+            // ✅ Custom messages (optional)
+            'name.required'        => 'Product name is required.',
+            'category_id.required' => 'Please select a category.',
+            'brand.required'       => 'Product brand is required.',
+            'price.required'       => 'Purchase price is required.',
+            'sell_price.gte'       => 'Sell price must be greater than or equal to purchase price.',
+            'stock.min'            => 'Stock must be at least 1.',
         ]);
 
-        $product->update($request->only([
-            'code',
-            'name',
-            'category_id',
-            'brand',
-            'price',
-            'discount',
-            'sell_price',
-            'stock',
-        ]));
+        // ✅ Generate auto code if empty
+        if (empty($validated['code'])) {
+            $lastProduct       = Product::latest()->first();
+            $lastCode          = $lastProduct ? $lastProduct->code : '';
+            $newNumber         = $lastCode ? intval(substr($lastCode, 1)) + 1 : 1;
+            $validated['code'] = 'P' . code_generator($newNumber, 5);
+        }
 
+        // ✅ Update product
+        $product->update($validated);
+
+        // ✅ Return JSON success response
         return response()->json([
             'message' => 'Product updated successfully.',
             'product' => $product,
-        ]);
+        ], 200);
     }
 
     public function destroy(string $id)

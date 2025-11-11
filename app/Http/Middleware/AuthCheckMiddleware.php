@@ -7,19 +7,26 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class AuthCheckMiddleware
-{
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    public function handle(Request $request, Closure $next, $level): Response
+class AuthCheckMiddleware{
+    //Allow multiple levels, e.g. ->middleware('authcheck:1,2')
+    public function handle(Request $request, Closure $next, ...$levels): Response
     {
-        if (Auth::user() && $level == Auth::user()->current_team_id) {
+        $user = Auth::user();
+
+        // If no user logged in, redirect to login
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        // Current user level (from your 'current_team_id')
+        $userLevel = $user->current_team_id;
+
+        // Check if user’s level is in the allowed list
+        if (in_array($userLevel, $levels)) {
             return $next($request);
         }
 
-        return redirect()->route("dashboard.index");
+        // If not authorized, redirect to dashboard
+        return redirect()->route('dashboard.index');
     }
 }

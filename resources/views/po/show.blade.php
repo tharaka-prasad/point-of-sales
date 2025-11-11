@@ -4,240 +4,229 @@
     <h3 class="mb-0">{{ $menu }}</h3>
 @endsection
 
+@section('breadcumb')
+    @parent
+    <li class="breadcrumb-item active" aria-current="page">{{ $menu }}</li>
+@endsection
+
 @section('content')
-    <div class="container">
+<div class="app-content">
+    <div class="container-fluid">
         <div class="card">
-            <header>
-                <meta charset="utf-8" />
-                <meta name="viewport" content="width=device-width,initial-scale=1" />
-                <title>Supermarket PO (Perchase Order)</title>
-                <div class="no-print">
-                    <a href="{{ route('po.index') }}"><button class="secondary">← Back</button></a>
-                    <button onclick="window.print()">Print</button>
-                </div>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-                <style>
-                    /* --- Existing styles --- */
+
+            <!-- --- Inline CSS --- -->
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 20px;
+                    background: #f9f9f9;
+                }
+
+                .container {
+                    max-width: 1200px;
+                    margin: auto;
+                }
+
+                .card {
+                    background: #fff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+                }
+
+                header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 20px;
+                }
+
+                h1 {
+                    margin: 0;
+                    color: #2c3e50;
+                }
+
+                .small {
+                    font-size: 0.85rem;
+                    color: #555;
+                }
+
+                .grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 15px;
+                    margin-top: 15px;
+                }
+
+                .field {
+                    margin-bottom: 10px;
+                }
+
+                .field label {
+                    display: block;
+                    font-size: 0.85rem;
+                    margin-bottom: 4px;
+                    font-weight: bold;
+                    color: #333;
+                }
+
+                input,
+                select,
+                textarea {
+                    width: 100%;
+                    padding: 8px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    box-sizing: border-box;
+                }
+
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 15px;
+                }
+
+                th,
+                td {
+                    border: 1px solid #ccc;
+                    padding: 8px;
+                    text-align: center;
+                }
+
+                th {
+                    background-color: #f2f2f2;
+                    font-weight: bold;
+                }
+
+                tfoot td {
+                    font-weight: bold;
+                    background: #f0f0f0;
+                }
+
+                button {
+                    margin: 5px;
+                    padding: 8px 16px;
+                    cursor: pointer;
+                    border: none;
+                    border-radius: 4px;
+                    font-weight: bold;
+                    transition: background-color 0.3s;
+                }
+
+                #addRow {
+                    background-color: #3498db;
+                    color: white;
+                }
+
+                #addRow:hover {
+                    background-color: #2980b9;
+                }
+
+                .secondary {
+                    background: #ecf0f1;
+                    color: #2c3e50;
+                }
+
+                .secondary:hover {
+                    background: #d5dbdb;
+                }
+
+                .warn {
+                    background: #e74c3c;
+                    color: white;
+                }
+
+                .warn:hover {
+                    background: #c0392b;
+                }
+
+                .totals {
+                    display: flex;
+                    gap: 20px;
+                    margin-top: 15px;
+                }
+
+                .box {
+                    background: #f4f4f4;
+                    padding: 10px;
+                    border-radius: 6px;
+                    text-align: center;
+                    flex: 1;
+                }
+
+                .footer {
+                    margin-top: 30px;
+                }
+
+                .signatures {
+                    display: flex;
+                    justify-content: space-around;
+                    margin-top: 20px;
+                }
+
+                .signatures .line {
+                    width: 200px;
+                    border-bottom: 1px solid #000;
+                    margin: 5px;
+                }
+
+                @media print {
                     body {
-                        font-family: Arial, sans-serif;
-                        margin: 20px;
-                        background: #f9f9f9;
+                        margin: 0;
+                        background: white;
                     }
 
                     .container {
-                        max-width: 1200px;
-                        margin: auto;
+                        max-width: 100%;
+                        box-shadow: none;
+                    }
+
+                    .no-print {
+                        display: none !important;
                     }
 
                     .card {
-                        background: #fff;
-                        padding: 20px;
-                        border-radius: 8px;
-                        box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
-                    }
-
-                    header {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        margin-bottom: 20px;
-                    }
-
-                    h1 {
-                        margin: 0;
-                        color: #2c3e50;
-                    }
-
-                    .small {
-                        font-size: 0.85rem;
-                        color: #555;
-                    }
-
-                    .grid {
-                        display: grid;
-                        grid-template-columns: 1fr 1fr;
-                        gap: 15px;
-                        margin-top: 15px;
-                    }
-
-                    .field {
-                        margin-bottom: 10px;
-                    }
-
-                    .field label {
-                        display: block;
-                        font-size: 0.85rem;
-                        margin-bottom: 4px;
-                        font-weight: bold;
-                        color: #333;
-                    }
-
-                    input,
-                    select,
-                    textarea {
-                        width: 100%;
-                        padding: 8px;
-                        border: 1px solid #ddd;
-                        border-radius: 4px;
-                        box-sizing: border-box;
-                    }
-
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-top: 15px;
-                    }
-
-                    th,
-                    td {
-                        border: 1px solid #ccc;
-                        padding: 8px;
-                        text-align: center;
-                    }
-
-                    th {
-                        background-color: #f2f2f2;
-                        font-weight: bold;
-                    }
-
-                    tfoot td {
-                        font-weight: bold;
-                        background: #f0f0f0;
+                        box-shadow: none;
+                        padding: 10px;
                     }
 
                     button {
-                        margin: 5px;
-                        padding: 8px 16px;
-                        cursor: pointer;
-                        border: none;
-                        border-radius: 4px;
-                        font-weight: bold;
-                        transition: background-color 0.3s;
+                        display: none !important;
                     }
+                }
+            </style>
 
-                    #addRow {
-                        background-color: #3498db;
-                        color: white;
-                    }
-
-                    #addRow:hover {
-                        background-color: #2980b9;
-                    }
-
-                    .secondary {
-                        background: #ecf0f1;
-                        color: #2c3e50;
-                    }
-
-                    .secondary:hover {
-                        background: #d5dbdb;
-                    }
-
-                    .warn {
-                        background: #e74c3c;
-                        color: white;
-                    }
-
-                    .warn:hover {
-                        background: #c0392b;
-                    }
-
-                    .actions {
-                        margin-top: 10px;
-                        display: flex;
-                        flex-wrap: wrap;
-                        gap: 10px;
-                    }
-
-                    .totals {
-                        display: flex;
-                        gap: 20px;
-                        margin-top: 15px;
-                    }
-
-                    .box {
-                        background: #f4f4f4;
-                        padding: 10px;
-                        border-radius: 6px;
-                        text-align: center;
-                        flex: 1;
-                    }
-
-                    .footer {
-                        margin-top: 30px;
-                    }
-
-                    .signatures {
-                        display: flex;
-                        justify-content: space-around;
-                        margin-top: 20px;
-                    }
-
-                    .signatures .line {
-                        width: 200px;
-                        border-bottom: 1px solid #000;
-                        margin: 5px;
-                    }
-
-                    .pdf-status {
-                        margin-top: 10px;
-                        padding: 10px;
-                        border-radius: 4px;
-                        text-align: center;
-                        display: none;
-                    }
-
-                    .success {
-                        background-color: #d4edda;
-                        color: #155724;
-                        border: 1px solid #c3e6cb;
-                    }
-
-                    .error {
-                        background-color: #f8d7da;
-                        color: #721c24;
-                        border: 1px solid #f5c6cb;
-                    }
-
-                    @media print {
-                        body {
-                            margin: 0;
-                            background: white;
-                        }
-
-                        .container {
-                            max-width: 100%;
-                            box-shadow: none;
-                        }
-
-                        .no-print {
-                            display: none !important;
-                        }
-
-                        .card {
-                            box-shadow: none;
-                            padding: 10px;
-                        }
-
-                        button {
-                            display: none !important;
-                        }
-                    }
-                </style>
+            <header>
+                <div>
+                    <h1>Purchase Order (PO)</h1>
+                    <div class="small">Supermarket PO — record issue for a supplier</div>
+                </div>
+                <div class="no-print">
+                    <a href="{{ route('po.index') }}"><button class="secondary">← Back</button></a>
+                </div>
             </header>
 
-            <form>
+            <form method="POST" action="{{ route('po.store') }}">
+                @csrf
                 <div class="grid">
                     <div class="card inner">
                         <div class="meta">
                             <div class="field">
                                 <label>Date</label>
-                                <input type="date" value="{{ $pos->date }}" disabled />
+                                <input id="poDate" type="date" name="date" value="{{ date('Y-m-d') }}" required />
                             </div>
                             <div class="field">
                                 <label>Supplier Name</label>
-                                <input type="text" value="{{ $pos->supplier->supplier_name }}" disabled />
+                                <select id="supplier" name="supplier_id" required>
+                                    <option value="">-- Select Supplier --</option>
+                                    @foreach ($suppliers as $supplier)
+                                        <option value="{{ $supplier->id }}">{{ $supplier->supplier_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>PO No</label>
+                                <input type="text" id="po_number" name="po_number" value="{{ $poNumber }}" readonly required>
                             </div>
                         </div>
                     </div>
@@ -245,75 +234,51 @@
                     <div class="card inner">
                         <div class="meta">
                             <div class="field">
-                                <label>General Remarks</label><br />
-                                <textarea rows="6" disabled>{{ $pos->general_remarks }}</textarea>
+                                <label>General Remarks</label>
+                                <textarea id="generalRemarks" name="description" rows="6" placeholder="Enter remarks here..."></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="table-wrap">
-                    <table>
+                    <table id="itemsTable">
                         <thead>
                             <tr>
-                                <th>Item name</th>
-                                <th>Description</th>
+                                <th>Item Name</th>
+                                <th>Category</th>
                                 <th>UOM</th>
-                                <th>Qty Ordered</th>
-                                <th>Qty Received</th>
-                                <th>Qty Accepted</th>
-                                <th>Qty Rejected</th>
-                                <th>Unit Price</th>
+                                <th>Qty</th>
+                                <th>Rate</th>
                                 <th>Total Price</th>
                                 <th>Remarks</th>
+                                <th class="no-print">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($grn->items as $index => $item)
-                                <tr>
-                                    <td><input type="text" value="{{ $item->item_code ?? '-' }}" disabled /></td>
-                                    <td><input type="text" value="{{ $item->description ?? '-' }}" disabled /></td>
-                                    <td><input type="text" value="{{ $item->uom ?? '-' }}" disabled /></td>
-                                    <td><input type="number" value="{{ $item->qty_ordered ?? 0 }}" disabled /></td>
-                                    <td><input type="number" value="{{ $item->qty_received ?? 0 }}" disabled /></td>
-                                    <td><input type="number" value="{{ $item->qty_accepted ?? 0 }}" disabled /></td>
-                                    <td><input type="number" value="{{ $item->qty_rejected ?? 0 }}" disabled /></td>
-                                    <td><input type="number"
-                                            value="{{ number_format($item->unit_price ?? 0, 2) }}"disabled /></td>
-                                    <td><input type="number" value="{{ $item->total ?? 0 }}" disabled /></td>
-
-                                    <td><input type="text" value="{{ $item->remarks ?? '-' }}" disabled /></td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-
+                        <tbody id="tbody"></tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="8" align="right"><strong>Grand Total</strong></td>
-                                <td>
-                                    <input type="number"
-                                        value="{{ number_format($grn->items->sum(fn($i) => $i->total ?? 0), 2) }}"
-                                        disabled />
-                                </td>
-                                <td></td>
+                                <td colspan="5" style="text-align:right; font-weight:bold;">Grand Total</td>
+                                <td id="grandTotal" data-value="0.00">0.00</td>
+                                <td colspan="2"></td>
                             </tr>
                         </tfoot>
-
                     </table>
+                </div>
+
+                <div class="actions no-print">
+                    <button type="button" id="addRow">+ Add Row</button>
+                    <button type="button" class="secondary" id="clearRows">Clear All</button>
                 </div>
 
                 <div class="totals">
                     <div class="box">
                         <div class="small">Total Items</div>
-                        <div>{{ $grn->items->count() }}</div>
+                        <div id="totalItems">0</div>
                     </div>
                     <div class="box">
-                        <div class="small">Total Qty Received</div>
-                        <div>{{ $grn->items->sum('qty_received') }}</div>
-                    </div>
-                    <div class="box">
-                        <div class="small">Total Qty Accepted</div>
-                        <div>{{ $grn->items->sum('qty_accepted') }}</div>
+                        <div class="small">Total Qty</div>
+                        <div id="totalReceived">0</div>
                     </div>
                 </div>
 
@@ -327,7 +292,79 @@
                         <div class="line"></div>
                     </div>
                 </div>
+
+                <div class="no-print buttons">
+                    <button type="submit" class="secondary">Save PO</button>
+                    <button type="button" id="resetAll" class="warn">Reset Form</button>
+                </div>
             </form>
         </div>
     </div>
+</div>
+
+<script>
+let rowIndex = 0;
+const tbody = document.getElementById("tbody");
+const totalItems = document.getElementById("totalItems");
+const totalReceived = document.getElementById("totalReceived");
+const grandTotalCell = document.getElementById("grandTotal");
+
+// --- Add table row ---
+function addRow(data = {}) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+        <td><input name="items[${rowIndex}][item_name]" class="item_name" value="${data.item_name || ''}"></td>
+        <td><input name="items[${rowIndex}][category]" class="category" value="${data.category || ''}"></td>
+        <td><input name="items[${rowIndex}][uom]" class="uom" value="${data.uom || ''}"></td>
+        <td><input name="items[${rowIndex}][qty]" class="qty" type="number" min="1" value="${data.qty || 0}"></td>
+        <td><input name="items[${rowIndex}][rate]" class="rate" type="number" step="0.01" min="0" value="${data.rate || 0}"></td>
+        <td class="total" data-value="0.00">0.00</td>
+        <td><input name="items[${rowIndex}][remarks]" class="remarks" value="${data.remarks || ''}"></td>
+        <td class="no-print"><button type="button" class="del warn">X</button></td>
+    `;
+    tr.querySelector(".del").onclick = () => { tr.remove(); recalc(); };
+    tr.querySelectorAll(".qty, .rate").forEach(input => input.oninput = recalc);
+    tbody.appendChild(tr);
+    rowIndex++;
+    recalc();
+}
+
+// --- Recalculate totals ---
+function recalc() {
+    const rows = tbody.querySelectorAll("tr");
+    totalItems.textContent = rows.length;
+
+    let totalQty = 0;
+    let gTotal = 0;
+
+    rows.forEach(r => {
+        const qty = +r.querySelector(".qty").value || 0;
+        const rate = +r.querySelector(".rate").value || 0;
+        const total = qty * rate;
+        r.querySelector(".total").textContent = total.toFixed(2);
+
+        totalQty += qty;
+        gTotal += total;
+    });
+
+    totalReceived.textContent = totalQty;
+    grandTotalCell.textContent = gTotal.toFixed(2);
+}
+
+// --- Button actions ---
+document.getElementById("addRow").onclick = () => addRow();
+document.getElementById("clearRows").onclick = () => { tbody.innerHTML = ""; recalc(); rowIndex = 0; addRow(); };
+document.getElementById("resetAll").onclick = () => {
+    tbody.innerHTML = "";
+    recalc();
+    document.querySelector("form").reset();
+    rowIndex = 0;
+    addRow();
+};
+
+// --- Initialize form on page load ---
+window.onload = () => {
+    addRow();
+};
+</script>
 @endsection

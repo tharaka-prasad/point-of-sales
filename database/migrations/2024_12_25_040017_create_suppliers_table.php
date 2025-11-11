@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("supplier_name");
             $table->string("company_name");
-            $table->string("name");
+            $table->string("category_id");
             $table->text("address")->nullable();
             $table->string("phone");
             $table->timestamps();

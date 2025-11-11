@@ -10,13 +10,12 @@ return new class extends Migration
     {
         Schema::create('pos', function (Blueprint $table) {
             $table->id();
-
             $table->string('po_number')->unique();
-            $table->text('supplier_id')->nullable();
+            $table->integer('supplier_id')->nullable();
             $table->text('description')->nullable();
             $table->decimal('rate', 10, 2)->nullable(); // Rs
             $table->enum('status', ['draft', 'complete', 'pending', 'reject'])->default('draft');
-            
+            $table->decimal('grand_total', 10, 2)->nullable();
             $table->timestamps();
         });
     }

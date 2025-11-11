@@ -12,15 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('po_items', function (Blueprint $table) {
-            $table->id();
-
+            $table->id('purchase_order_id');
             $table->string('item_name')->nullable();
             $table->string('category')->nullable();
             $table->string('uom')->nullable();
             $table->string('qty')->nullable();
             $table->decimal('rate', 10, 2)->nullable(); // Rs
             $table->string('remarks')->nullable();
-            
+            $table->decimal('total', 10, 2)->nullable();
             $table->timestamps();
         });
     }

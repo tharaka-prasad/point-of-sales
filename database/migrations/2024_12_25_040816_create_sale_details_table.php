@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId("sale_id")->constrained()->cascadeOnDelete();
             $table->foreignId("product_id")->constrained()->cascadeOnDelete();
-            $table->integer("sale_price");
-            $table->integer("amount");
+            $table->decimal("sale_price", 10, 2);
+            $table->decimal("amount", 10, 2);
             $table->tinyInteger("discount")->default(0);
-            $table->integer("sub_total");
+            $table->decimal("sub_total", 10, 2);
+            $table->integer('return_qty')->default(0);
             $table->timestamps();
         });
     }
