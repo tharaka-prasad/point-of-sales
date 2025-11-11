@@ -104,6 +104,7 @@ Route::middleware([
         Route::get('/reports/generate', [ReportsController::class, 'generate'])->name('reports.generate');
         // Admin dashboard charts
 
+        Route::get('/reports/income-chart-data', [ReportsController::class, 'incomeChartData'])->name('reports.income-chart-data');
             //supplier_report
             Route::get('/reports/supplier_report', [ReportsController::class, 'supplier_report'])->name('reports.supplier_report');
             //supplier_pdf
