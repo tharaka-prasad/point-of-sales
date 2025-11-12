@@ -26,7 +26,8 @@
                 @if (Auth::user()->current_team_id == 1)
                     <!-- Admin Dashboard -->
                     <li class="nav-item">
-                        <a href="{{ route('dashboard.index') }}" class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
+                        <a href="{{ route('dashboard.index') }}"
+                            class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>Dashboard</p>
                         </a>
@@ -96,7 +97,14 @@
                             <p>Cashier Shift</p>
                         </a>
                     </li>
-
+                    <!-- KITCHEN -->
+                    <li class="nav-header">KITCHEN</li>
+                    <li class="nav-item">
+                        <a href="{{route('kitchen.index')}}" class="nav-link">
+                            <i class="nav-icon fas fa-utensils"></i>
+                            <p>Kitchen</p>
+                        </a>
+                    </li>
                     <!-- REPORT Section -->
                     <li class="nav-header">REPORT</li>
                     <li class="nav-item">
@@ -177,7 +185,7 @@
                 <!-- Logout (for all) -->
                 <li class="nav-item">
                     <a href="javascript:void(0)" class="nav-link"
-                       onclick="document.getElementById('logout-form').submit()">
+                        onclick="document.getElementById('logout-form').submit()">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                         <p>Logout</p>
                     </a>
