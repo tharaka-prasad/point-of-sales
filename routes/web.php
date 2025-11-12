@@ -160,7 +160,8 @@ Route::middleware([
         Route::prefix('kitchen')->group(function () {
         Route::get('/', [KitchenController::class, 'index'])->name('kitchen.index');
         Route::get('/create', [KitchenController::class, 'create'])->name('kitchen.create');
-        Route::post('/store', [KitchenController::class, 'store'])->name('kitchen.store');
+        Route::post('/kitchen/store', [KitchenController::class, 'store'])->name('kitchen.store');
+
         });
 
     });

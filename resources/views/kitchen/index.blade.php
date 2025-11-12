@@ -21,7 +21,12 @@
 
                         <div class="card-header">
                             <button class="btn btn-primary xs" onclick="addKitchen('{{ route('kitchen.store') }}')">
-                                <i class="fas fa-plus"></i> Add Kitchen Issue
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+
+                            <button type="button" class="btn btn-primary"
+                                onclick="addKitchen('{{ route('kitchen.store') }}')">
+                                <i class="fas fa-plus"></i> Add Kitchen Item
                             </button>
                         </div>
 
@@ -85,60 +90,48 @@
 
 @push('scripts')
     <script>
-
-        // ✅ Open Kitchen Modal
+        // add Kitchen Modal
         function addKitchen(url) {
-            $("#modalForm").modal("show");
-            $("#modalForm .modal-title").text("Add Kitchen Issue");
+            const $modal = $("#kitchenModal");
+            const $form = $modal.find("form");
 
-            let form = $("#modalForm form")[0];
-            form.reset();
+            if ($form.length === 0) {
+                console.error("⚠️ Kitchen form not found!");
+                return;
+            }
 
-            $("#modalForm form").attr("action", url);
-            $("#modalForm [name=_method]").val("POST");
+            // Reset form and set action
+            $form[0].reset();
+            $form.attr("action", url);
+            $form.find("[name=_method]").val("POST");
+
+            // Set modal title
+            $modal.find(".modal-title").text("Add Kitchen Item");
+
+            // Show modal
+            $modal.modal("show");
         }
 
-        // Function: Add Member
-            window.addMember = function(url) {
-                $("#modalForm").modal("show");
-                $("#modalForm .modal-title").text("Add Member");
 
-                $("#modalForm form")[0].reset();
-                $("#modalForm form").attr("action", url);
-                $("#modalForm [name=_method]").val("POST");
+        // Function: Delete Member
+        window.deleteMember = function(url) {
+            if (confirm("Are you sure delete this Member?")) {
+                $.post(url, {
+                        "_token": $("[name=csrf-token]").attr("content"),
+                        "_method": "DELETE"
+                    })
+                    .done((response) => {
+                        member_table.ajax.reload();
+                    })
+                    .fail((errors) => {
+                        alert("Failed to delete data!");
+                    });
             }
-
-        // Function: Edit Member
-            window.editMember = function(url) {
-                $("#modalForm").modal("show");
-                $("#modalForm .modal-title").text("Edit Member");
-
-                $("#modalForm form")[0].reset();
-                $("#modalForm form").attr("action", url);
-                $("#modalForm [name=_method]").val("PUT");
-            }
-
-        // Function: Delete
-            // Function: Delete Member
-            window.deleteMember = function(url) {
-                if (confirm("Are you sure delete this Member?")) {
-                    $.post(url, {
-                            "_token": $("[name=csrf-token]").attr("content"),
-                            "_method": "DELETE"
-                        })
-                        .done((response) => {
-                            member_table.ajax.reload();
-                        })
-                        .fail((errors) => {
-                            alert("Failed to delete data!");
-                        });
-                }
-            }
+        }
 
         // ✅ Sidebar animation
         $(function() {
             $("body").toggleClass("sidebar-collapse");
         });
-
     </script>
 @endpush

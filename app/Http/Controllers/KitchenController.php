@@ -38,4 +38,5 @@ class KitchenController extends Controller
 
         return redirect()->route('kitchen.index')->with('success', 'Kitchen issue saved successfully');
     }
+
 }
