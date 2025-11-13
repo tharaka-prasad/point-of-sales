@@ -11,12 +11,12 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\QuickBooksController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SaleDetailController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReportsController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KitchenController;
@@ -45,58 +45,59 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
-])->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, "index"])->name("dashboard.index");
+    ])->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, "index"])->name("dashboard.index");
 
-    //Quick-Books
-    Route::get('/qbo/connect', [QuickBooksController::class, 'connect']);
-    Route::get('/qbo/callback', [QuickBooksController::class, 'callback']);
+        //Quick-Books
+        Route::get('/qbo/connect', [QuickBooksController::class, 'connect']);
+        Route::get('/qbo/callback', [QuickBooksController::class, 'callback']);
 
-    Route::middleware(['level:1'])->group(function () {
+    Route::middleware(['level:1'])->group(function (){
         // Category
-        Route::get('/category/data', [CategoryController::class, "data"])->name("category.data");
         Route::resource('/category', CategoryController::class);
+        Route::get('/category/data', [CategoryController::class, "data"])->name("category.data");
+
 
         // Product
-        Route::get('/product/data', [ProductController::class, "data"])->name("product.data");
         Route::resource('/product', ProductController::class);
+        Route::get('/product/data', [ProductController::class, "data"])->name("product.data");
         Route::post('/product/delete-selected', [ProductController::class, "deleteSelected"])->name("product.deleteSelected");
         Route::post('/product/print-barcode', [ProductController::class, "printBarcode"])->name("product.printBarcode");
         Route::get('/product/autocode', [ProductController::class, 'autoCode'])->name('product.autocode');
 
         // Member
-        Route::get('/member/data', [MemberController::class, "data"])->name("member.data");
         Route::resource('/member', MemberController::class);
+        Route::get('/member/data', [MemberController::class, "data"])->name("member.data");
         Route::post('/member/delete-selected', [MemberController::class, "deleteSelected"])->name("member.deleteSelected");
         Route::post('/member/print-member', [MemberController::class, "printMember"])->name("member.printMember");
 
         // Supplier
-        Route::get('/supplier/data', [SupplierController::class, "data"])->name("supplier.data");
         Route::resource('/supplier', SupplierController::class);
+        Route::get('/supplier/data', [SupplierController::class, "data"])->name("supplier.data");
         Route::get('/suppliers/all', [SupplierController::class, 'getAll'])->name('suppliers.all');
         //Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
 
         // PO
         Route::resource('po', PurchaseOrderController::class);
-        Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');             //view po oders on table
-        Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');    // create new po
-        Route::delete('/po/{po}', [PurchaseOrderController::class, 'destroy'])->name('po.destroy'); // to delete
-        Route::get('/po/next-number', [PurchaseOrderController::class, 'getNextPoNumber']);         // this is generate po numer auto and display
-        Route::get('/po/{po}', [PurchaseOrderController::class, 'show'])->name('po.show');          // to view pdf
+        Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');//view po oders on table
+        Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');// create new po
+        Route::delete('/po/{po}', [PurchaseOrderController::class, 'destroy'])->name('po.destroy');// to delete
+        Route::get('/po/next-number', [PurchaseOrderController::class, 'getNextPoNumber']);// this is generate po numer auto and display
+        Route::get('/po/{po}', [PurchaseOrderController::class, 'show'])->name('po.show');// to view pdf
 
         // GRN
         Route::get('/grn', [GrnController::class, 'index'])->name('grn.index');
         Route::get('/grn/create', [GrnController::class, 'create'])->name('grn.create');
-        Route::post('/grn', [GrnController::class, 'store'])->name('grn.store');
         Route::get('/grn/{grn}', [GrnController::class, 'show'])->name('grn.show');
         Route::get('/grn/{grn}/edit', [GrnController::class, 'edit'])->name('grn.edit');
+        Route::post('/grn', [GrnController::class, 'store'])->name('grn.store');
         Route::put('/grn/{grn}', [GrnController::class, 'update'])->name('grn.update');
         Route::delete('/grn/{grn}', [GrnController::class, 'destroy'])->name('grn.destroy');
 
         // Expense
-        Route::get('/expense/data', [ExpenseController::class, "data"])->name("expense.data");
         Route::resource('/expense', ExpenseController::class);
+        Route::get('/expense/data', [ExpenseController::class, "data"])->name("expense.data");
 
         // Sale
         Route::get('/sale/data', [SaleController::class, "data"])->name("sale.data");
@@ -139,23 +140,20 @@ Route::middleware([
 
         // Cashier
         Route::get('/cashier', [CashierController::class, "index"])->name("cashier.index");
-        Route::post('/cashier', [CashierController::class, "store"])->name("cashier.store");
         Route::get('/cashier/print/{sale}', [CashierController::class, 'print'])->name('cashier.print');
         Route::get('/cashier/drafts', [CashierController::class, 'getDraftSales'])->name('cashier.drafts');
         Route::get('/cashier/drafts/{id}', [CashierController::class, 'getDraftSale']);
-// routes/web.php
-        Route::get('/cashier/return', [CashierController::class, 'returnPage'])->name('cashier.return');
-        Route::get('/cashier/returns/{customerId}/sales', [CashierController::class, 'getCustomerSales']);
-        Route::get('/cashier/returns/sale/{saleId}', [CashierController::class, 'getSaleProducts']);
-        Route::post('/cashier/return-store', [CashierController::class, 'storeReturn'] )->name('cashier.return.store');
+        Route::get('/sales/customer/{id}', [SaleController::class, 'getCustomerSales'])->name('sales.customer');
+        Route::post('/cashier', [CashierController::class, "store"])->name("cashier.store");
+        Route::post('/sales/return', [SaleController::class, 'storeReturn'])->name('sales.return');
 
         // Cashier Shift
         Route::prefix('cashier_shifts')->name('cashierShifts.')->group(function () {
-            Route::get('/', [CashierShiftController::class, 'index'])->name('index');
-            Route::get('/data', [CashierShiftController::class, 'data'])->name('data');
-            Route::post('/', [CashierShiftController::class, 'store'])->name('store');
-            Route::post('/{id}/close', [CashierShiftController::class, 'close'])->name('close');
-            Route::delete('/{id}', [CashierShiftController::class, 'destroy'])->name('destroy');
+        Route::get('/', [CashierShiftController::class, 'index'])->name('index');
+        Route::get('/data', [CashierShiftController::class, 'data'])->name('data');
+        Route::post('/', [CashierShiftController::class, 'store'])->name('store');
+        Route::post('/{id}/close', [CashierShiftController::class, 'close'])->name('close');
+        Route::delete('/{id}', [CashierShiftController::class, 'destroy'])->name('destroy');
         });
 
         //Kitchen
@@ -168,9 +166,9 @@ Route::middleware([
     });
 
     Route::middleware([
-        'auth:sanctum',
-        config('jetstream.auth_session'),
-        'verified',
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
     ])->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, "index"])->name("dashboard.index");
@@ -211,3 +209,4 @@ Route::middleware([
     Route::get('/profile', [UserController::class, "profile"])->name("user.profile");
     Route::put('/profile', [UserController::class, "updateProfile"])->name("user.updateProfile");
 });
+

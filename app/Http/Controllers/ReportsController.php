@@ -77,66 +77,72 @@ class ReportsController extends Controller {
     }
 
     //supplier
+
     public function supplier_report() {
         $menu = 'Supplier';
         $suppliers = Supplier::all();
         $categories = Category::select( 'id', 'name' )->get();
         // dd( $categories );
-        return view( 'reports.supplier_report', compact( 'menu', 'suppliers', 'categories' ));
+        return view( 'reports.supplier_report', compact( 'menu', 'suppliers', 'categories' ) );
     }
 
-    public function supplier_report_pdf($first_date = null, $last_date = null){
+    public function supplier_report_pdf( $first_date = null, $last_date = null ) {
         // Defaults: last month → today
-        $first_date = $first_date ?? now()->subMonth()->format('Y-m-d');
-        $last_date  = $last_date ?? now()->format('Y-m-d');
+        $first_date = $first_date ?? now()->subMonth()->format( 'Y-m-d' );
+        $last_date  = $last_date ?? now()->format( 'Y-m-d' );
 
         // Fetch suppliers for the date range
-        $data = Supplier::orderBy('created_at', 'desc')->get();
+        $data = Supplier::orderBy( 'created_at', 'desc' )->get();
 
         // Generate PDF
-        $pdf = Pdf::loadView("reports.supplier_pdf", compact("data", "first_date", "last_date"));
-        $pdf->setPaper("a4", "portrait");
+        $pdf = Pdf::loadView( 'reports.supplier_pdf', compact( 'data', 'first_date', 'last_date' ) );
+        $pdf->setPaper( 'a4', 'portrait' );
 
-        return $pdf->stream("SupplierReport-$first_date-to-$last_date.pdf");
+        return $pdf->stream( "SupplierReport-$first_date-to-$last_date.pdf" );
     }
     // Product Report Page
-    public function product_report(){
-        $menu = "Product";
-        $categories = Category::select("id", "name")->get();
 
-        return view("reports.product_report", compact("menu", "categories"));
+    public function product_report() {
+        $menu = 'Product';
+        $categories = Category::select( 'id', 'name' )->get();
+
+        return view( 'reports.product_report', compact( 'menu', 'categories' ) );
     }
 
     // Product Report PDF Export
-    public function product_exportPdf(){
-        $data = Product::with('category')->get();
-        $today = now()->format('Y-m-d H:i:s');
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.product_pdf', compact('data', 'today'));
-        $pdf->setPaper('a4', 'portrait');
+    public function product_exportPdf() {
+        $data = Product::with( 'category' )->get();
+        $today = now()->format( 'Y-m-d H:i:s' );
 
-        return $pdf->stream("Product_Report_" . now()->format('Ymd_His') . ".pdf");
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView( 'reports.product_pdf', compact( 'data', 'today' ) );
+        $pdf->setPaper( 'a4', 'portrait' );
+
+        return $pdf->stream( 'Product_Report_' . now()->format( 'Ymd_His' ) . '.pdf' );
     }
 
     // Customer Report Page
-    public function customer_report(){
-        $menu = "Customer";
 
-        return view("reports.customer_report", compact("menu"));
+    public function customer_report() {
+        $menu = 'Customer';
+        $customers = Member::all();
+
+        return view( 'reports.customer_report', compact( 'menu' ) );
     }
 
     // Customer Report PDF Export
-    public function customer_exportPdf(){
+
+    public function customer_exportPdf() {
         // Defaults: last month → today
-        $first_date = $first_date ?? now()->subMonth()->format('Y-m-d');
-        $last_date  = $last_date ?? now()->format('Y-m-d');
+        $first_date = $first_date ?? now()->subMonth()->format( 'Y-m-d' );
+        $last_date  = $last_date ?? now()->format( 'Y-m-d' );
 
-         // Fetch Members for the date range
-        $data = Member::orderBy('created_at', 'desc')->get();
+        // Fetch Members for the date range
+        $data = Member::orderBy( 'created_at', 'desc' )->get();
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.customer_pdf', compact("data", "first_date", "last_date"));
-        $pdf->setPaper('a4', 'portrait');
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView( 'reports.customer_pdf', compact( 'data', 'first_date', 'last_date' ) );
+        $pdf->setPaper( 'a4', 'portrait' );
 
-        return $pdf->stream("Customer_Report_" . now()->format('Ymd_His') . ".pdf");
+        return $pdf->stream( 'Customer_Report_' . now()->format( 'Ymd_His' ) . '.pdf' );
     }
 }
