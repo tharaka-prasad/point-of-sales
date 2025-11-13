@@ -11,6 +11,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+                
                 <div class="modal-body">
                     <div class="form-group row">
                         <input type="text" name="name" id="name" class="form-control"

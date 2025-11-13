@@ -117,4 +117,26 @@ class ReportsController extends Controller {
 
         return $pdf->stream("Product_Report_" . now()->format('Ymd_His') . ".pdf");
     }
+
+    // Customer Report Page
+    public function customer_report(){
+        $menu = "Customer";
+
+        return view("reports.customer_report", compact("menu"));
+    }
+
+    // Customer Report PDF Export
+    public function customer_exportPdf(){
+        // Defaults: last month → today
+        $first_date = $first_date ?? now()->subMonth()->format('Y-m-d');
+        $last_date  = $last_date ?? now()->format('Y-m-d');
+
+         // Fetch Members for the date range
+        $data = Member::orderBy('created_at', 'desc')->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.customer_pdf', compact("data", "first_date", "last_date"));
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->stream("Customer_Report_" . now()->format('Ymd_His') . ".pdf");
+    }
 }

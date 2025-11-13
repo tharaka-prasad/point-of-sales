@@ -140,5 +140,10 @@ function deleteProduct(url) {
         .fail(() => alert("Failed to delete product!"));
     }
 }
+
+{{-- Side bar animation --}}
+        $(function() {
+            $("body").toggleClass("sidebar-collapse");
+        });
 </script>
 @endpush

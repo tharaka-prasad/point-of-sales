@@ -82,6 +82,9 @@ class SaleController extends Controller
     public function store(Request $request)
     {
         $sale = Sale::findOrFail($request->sale_id);
+        $validated = $request->validate([
+            'member_id' => 'nullable|string'
+        ]);
 
         if ($sale) {
             $sale->member_id = $request->member_id;

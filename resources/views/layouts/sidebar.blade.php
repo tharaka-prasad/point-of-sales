@@ -26,7 +26,8 @@
                 @if (Auth::user()->current_team_id == 1)
                     <!-- Admin Dashboard -->
                     <li class="nav-item">
-                        <a href="{{ route('dashboard.index') }}" class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
+                        <a href="{{ route('dashboard.index') }}"
+                            class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>Dashboard</p>
                         </a>
@@ -96,21 +97,28 @@
                             <p>Cashier Shift</p>
                         </a>
                     </li>
-
+                    <!-- KITCHEN -->
+                    <li class="nav-header">KITCHEN</li>
+                    <li class="nav-item">
+                        <a href="{{route('kitchen.index')}}" class="nav-link">
+                            <i class="nav-icon fas fa-utensils"></i>
+                            <p>Kitchen</p>
+                        </a>
+                    </li>
                     <!-- REPORT Section -->
                     <li class="nav-header">REPORT</li>
                     <li class="nav-item">
                         <a href="{{ route('report.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
+                            <i class="nav-icon fas fa-chart-line"></i>
                             <p>Income report</p>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="https://quickbooks.intuit.com/" target="_blank" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
                             <p>QuickBooks-remove</p>
                         </a>
-                    </li>
+                    </li> --}}
                     <li class="nav-item">
                         <a href="{{ route('reports.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-chart-line"></i>
@@ -177,7 +185,7 @@
                 <!-- Logout (for all) -->
                 <li class="nav-item">
                     <a href="javascript:void(0)" class="nav-link"
-                       onclick="document.getElementById('logout-form').submit()">
+                        onclick="document.getElementById('logout-form').submit()">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                         <p>Logout</p>
                     </a>
