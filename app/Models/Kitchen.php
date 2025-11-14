@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,5 +15,11 @@ class Kitchen extends Model
         'unit',
         'issue_date',
         'issued_by',
+        'meal_type',
     ];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'item_name', 'id');
+    }
 }

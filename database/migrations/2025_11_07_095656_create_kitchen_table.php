@@ -12,11 +12,12 @@ return new class extends Migration
     {
         Schema::create('kitchen', function (Blueprint $table) {
             $table->id();
-            $table->string('item_name');
-            $table->integer('qty');
-            $table->string('unit')->nullable();
+            $table->integer('item_name')->nullable();
+            $table->integer('qty')->nullable();
+            $table->string('unit')->nullable(); 
             $table->date('issue_date')->nullable();
             $table->string('issued_by')->nullable();
+            $table->enum('meal_type' , ['breakfast', 'lunch', 'dinner', 'all'])->nullable();
             $table->timestamps();
         });
     }

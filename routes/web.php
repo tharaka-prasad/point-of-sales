@@ -159,6 +159,9 @@ Route::middleware([
         Route::get('/', [KitchenController::class, 'index'])->name('kitchen.index');
         Route::get('/create', [KitchenController::class, 'create'])->name('kitchen.create');
         Route::post('/kitchen/store', [KitchenController::class, 'store'])->name('kitchen.store');
+        Route::get('/edit/{id}', [KitchenController::class, 'edit'])->name('kitchen.edit');
+        Route::put('/update/{id}', [KitchenController::class, 'update'])->name('kitchen.update');
+        Route::delete('/delete/{id}', [KitchenController::class, 'destroy'])->name('kitchen.destroy');
         });
 
     });
