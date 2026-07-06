@@ -146,7 +146,7 @@
                                 </button>
                                 @include('cashier.draftModal')
 
-                                <a href="{{ route('cashier.return') }}" class="btn btn-info">
+                                <a href="{{ route('cashier.return') }}" id="findReturnsBtn" class="btn btn-info">
                                     <i class="bi bi-search"></i> Find Returns
                                 </a>
 
@@ -189,6 +189,7 @@
             const findDraftsBtn = document.getElementById("findDraftsBtn");
             const draftModalEl = document.getElementById("draftModal");
             const draftListBody = document.getElementById("draftListBody");
+            const findReturnsBtn = document.getElementById("findReturnsBtn");
 
             let currentDraftId = null; // store loaded draft ID
 
@@ -463,22 +464,22 @@
                 barcodeInput.value = '';
                 currentDraftId = null;
             });
-        });
 
-        document.getElementById('findReturnsBtn').addEventListener('click', function() {
-            window.location.href = "{{ route('cashier.return') }}";
-        });
+            // ------------------------------
+            // Find Returns button (safe-guarded)
+            // ------------------------------
+            if (findReturnsBtn) {
+                findReturnsBtn.addEventListener('click', function(e) {
+                    // href already navigates to cashier.return, nothing extra needed
+                });
+            }
 
-<<<<<<< HEAD
-
-=======
-        {{-- Side bar animation --}}
-        $(function() {
-            $("body").toggleClass("sidebar-collapse");
+            // Sidebar animation (jQuery) - only if jQuery is loaded
+            if (typeof $ === 'function') {
+                $(function() {
+                    $("body").toggleClass("sidebar-collapse");
+                });
+            }
         });
->>>>>>> e7b47817d8b2a48add4181cd249051ebbb451c0d
     </script>
 @endpush
-
-
-
